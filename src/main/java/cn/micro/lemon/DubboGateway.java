@@ -34,7 +34,6 @@ public class DubboGateway {
         Object[] invokeParamValues = paramValues.toArray(new Object[0]);
 
         GenericService genericService = ReferenceConfigCache.getCache().get(reference);
-        System.out.println(reference.getMethods());
         return genericService.$invoke(methodName, invokeParamTypes, invokeParamValues);
     }
 
