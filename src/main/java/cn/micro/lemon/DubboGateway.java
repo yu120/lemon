@@ -22,17 +22,18 @@ public class DubboGateway {
         paramValues.add("张三");
 
         DubboGateway dubboGateway = new DubboGateway();
-        dubboGateway.initialize();
+        dubboGateway.initialize("micro-dubbo-gateway", "zookeeper://127.0.0.1:2181");
         Object result = dubboGateway.invoke(interfaceClass, methodName, paramTypes, paramValues);
         System.out.println(result);
     }
 
-    public void initialize() {
+    public void initialize(String applicationName, String registryAddress) {
         ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setName("micro-dubbo-gateway");
-        RegistryConfig registryConfig = new RegistryConfig();
-        registryConfig.setAddress("zookeeper://127.0.0.1:2181");
+        applicationConfig.setName(applicationName);
         this.application = applicationConfig;
+
+        RegistryConfig registryConfig = new RegistryConfig();
+        registryConfig.setAddress(registryAddress);
         this.registry = registryConfig;
     }
 
@@ -47,6 +48,7 @@ public class DubboGateway {
         Object[] invokeParamValues = paramValues.toArray(new Object[0]);
 
         GenericService genericService = ReferenceConfigCache.getCache().get(reference);
+        System.out.println(reference.getMethods());
         return genericService.$invoke(methodName, invokeParamTypes, invokeParamValues);
     }
 
