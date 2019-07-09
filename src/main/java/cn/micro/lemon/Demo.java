@@ -9,11 +9,14 @@ public class Demo {
 
         DubboInvokeProxy dubboInvokeProxy = new DubboInvokeProxy();
         dubboInvokeProxy.initialize("micro-dubbo-gateway", "zookeeper://127.0.0.1:2181");
+
+        // 测试案例1
         Object result1 = dubboInvokeProxy.invoke(interfaceClass, "sayHello",
                 Arrays.asList("java.lang.String"),
                 Arrays.asList("张三"));
         System.out.println("sayHello: " + result1);
 
+        // 测试案例2
         Map<String, Object> map2 = new HashMap<>();
         map2.put("name", "张三");
         map2.put("age", 22);
@@ -22,6 +25,7 @@ public class Demo {
                 Arrays.asList(map2));
         System.out.println("test: " + result2);
 
+        // 测试案例3
         Map<String, Object> map3 = new HashMap<>();
         map3.put("name", "李四");
         map3.put("age", 33);
