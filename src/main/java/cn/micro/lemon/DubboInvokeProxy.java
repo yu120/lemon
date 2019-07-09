@@ -8,7 +8,7 @@ import org.apache.dubbo.rpc.service.GenericService;
 
 import java.util.*;
 
-public class DubboGateway {
+public class DubboInvokeProxy {
 
     private ApplicationConfig application;
     private RegistryConfig registry;

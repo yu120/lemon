@@ -13,9 +13,9 @@ public class Demo {
         List<Object> paramValues = new ArrayList<>();
         paramValues.add("张三");
 
-        DubboGateway dubboGateway = new DubboGateway();
-        dubboGateway.initialize("micro-dubbo-gateway", "zookeeper://127.0.0.1:2181");
-        Object result = dubboGateway.invoke(interfaceClass, methodName, paramTypes, paramValues);
+        DubboInvokeProxy dubboInvokeProxy = new DubboInvokeProxy();
+        dubboInvokeProxy.initialize("micro-dubbo-gateway", "zookeeper://127.0.0.1:2181");
+        Object result = dubboInvokeProxy.invoke(interfaceClass, methodName, paramTypes, paramValues);
         System.out.println(result);
     }
 
