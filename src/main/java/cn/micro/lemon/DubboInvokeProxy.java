@@ -7,6 +7,7 @@ import org.apache.dubbo.config.utils.ReferenceConfigCache;
 import org.apache.dubbo.rpc.service.GenericService;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class DubboInvokeProxy {
 
@@ -23,7 +24,8 @@ public class DubboInvokeProxy {
         this.registry = registryConfig;
     }
 
-    public Object invoke(String interfaceClass, String methodName, List<String> paramTypes, List<Object> paramValues) {
+    public Object invoke(String interfaceClass, String method,
+                         List<String> paramTypes, List<Object> paramValues) {
         ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
         reference.setApplication(application);
         reference.setRegistry(registry);
@@ -34,7 +36,22 @@ public class DubboInvokeProxy {
         Object[] invokeParamValues = paramValues.toArray(new Object[0]);
 
         GenericService genericService = ReferenceConfigCache.getCache().get(reference);
-        return genericService.$invoke(methodName, invokeParamTypes, invokeParamValues);
+        return genericService.$invoke(method, invokeParamTypes, invokeParamValues);
+    }
+
+    public CompletableFuture<Object> invokeAsync(String interfaceClass, String method,
+                                                 List<String> paramTypes, List<Object> paramValues) {
+        ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
+        reference.setApplication(application);
+        reference.setRegistry(registry);
+        reference.setInterface(interfaceClass);
+        reference.setGeneric(true);
+
+        String[] invokeParamTypes = paramTypes.toArray(new String[0]);
+        Object[] invokeParamValues = paramValues.toArray(new Object[0]);
+
+        GenericService genericService = ReferenceConfigCache.getCache().get(reference);
+        return genericService.$invokeAsync(method, invokeParamTypes, invokeParamValues);
     }
 
 }
