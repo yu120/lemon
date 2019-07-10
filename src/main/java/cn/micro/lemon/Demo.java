@@ -1,7 +1,7 @@
 package cn.micro.lemon;
 
 import cn.micro.lemon.dubbo.DubboConfig;
-import cn.micro.lemon.dubbo.DubboInvokeProxy;
+import cn.micro.lemon.dubbo.DubboLemonInvoke;
 import cn.micro.lemon.dubbo.ServiceDefinition;
 
 import java.util.*;
@@ -19,8 +19,8 @@ public class Demo {
         microConfig.setApplication("micro-dubbo-gateway");
         microConfig.setDubbo(dubboConfig);
 
-        InvokeProxy invokeProxy = new DubboInvokeProxy();
-        invokeProxy.initialize(microConfig);
+        LemonInvoke lemonInvoke = new DubboLemonInvoke();
+        lemonInvoke.initialize(microConfig);
 
         // 测试案例1
         ServiceDefinition serviceDefinition1 = new ServiceDefinition();
@@ -28,7 +28,7 @@ public class Demo {
         serviceDefinition1.setService(serviceId);
         serviceDefinition1.setMethod("sayHello");
         serviceDefinition1.setParamValues(new Object[]{"张三"});
-        Object result1 = invokeProxy.invoke(serviceDefinition1);
+        Object result1 = lemonInvoke.invoke(serviceDefinition1);
         System.out.println("sayHello: " + result1);
 
         // 测试案例2
@@ -40,7 +40,7 @@ public class Demo {
         serviceDefinition2.setService(serviceId);
         serviceDefinition2.setMethod("test");
         serviceDefinition2.setParamValues(new Object[]{map2});
-        Object result2 = invokeProxy.invoke(serviceDefinition2);
+        Object result2 = lemonInvoke.invoke(serviceDefinition2);
         System.out.println("test: " + result2);
 
         // 测试案例3
@@ -55,7 +55,7 @@ public class Demo {
         serviceDefinition3.setService(serviceId);
         serviceDefinition3.setMethod("demo");
         serviceDefinition3.setParamValues(new Object[]{list3});
-        Object result3 = invokeProxy.invoke(serviceDefinition3);
+        Object result3 = lemonInvoke.invoke(serviceDefinition3);
         System.out.println("demo: " + result3);
     }
 

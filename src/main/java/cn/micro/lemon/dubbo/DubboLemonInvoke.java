@@ -1,6 +1,6 @@
 package cn.micro.lemon.dubbo;
 
-import cn.micro.lemon.InvokeProxy;
+import cn.micro.lemon.LemonInvoke;
 import cn.micro.lemon.MicroConfig;
 import cn.micro.lemon.dubbo.metadata.MetadataCollectorFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import org.apache.dubbo.rpc.service.GenericService;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
-public class DubboInvokeProxy implements InvokeProxy {
+public class DubboLemonInvoke implements LemonInvoke {
 
     private ApplicationConfig application;
     private RegistryConfig registry;

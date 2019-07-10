@@ -4,7 +4,7 @@ import cn.micro.lemon.dubbo.ServiceDefinition;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface InvokeProxy {
+public interface LemonInvoke {
 
     void initialize(MicroConfig microConfig);
 
