@@ -20,6 +20,7 @@ public interface IFilter {
     /**
      * The filter
      *
+     * @param chain   {@link LemonChain}
      * @param context {@link LemonContext}
      * @throws Throwable throw exception
      */
