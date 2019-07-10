@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class ServiceDefinition implements Serializable {
 
     private String application;
-    private String serviceId;
+    private String service;
     private String group;
     private String version;
     private String methodName;

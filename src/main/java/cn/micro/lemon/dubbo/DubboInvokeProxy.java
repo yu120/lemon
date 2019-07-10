@@ -34,7 +34,7 @@ public class DubboInvokeProxy {
         ReferenceConfig<GenericService> referenceConfig = new ReferenceConfig<>();
         referenceConfig.setApplication(application);
         referenceConfig.setRegistry(registry);
-        referenceConfig.setInterface(serviceDefinition.getServiceId());
+        referenceConfig.setInterface(serviceDefinition.getService());
         referenceConfig.setGeneric(true);
 
         if (serviceDefinition.getParamTypes() == null) {

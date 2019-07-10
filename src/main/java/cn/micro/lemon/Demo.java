@@ -25,7 +25,7 @@ public class Demo {
         // 测试案例1
         ServiceDefinition serviceDefinition1 = new ServiceDefinition();
         serviceDefinition1.setApplication("micro-dubbo-provider");
-        serviceDefinition1.setServiceId(serviceId);
+        serviceDefinition1.setService(serviceId);
         serviceDefinition1.setMethodName("sayHello");
         serviceDefinition1.setParamValues(new Object[]{"张三"});
         Object result1 = dubboInvokeProxy.invoke(serviceDefinition1);
@@ -37,7 +37,7 @@ public class Demo {
         map2.put("age", 22);
         ServiceDefinition serviceDefinition2 = new ServiceDefinition();
         serviceDefinition2.setApplication("micro-dubbo-provider");
-        serviceDefinition2.setServiceId(serviceId);
+        serviceDefinition2.setService(serviceId);
         serviceDefinition2.setMethodName("test");
         serviceDefinition2.setParamValues(new Object[]{map2});
         Object result2 = dubboInvokeProxy.invoke(serviceDefinition2);
@@ -52,7 +52,7 @@ public class Demo {
         list3.add(map3);
         ServiceDefinition serviceDefinition3 = new ServiceDefinition();
         serviceDefinition3.setApplication("micro-dubbo-provider");
-        serviceDefinition3.setServiceId(serviceId);
+        serviceDefinition3.setService(serviceId);
         serviceDefinition3.setMethodName("demo");
         serviceDefinition3.setParamValues(new Object[]{list3});
         Object result3 = dubboInvokeProxy.invoke(serviceDefinition3);

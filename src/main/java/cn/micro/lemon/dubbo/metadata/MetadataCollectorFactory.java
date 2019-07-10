@@ -33,7 +33,7 @@ public class MetadataCollectorFactory {
 
     public void wrapperTypesFromMetadata(ServiceDefinition serviceDefinition) {
         MetadataIdentifier identifier = new MetadataIdentifier(
-                serviceDefinition.getServiceId(), serviceDefinition.getVersion(),
+                serviceDefinition.getService(), serviceDefinition.getVersion(),
                 serviceDefinition.getGroup(), CommonConstants.PROVIDER_SIDE, serviceDefinition.getApplication());
         String metadata = metadataCollector.getProviderMetaData(identifier);
         System.out.println(metadata);
