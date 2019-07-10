@@ -10,6 +10,7 @@ import org.apache.dubbo.metadata.definition.model.FullServiceDefinition;
 import org.apache.dubbo.metadata.definition.model.MethodDefinition;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,7 +45,15 @@ public class MetadataCollectorFactory {
         if (methods != null) {
             for (MethodDefinition m : methods) {
                 if (sameMethod(m, serviceDefinition.getMethodName(), serviceDefinition.getParamValues().length)) {
-                    serviceDefinition.setParamTypes(m.getParameterTypes());
+                    List<String> parameterTypes = new ArrayList<>();
+                    for (String parameterType : m.getParameterTypes()) {
+                        if (parameterType.contains("<")) {
+                            parameterTypes.add(parameterType.substring(0, parameterType.indexOf("<")));
+                        } else {
+                            parameterTypes.add(parameterType);
+                        }
+                    }
+                    serviceDefinition.setParamTypes(parameterTypes.toArray(new String[0]));
                 }
             }
         }
