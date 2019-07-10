@@ -24,8 +24,9 @@ public class MetadataCollectorFactory {
     public void initialize(String metadataAddress) {
         if (StringUtils.isNotEmpty(metadataAddress)) {
             URL metadataUrl = URL.valueOf(metadataAddress);
-            this.metadataCollector = ExtensionLoader.getExtensionLoader(
-                    MetadataCollector.class).getExtension(metadataUrl.getProtocol());
+            //this.metadataCollector = ExtensionLoader.getExtensionLoader(MetadataCollector.class).getExtension(metadataUrl.getProtocol());
+            this.metadataCollector = new ZookeeperMetadataCollector();
+            metadataCollector.initialize(metadataUrl);
         }
     }
 
