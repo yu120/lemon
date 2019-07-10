@@ -1,9 +1,6 @@
 package cn.micro.lemon.server;
 
 import cn.micro.lemon.LemonInvoke;
-import cn.micro.lemon.MicroConfig;
-import cn.micro.lemon.dubbo.DubboConfig;
-import cn.micro.lemon.dubbo.DubboLemonInvoke;
 import cn.micro.lemon.dubbo.ServiceDefinition;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -14,8 +11,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import org.apache.dubbo.common.constants.CommonConstants;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,17 +20,8 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
     private LemonInvoke lemonInvoke;
 
-    public LemonServerHandler() {
-        this.lemonInvoke = new DubboLemonInvoke();
-
-        DubboConfig dubboConfig = new DubboConfig();
-        dubboConfig.setRegistryAddress("zookeeper://127.0.0.1:2181");
-        dubboConfig.setMetadataAddress("zookeeper://127.0.0.1:2181");
-
-        MicroConfig microConfig = new MicroConfig();
-        microConfig.setApplication("micro-dubbo-gateway");
-        microConfig.setDubbo(dubboConfig);
-        lemonInvoke.initialize(microConfig);
+    public LemonServerHandler(LemonInvoke lemonInvoke) {
+        this.lemonInvoke = lemonInvoke;
     }
 
     @Override
@@ -112,22 +98,6 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
         serviceDefinition.setParamValues(paramValues.toArray(new Object[0]));
         return serviceDefinition;
-    }
-
-    private Object toObject(byte[] bytes) {
-        Object obj = null;
-
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-            ObjectInputStream ois = new ObjectInputStream(bis);
-            obj = ois.readObject();
-            ois.close();
-            bis.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return obj;
     }
 
 }

@@ -1,0 +1,5 @@
+port: 8080
+application: micro-dubbo-provider
+dubbo:
+  registryAddress: zookeeper://127.0.0.1:2181
+  metadataAddress: zookeeper://127.0.0.1:2181
