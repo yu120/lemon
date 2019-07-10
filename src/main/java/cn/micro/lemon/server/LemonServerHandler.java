@@ -15,8 +15,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
+/**
+ * Lemon Server Handler
+ *
+ * @author lry
+ */
 public class LemonServerHandler extends ChannelInboundHandlerAdapter {
+
+    private final static String APPLICATION_JSON = "application/json;charset=UTF-8";
 
     private LemonInvoke lemonInvoke;
 
@@ -28,15 +36,17 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
             FullHttpRequest httpRequest = (FullHttpRequest) msg;
-            ServiceDefinition serviceDefinition = buildServiceDefinition(httpRequest);
-            Object result = lemonInvoke.invoke(serviceDefinition);
 
-            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
-                    HttpResponseStatus.OK, Unpooled.wrappedBuffer(JSON.toJSONString(result).getBytes(StandardCharsets.UTF_8)));
-            response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain;charset=UTF-8");
-            response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
-            response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-            ctx.writeAndFlush(response);
+            ServiceDefinition serviceDefinition = buildServiceDefinition(httpRequest);
+            CompletableFuture<Object> future = lemonInvoke.invokeAsync(serviceDefinition);
+            future.whenComplete((result, t) -> {
+                ByteBuf byteBuf = Unpooled.wrappedBuffer(JSON.toJSONString(result).getBytes(StandardCharsets.UTF_8));
+                FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
+                response.headers().set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
+                response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
+                response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+                ctx.writeAndFlush(response);
+            });
         }
     }
 
