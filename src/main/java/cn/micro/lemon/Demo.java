@@ -1,5 +1,6 @@
 package cn.micro.lemon;
 
+import cn.micro.lemon.dubbo.DubboConfig;
 import cn.micro.lemon.dubbo.DubboInvokeProxy;
 import cn.micro.lemon.dubbo.ServiceDefinition;
 
@@ -10,11 +11,13 @@ public class Demo {
     public static void main(String[] args) {
         String serviceId = "cn.micro.biz.dubbo.provider.DemoService";
 
+        DubboConfig dubboConfig = new DubboConfig();
+        dubboConfig.setApplicationName("micro-dubbo-gateway");
+        dubboConfig.setRegistryAddress("zookeeper://127.0.0.1:2181");
+        dubboConfig.setMetadataAddress("zookeeper://127.0.0.1:2181");
+
         DubboInvokeProxy dubboInvokeProxy = new DubboInvokeProxy();
-        dubboInvokeProxy.initialize(
-                "micro-dubbo-gateway",
-                "zookeeper://127.0.0.1:2181",
-                "zookeeper://127.0.0.1:2181");
+        dubboInvokeProxy.initialize(dubboConfig);
 
         // 测试案例1
         ServiceDefinition serviceDefinition1 = new ServiceDefinition();

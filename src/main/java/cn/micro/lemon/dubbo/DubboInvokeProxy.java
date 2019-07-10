@@ -16,17 +16,17 @@ public class DubboInvokeProxy {
     private RegistryConfig registry;
     private MetadataCollectorFactory metadataCollectorFactory;
 
-    public void initialize(String applicationName, String registryAddress, String metadataAddress) {
+    public void initialize(DubboConfig dubboConfig) {
         ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setName(applicationName);
+        applicationConfig.setName(dubboConfig.getApplicationName());
         this.application = applicationConfig;
 
         RegistryConfig registryConfig = new RegistryConfig();
-        registryConfig.setAddress(registryAddress);
+        registryConfig.setAddress(dubboConfig.getRegistryAddress());
         this.registry = registryConfig;
 
         this.metadataCollectorFactory = new MetadataCollectorFactory();
-        metadataCollectorFactory.initialize(metadataAddress);
+        metadataCollectorFactory.initialize(dubboConfig.getMetadataAddress());
     }
 
     public Object invoke(ServiceDefinition serviceDefinition) {

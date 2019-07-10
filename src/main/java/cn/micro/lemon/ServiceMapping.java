@@ -14,8 +14,9 @@ import java.io.Serializable;
 @ToString
 public class ServiceMapping implements Serializable {
 
-    private String name;
-    private String serviceId;
+    private String category;
+    private String application;
+    private String service;
     private String group;
     private String version;
 
