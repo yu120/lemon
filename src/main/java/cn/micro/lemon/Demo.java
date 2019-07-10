@@ -12,12 +12,15 @@ public class Demo {
         String serviceId = "cn.micro.biz.dubbo.provider.DemoService";
 
         DubboConfig dubboConfig = new DubboConfig();
-        dubboConfig.setApplicationName("micro-dubbo-gateway");
         dubboConfig.setRegistryAddress("zookeeper://127.0.0.1:2181");
         dubboConfig.setMetadataAddress("zookeeper://127.0.0.1:2181");
 
+        MicroConfig microConfig = new MicroConfig();
+        microConfig.setApplication("micro-dubbo-gateway");
+        microConfig.setDubbo(dubboConfig);
+
         DubboInvokeProxy dubboInvokeProxy = new DubboInvokeProxy();
-        dubboInvokeProxy.initialize(dubboConfig);
+        dubboInvokeProxy.initialize(microConfig);
 
         // 测试案例1
         ServiceDefinition serviceDefinition1 = new ServiceDefinition();

@@ -1,5 +1,6 @@
 package cn.micro.lemon.dubbo;
 
+import cn.micro.lemon.MicroConfig;
 import cn.micro.lemon.dubbo.metadata.MetadataCollectorFactory;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
@@ -16,17 +17,17 @@ public class DubboInvokeProxy {
     private RegistryConfig registry;
     private MetadataCollectorFactory metadataCollectorFactory;
 
-    public void initialize(DubboConfig dubboConfig) {
+    public void initialize(MicroConfig microConfig) {
         ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setName(dubboConfig.getApplicationName());
+        applicationConfig.setName(microConfig.getApplication());
         this.application = applicationConfig;
 
         RegistryConfig registryConfig = new RegistryConfig();
-        registryConfig.setAddress(dubboConfig.getRegistryAddress());
+        registryConfig.setAddress(microConfig.getDubbo().getRegistryAddress());
         this.registry = registryConfig;
 
         this.metadataCollectorFactory = new MetadataCollectorFactory();
-        metadataCollectorFactory.initialize(dubboConfig.getMetadataAddress());
+        metadataCollectorFactory.initialize(microConfig.getDubbo().getMetadataAddress());
     }
 
     public Object invoke(ServiceDefinition serviceDefinition) {

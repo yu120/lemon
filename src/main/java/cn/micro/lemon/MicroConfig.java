@@ -1,5 +1,6 @@
 package cn.micro.lemon;
 
+import cn.micro.lemon.dubbo.DubboConfig;
 import lombok.Data;
 import lombok.ToString;
 
@@ -13,8 +14,10 @@ import java.util.List;
  */
 @Data
 @ToString
-public class MicroServiceConfig implements Serializable {
+public class MicroConfig implements Serializable {
 
+    private String application;
+    private DubboConfig dubbo;
     private List<ServiceMapping> services;
 
 }

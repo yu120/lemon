@@ -14,7 +14,6 @@ import java.io.Serializable;
 @ToString
 public class DubboConfig implements Serializable {
 
-    private String applicationName;
     private String registryAddress;
     private String metadataAddress;
 
