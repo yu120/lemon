@@ -17,7 +17,6 @@ import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 public class ZookeeperMetadataCollector implements MetadataCollector {
 
     private CuratorFramework client;
-    private URL url;
     private String root;
     private final static String METADATA_NODE_NAME = "service.data";
     private final static String DEFAULT_ROOT = "dubbo";
@@ -29,7 +28,6 @@ public class ZookeeperMetadataCollector implements MetadataCollector {
             group = CommonConstants.PATH_SEPARATOR + group;
         }
 
-        this.url = url;
         this.root = group;
         this.client = CuratorFrameworkFactory.newClient(url.getAddress(),
                 new ExponentialBackoffRetry(1000, 3));
@@ -37,9 +35,9 @@ public class ZookeeperMetadataCollector implements MetadataCollector {
     }
 
     @Override
-    public String getProviderMetaData(MetadataIdentifier identifier) {
+    public String getProviderMetaData(MetadataIdentifier metadataIdentifier) {
         try {
-            String path = getNodePath(identifier);
+            String path = getNodePath(metadataIdentifier);
             if (client.checkExists().forPath(path) == null) {
                 return null;
             }

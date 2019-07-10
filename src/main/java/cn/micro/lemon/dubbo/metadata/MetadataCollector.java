@@ -9,6 +9,6 @@ public interface MetadataCollector {
 
     void initialize(URL url);
 
-    String getProviderMetaData(MetadataIdentifier identifier);
+    String getProviderMetaData(MetadataIdentifier metadataIdentifier);
 
 }
