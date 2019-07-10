@@ -13,7 +13,7 @@ public class ServiceDefinition implements Serializable {
     private String service;
     private String group;
     private String version;
-    private String methodName;
+    private String method;
     private String[] paramTypes;
     private Object[] paramValues;
 

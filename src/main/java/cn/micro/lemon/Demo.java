@@ -26,7 +26,7 @@ public class Demo {
         ServiceDefinition serviceDefinition1 = new ServiceDefinition();
         serviceDefinition1.setApplication("micro-dubbo-provider");
         serviceDefinition1.setService(serviceId);
-        serviceDefinition1.setMethodName("sayHello");
+        serviceDefinition1.setMethod("sayHello");
         serviceDefinition1.setParamValues(new Object[]{"张三"});
         Object result1 = invokeProxy.invoke(serviceDefinition1);
         System.out.println("sayHello: " + result1);
@@ -38,7 +38,7 @@ public class Demo {
         ServiceDefinition serviceDefinition2 = new ServiceDefinition();
         serviceDefinition2.setApplication("micro-dubbo-provider");
         serviceDefinition2.setService(serviceId);
-        serviceDefinition2.setMethodName("test");
+        serviceDefinition2.setMethod("test");
         serviceDefinition2.setParamValues(new Object[]{map2});
         Object result2 = invokeProxy.invoke(serviceDefinition2);
         System.out.println("test: " + result2);
@@ -53,7 +53,7 @@ public class Demo {
         ServiceDefinition serviceDefinition3 = new ServiceDefinition();
         serviceDefinition3.setApplication("micro-dubbo-provider");
         serviceDefinition3.setService(serviceId);
-        serviceDefinition3.setMethodName("demo");
+        serviceDefinition3.setMethod("demo");
         serviceDefinition3.setParamValues(new Object[]{list3});
         Object result3 = invokeProxy.invoke(serviceDefinition3);
         System.out.println("demo: " + result3);

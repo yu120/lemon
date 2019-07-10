@@ -39,7 +39,7 @@ public class DubboInvokeProxy implements InvokeProxy {
         try {
             GenericService genericService = buildGenericService(serviceDefinition);
             log.debug("Dubbo generic invoke is starting, service definition is {}, generic service is {}.", serviceDefinition, genericService);
-            Object result = genericService.$invoke(serviceDefinition.getMethodName(),
+            Object result = genericService.$invoke(serviceDefinition.getMethod(),
                     serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
             log.debug("Dubbo generic invoke is end, service definition is {}, return result is {}.", serviceDefinition, result);
             return result;
@@ -69,7 +69,7 @@ public class DubboInvokeProxy implements InvokeProxy {
     @Override
     public CompletableFuture<Object> invokeAsync(ServiceDefinition serviceDefinition) {
         GenericService genericService = buildGenericService(serviceDefinition);
-        return genericService.$invokeAsync(serviceDefinition.getMethodName(),
+        return genericService.$invokeAsync(serviceDefinition.getMethod(),
                 serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
     }
 

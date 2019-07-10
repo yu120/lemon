@@ -45,7 +45,7 @@ public class MetadataCollectorFactory {
         List<MethodDefinition> methods = fullServiceDefinition.getMethods();
         if (methods != null) {
             for (MethodDefinition m : methods) {
-                if (sameMethod(m, serviceDefinition.getMethodName(), serviceDefinition.getParamValues().length)) {
+                if (sameMethod(m, serviceDefinition.getMethod(), serviceDefinition.getParamValues().length)) {
                     List<String> parameterTypes = new ArrayList<>();
                     for (String parameterType : m.getParameterTypes()) {
                         if (parameterType.contains("<")) {
