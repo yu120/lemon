@@ -1,5 +1,6 @@
 package cn.micro.lemon.filter;
 
+import cn.micro.lemon.MicroConfig;
 import org.micro.neural.extension.SPI;
 
 /**
@@ -13,9 +14,9 @@ public interface IFilter {
     /**
      * The initialize
      *
-     * @throws Exception throw exception
+     * @param microConfig {@link MicroConfig}
      */
-    void initialize() throws Exception;
+    void initialize(MicroConfig microConfig);
 
     /**
      * The filter
@@ -28,9 +29,7 @@ public interface IFilter {
 
     /**
      * The destroy
-     *
-     * @throws Exception throw exception
      */
-    void destroy() throws Exception;
+    void destroy();
 
 }

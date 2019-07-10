@@ -1,33 +1,41 @@
 package cn.micro.lemon.filter;
 
-import lombok.extern.slf4j.Slf4j;
+import cn.micro.lemon.MicroConfig;
+import lombok.Getter;
 import org.micro.neural.extension.Extension;
 import org.micro.neural.extension.ExtensionLoader;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
-@Slf4j
-public class FilterFactory {
+@Getter
+public enum FilterFactory {
 
-    private final ConcurrentMap<String, IFilter> filters = new ConcurrentSkipListMap<>();
+    // ====
 
-    public FilterFactory() {
-        try {
-            List<IFilter> filterList = ExtensionLoader.getLoader(IFilter.class).getExtensions();
-            if (filterList.size() > 0) {
-                for (IFilter filter : filterList) {
-                    log.debug("The add filter: {}", filter.getClass().getName());
+    INSTANCE;
 
-                    Extension extension = filter.getClass().getAnnotation(Extension.class);
-                    if (extension != null) {
-                        filters.put(filter.getClass().getName(), filter);
-                    }
+    private final List<IFilter> filters = new ArrayList<>();
+
+    public void initialize(MicroConfig microConfig) {
+        List<IFilter> filterList = ExtensionLoader.getLoader(IFilter.class).getExtensions();
+        if (filterList.size() > 0) {
+            for (IFilter filter : filterList) {
+                Extension extension = filter.getClass().getAnnotation(Extension.class);
+                if (extension != null) {
+                    filters.add(filter);
                 }
             }
-        } catch (Exception e) {
-            log.error("The start filter chain is exception", e);
+        }
+
+        for (IFilter filter : filters) {
+            filter.initialize(microConfig);
+        }
+    }
+
+    public void destroy() {
+        for (IFilter filter : filters) {
+            filter.destroy();
         }
     }
 

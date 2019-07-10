@@ -1,9 +1,8 @@
 package cn.micro.lemon.server;
 
 import cn.micro.lemon.Lemon;
-import cn.micro.lemon.LemonInvoke;
 import cn.micro.lemon.MicroConfig;
-import cn.micro.lemon.dubbo.DubboLemonInvoke;
+import cn.micro.lemon.filter.FilterFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -31,9 +30,7 @@ public class LemonServer {
 
     public LemonServer() {
         MicroConfig microConfig = load();
-
-        LemonInvoke lemonInvoke = new DubboLemonInvoke();
-        lemonInvoke.initialize(microConfig);
+        FilterFactory.INSTANCE.initialize(microConfig);
 
         try {
             bossGroup = new NioEventLoopGroup();
@@ -51,7 +48,7 @@ public class LemonServer {
                             ch.pipeline().addLast(new HttpResponseEncoder());
                             // Convert multiple requests from HTTP to FullHttpRequest/FullHttpResponse
                             ch.pipeline().addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-                            ch.pipeline().addLast(new LemonServerHandler(lemonInvoke));
+                            ch.pipeline().addLast(new LemonServerHandler());
                         }
                     });
             ChannelFuture channelFuture = serverBootstrap.bind(microConfig.getPort()).sync();
@@ -84,6 +81,8 @@ public class LemonServer {
             if (workerGroup != null) {
                 workerGroup.shutdownGracefully();
             }
+            
+            FilterFactory.INSTANCE.destroy();
         } catch (Exception e) {
             log.error("The destroy server is fail", e);
         }
