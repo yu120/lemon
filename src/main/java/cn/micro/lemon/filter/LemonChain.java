@@ -18,7 +18,7 @@ public class LemonChain {
             return;
         }
 
-        IFilter filter = filters.get(index.incrementAndGet());
+        IFilter filter = filters.get(index.getAndIncrement());
         if (filter == null) {
             return;
         }
