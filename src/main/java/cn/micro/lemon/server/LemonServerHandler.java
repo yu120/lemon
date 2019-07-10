@@ -2,10 +2,10 @@ package cn.micro.lemon.server;
 
 import cn.micro.lemon.LemonInvoke;
 import cn.micro.lemon.dubbo.ServiceDefinition;
+import cn.micro.lemon.filter.LemonContext;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Lemon Server Handler
@@ -35,24 +34,57 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
-            FullHttpRequest httpRequest = (FullHttpRequest) msg;
+            FullHttpRequest request = (FullHttpRequest) msg;
 
-            ServiceDefinition serviceDefinition = buildServiceDefinition(httpRequest);
-            CompletableFuture<Object> future = lemonInvoke.invokeAsync(serviceDefinition);
-            future.whenComplete((result, t) -> {
-                ByteBuf byteBuf = Unpooled.wrappedBuffer(JSON.toJSONString(result).getBytes(StandardCharsets.UTF_8));
-                FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
-                response.headers().set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
-                response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-                response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-                ctx.writeAndFlush(response);
-            });
+            LemonContext lemonContext = buildChainContext(ctx, request);
+
+//            CompletableFuture<Object> future = lemonInvoke.invokeAsync(serviceDefinition);
+//            future.whenComplete((result, t) -> {
+//                lemonContext.writeAndFlush(result);
+//            });
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.close();
+    }
+
+    private LemonContext buildChainContext(ChannelHandlerContext ctx, FullHttpRequest request) {
+        QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
+        HttpHeaders httpHeaders = request.headers();
+
+        LemonContext.ChainContextBuilder builder = LemonContext.builder();
+        builder.uri(request.uri());
+        builder.path(decoder.path());
+        builder.method(request.method().name());
+        builder.keepAlive(HttpUtil.isKeepAlive(request));
+
+        int contentLength;
+        byte[] contentByte;
+        ByteBuf byteBuf = null;
+        try {
+            byteBuf = request.content();
+            contentLength = byteBuf.readableBytes();
+            contentByte = new byte[contentLength];
+            byteBuf.readBytes(contentByte);
+        } finally {
+            if (byteBuf != null) {
+                byteBuf.release();
+            }
+        }
+
+        builder.contentLength(contentLength);
+        builder.contentByte(contentByte);
+        builder.content(new String(contentByte, StandardCharsets.UTF_8));
+
+        LemonContext lemonContext = builder.build();
+        lemonContext.setCtx(ctx);
+        lemonContext.getHeaderAll().addAll(httpHeaders.entries());
+        lemonContext.getParameterAll().putAll(decoder.parameters());
+        lemonContext.addHeaders(httpHeaders.entries());
+        lemonContext.addParameters(decoder.parameters());
+        return lemonContext;
     }
 
     private ServiceDefinition buildServiceDefinition(FullHttpRequest httpRequest) {

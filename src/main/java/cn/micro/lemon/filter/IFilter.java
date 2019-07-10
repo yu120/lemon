@@ -1,10 +1,13 @@
 package cn.micro.lemon.filter;
 
+import org.micro.neural.extension.SPI;
+
 /**
  * Filter
  *
  * @author lry
  */
+@SPI
 public interface IFilter {
 
     /**
@@ -17,10 +20,10 @@ public interface IFilter {
     /**
      * The filter
      *
-     * @param chainContext {@link ChainContext}
+     * @param context {@link LemonContext}
      * @throws Throwable throw exception
      */
-    void doFilter(ChainContext chainContext) throws Throwable;
+    void doFilter(LemonChain chain, LemonContext context) throws Throwable;
 
     /**
      * The destroy
