@@ -25,8 +25,8 @@ public class MetadataCollectorFactory {
     public void initialize(String metadataAddress) {
         if (StringUtils.isNotEmpty(metadataAddress)) {
             URL metadataUrl = URL.valueOf(metadataAddress);
-            //this.metadataCollector = ExtensionLoader.getExtensionLoader(MetadataCollector.class).getExtension(metadataUrl.getProtocol());
-            this.metadataCollector = new ZookeeperMetadataCollector();
+            this.metadataCollector = ExtensionLoader.getExtensionLoader(
+                    MetadataCollector.class).getExtension(metadataUrl.getProtocol());
             metadataCollector.initialize(metadataUrl);
         }
     }
@@ -36,6 +36,7 @@ public class MetadataCollectorFactory {
                 serviceDefinition.getServiceId(), serviceDefinition.getVersion(),
                 serviceDefinition.getGroup(), CommonConstants.PROVIDER_SIDE, serviceDefinition.getApplication());
         String metadata = metadataCollector.getProviderMetaData(identifier);
+        System.out.println(metadata);
         if (StringUtils.isBlank(metadata)) {
             return;
         }
