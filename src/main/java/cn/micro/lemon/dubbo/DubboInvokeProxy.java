@@ -1,5 +1,6 @@
-package cn.micro.lemon;
+package cn.micro.lemon.dubbo;
 
+import cn.micro.lemon.dubbo.metadata.MetadataCollectorFactory;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
@@ -13,8 +14,9 @@ public class DubboInvokeProxy {
 
     private ApplicationConfig application;
     private RegistryConfig registry;
+    private MetadataCollectorFactory metadataCollectorFactory;
 
-    public void initialize(String applicationName, String registryAddress) {
+    public void initialize(String applicationName, String registryAddress, String metadataAddress) {
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setName(applicationName);
         this.application = applicationConfig;
@@ -22,21 +24,25 @@ public class DubboInvokeProxy {
         RegistryConfig registryConfig = new RegistryConfig();
         registryConfig.setAddress(registryAddress);
         this.registry = registryConfig;
+
+        this.metadataCollectorFactory = new MetadataCollectorFactory();
+        metadataCollectorFactory.initialize(metadataAddress);
     }
 
-    public Object invoke(String interfaceClass, String method,
-                         List<String> paramTypes, List<Object> paramValues) {
-        ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
-        reference.setApplication(application);
-        reference.setRegistry(registry);
-        reference.setInterface(interfaceClass);
-        reference.setGeneric(true);
+    public Object invoke(ServiceDefinition serviceDefinition) {
+        ReferenceConfig<GenericService> referenceConfig = new ReferenceConfig<>();
+        referenceConfig.setApplication(application);
+        referenceConfig.setRegistry(registry);
+        referenceConfig.setInterface(serviceDefinition.getServiceId());
+        referenceConfig.setGeneric(true);
 
-        String[] invokeParamTypes = paramTypes.toArray(new String[0]);
-        Object[] invokeParamValues = paramValues.toArray(new Object[0]);
+        if (serviceDefinition.getParamTypes() == null) {
+            metadataCollectorFactory.wrapperTypesFromMetadata(serviceDefinition);
+        }
 
-        GenericService genericService = ReferenceConfigCache.getCache().get(reference);
-        return genericService.$invoke(method, invokeParamTypes, invokeParamValues);
+        GenericService genericService = ReferenceConfigCache.getCache().get(referenceConfig);
+        return genericService.$invoke(serviceDefinition.getMethodName(),
+                serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
     }
 
     public CompletableFuture<Object> invokeAsync(String interfaceClass, String method,
