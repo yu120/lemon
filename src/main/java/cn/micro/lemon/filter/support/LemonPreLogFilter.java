@@ -14,7 +14,7 @@ import org.micro.neural.extension.Extension;
  */
 @Slf4j
 @Extension(order = 30)
-public class LemonLogFilter implements IFilter {
+public class LemonPreLogFilter implements IFilter {
 
     @Override
     public void initialize(LemonConfig lemonConfig) {
@@ -23,7 +23,7 @@ public class LemonLogFilter implements IFilter {
 
     @Override
     public void doFilter(LemonChain chain, LemonContext context) throws Throwable {
-        log.debug("The log lemon context: {}", context);
+        log.debug("The pre log lemon context: {}", context);
         chain.doFilter(context);
     }
 

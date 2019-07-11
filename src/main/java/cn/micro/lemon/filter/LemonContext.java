@@ -45,6 +45,8 @@ public class LemonContext {
     private String content;
     private ChannelHandlerContext ctx;
 
+    private Object result;
+    
     /**
      * The add headers
      *
@@ -54,7 +56,7 @@ public class LemonContext {
         if (path.length() <= 1) {
             return;
         }
-        
+
         String tempPath = path;
         if (tempPath.startsWith("/")) {
             tempPath = tempPath.substring(1);

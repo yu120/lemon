@@ -43,6 +43,8 @@ public class LemonInvokeFilter implements IFilter {
                 LemonStatusCode statusCode = lemonInvoke.failure(context, throwable);
                 context.writeAndFlush(statusCode, null);
                 return;
+            } else {
+                context.setResult(result);
             }
 
             try {
