@@ -41,7 +41,7 @@ public class LemonInvokeFilter implements IFilter {
             if (throwable != null) {
                 log.error(throwable.getMessage(), throwable);
                 LemonStatusCode statusCode = lemonInvoke.failure(context, throwable);
-                context.writeAndFlush(statusCode, null);
+                context.writeAndFlush(statusCode);
                 return;
             } else {
                 context.setResult(result);
@@ -52,7 +52,7 @@ public class LemonInvokeFilter implements IFilter {
             } catch (Throwable t) {
                 log.error(t.getMessage(), t);
             } finally {
-                context.writeAndFlush(LemonStatusCode.SUCCESS, result);
+                context.writeAndFlush(LemonStatusCode.SUCCESS);
             }
         });
     }

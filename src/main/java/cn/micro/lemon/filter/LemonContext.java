@@ -108,14 +108,13 @@ public class LemonContext {
      * The write and flush
      *
      * @param statusCode {@link LemonStatusCode}
-     * @param obj        object
      */
-    public void writeAndFlush(LemonStatusCode statusCode, Object obj) {
+    public void writeAndFlush(LemonStatusCode statusCode) {
         FullHttpResponse response;
         if (LemonStatusCode.SUCCESS != statusCode) {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
         } else {
-            ByteBuf byteBuf = Unpooled.wrappedBuffer(JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8));
+            ByteBuf byteBuf = Unpooled.wrappedBuffer(JSON.toJSONString(result).getBytes(StandardCharsets.UTF_8));
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
         }
 

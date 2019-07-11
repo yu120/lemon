@@ -46,7 +46,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
             FullHttpRequest request = (FullHttpRequest) msg;
             String uri = request.uri();
             if (!uri.startsWith("/" + lemonConfig.getApplication() + "/")) {
-                LemonContext.builder().ctx(ctx).build().writeAndFlush(LemonStatusCode.NO_HANDLER_FOUND_EXCEPTION, null);
+                LemonContext.builder().ctx(ctx).build().writeAndFlush(LemonStatusCode.NO_HANDLER_FOUND_EXCEPTION);
                 return;
             }
 

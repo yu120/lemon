@@ -28,7 +28,7 @@ public class LemonExceptionFilter implements IFilter {
             chain.doFilter(context);
         } catch (Throwable t) {
             log.error(t.getMessage(), t);
-            context.writeAndFlush(LemonStatusCode.MICRO_ERROR_EXCEPTION, null);
+            context.writeAndFlush(LemonStatusCode.MICRO_ERROR_EXCEPTION);
         }
     }
 
