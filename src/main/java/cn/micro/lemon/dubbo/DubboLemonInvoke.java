@@ -31,16 +31,11 @@ import java.util.concurrent.CompletableFuture;
 @Extension("dubbo")
 public class DubboLemonInvoke implements LemonInvoke {
 
-    private ApplicationConfig application;
     private RegistryConfig registry;
     private MetadataCollectorFactory metadataCollectorFactory;
 
     @Override
     public void initialize(MicroConfig microConfig) {
-        ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setName(microConfig.getApplication());
-        this.application = applicationConfig;
-
         RegistryConfig registryConfig = new RegistryConfig();
         registryConfig.setAddress(microConfig.getDubbo().getRegistryAddress());
         this.registry = registryConfig;
@@ -90,7 +85,9 @@ public class DubboLemonInvoke implements LemonInvoke {
 
     private GenericService buildGenericService(ServiceDefinition serviceDefinition) {
         ReferenceConfig<GenericService> referenceConfig = new ReferenceConfig<>();
-        referenceConfig.setApplication(application);
+        referenceConfig.setApplication(new ApplicationConfig(serviceDefinition.getApplication()));
+        referenceConfig.setGroup(serviceDefinition.getGroup());
+        referenceConfig.setVersion(serviceDefinition.getVersion());
         referenceConfig.setRegistry(registry);
         referenceConfig.setInterface(serviceDefinition.getService());
         referenceConfig.setGeneric(true);
@@ -123,10 +120,16 @@ public class DubboLemonInvoke implements LemonInvoke {
 
         Map<String, String> parameters = context.getParameters();
         if (parameters.containsKey(CommonConstants.GROUP_KEY)) {
-            serviceDefinition.setGroup(parameters.get(CommonConstants.GROUP_KEY));
+            String group = parameters.get(CommonConstants.GROUP_KEY);
+            if (group != null && group.length() > 0) {
+                serviceDefinition.setGroup(group);
+            }
         }
         if (parameters.containsKey(CommonConstants.VERSION_KEY)) {
-            serviceDefinition.setVersion(parameters.get(CommonConstants.VERSION_KEY));
+            String version = parameters.get(CommonConstants.VERSION_KEY);
+            if (version != null && version.length() > 0) {
+                serviceDefinition.setVersion(version);
+            }
         }
 
         List<Object> paramValues = new ArrayList<>();
