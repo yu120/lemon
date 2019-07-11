@@ -7,6 +7,11 @@ import cn.micro.lemon.filter.LemonContext;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.extension.Extension;
 
+/**
+ * Lemon Log Filter
+ *
+ * @author lry
+ */
 @Slf4j
 @Extension(order = 10)
 public class LemonLogFilter implements IFilter {
