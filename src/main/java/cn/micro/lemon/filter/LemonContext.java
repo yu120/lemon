@@ -12,10 +12,7 @@ import lombok.ToString;
 import org.slf4j.MDC;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Lemon Context
@@ -38,6 +35,7 @@ public class LemonContext {
     private boolean keepAlive;
     private int contentLength;
 
+    private final List<String> paths = new ArrayList<>();
     private final Map<String, String> headers = new HashMap<>();
     private final List<Map.Entry<String, String>> headerAll = new ArrayList<>();
     private final Map<String, String> parameters = new HashMap<>();
@@ -46,6 +44,30 @@ public class LemonContext {
     private byte[] contentByte;
     private String content;
     private ChannelHandlerContext ctx;
+
+    /**
+     * The add headers
+     *
+     * @param path path
+     */
+    public void addPaths(String path) {
+        if (path.length() <= 1) {
+            return;
+        }
+        
+        String tempPath = path;
+        if (tempPath.startsWith("/")) {
+            tempPath = tempPath.substring(1);
+        }
+        if (tempPath.endsWith("/")) {
+            tempPath = tempPath.substring(0, tempPath.length() - 1);
+        }
+
+        String[] pathArray = tempPath.split("/");
+        if (pathArray.length > 0) {
+            paths.addAll(Arrays.asList(pathArray));
+        }
+    }
 
     /**
      * The add parameters

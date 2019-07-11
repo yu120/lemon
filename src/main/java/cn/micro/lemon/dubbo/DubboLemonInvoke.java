@@ -100,23 +100,15 @@ public class DubboLemonInvoke implements LemonInvoke {
     }
 
     private ServiceDefinition buildServiceDefinition(LemonContext context) {
-        String uri = context.getPath();
-        if (uri.startsWith("/")) {
-            uri = uri.substring(1);
-        }
-        if (uri.endsWith("/")) {
-            uri = uri.substring(0, uri.length() - 1);
-        }
-
-        String[] pathArray = uri.split("/");
-        if (pathArray.length != 3) {
+        List<String> paths = context.getPaths();
+        if (paths.size() != 4) {
             throw new IllegalArgumentException("Illegal Request");
         }
 
         ServiceDefinition serviceDefinition = new ServiceDefinition();
-        serviceDefinition.setApplication(pathArray[0]);
-        serviceDefinition.setService(pathArray[1]);
-        serviceDefinition.setMethod(pathArray[2]);
+        serviceDefinition.setApplication(paths.get(1));
+        serviceDefinition.setService(paths.get(2));
+        serviceDefinition.setMethod(paths.get(3));
 
         Map<String, String> parameters = context.getParameters();
         if (parameters.containsKey(CommonConstants.GROUP_KEY)) {

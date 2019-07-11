@@ -1,6 +1,7 @@
 package cn.micro.lemon.server;
 
 import cn.micro.lemon.LemonConfig;
+import cn.micro.lemon.LemonStatusCode;
 import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.filter.LemonContext;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -20,9 +21,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
+    private LemonConfig lemonConfig;
     private StandardThreadExecutor standardThreadExecutor = null;
 
     public LemonServerHandler(LemonConfig lemonConfig) {
+        this.lemonConfig = lemonConfig;
         if (lemonConfig.getBizCoreThread() > 0) {
             ThreadFactoryBuilder bizBuilder = new ThreadFactoryBuilder();
             bizBuilder.setDaemon(true);
@@ -41,6 +44,12 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;
+            String uri = request.uri();
+            if (!uri.startsWith("/" + lemonConfig.getApplication() + "/")) {
+                LemonContext.builder().ctx(ctx).build().writeAndFlush(LemonStatusCode.NO_HANDLER_FOUND_EXCEPTION, null);
+                return;
+            }
+
             LemonContext lemonContext = buildChainContext(ctx, request);
             if (standardThreadExecutor == null) {
                 try {
@@ -95,6 +104,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
         LemonContext lemonContext = builder.build();
         lemonContext.setCtx(ctx);
+        lemonContext.addPaths(decoder.path());
         lemonContext.getHeaderAll().addAll(httpHeaders.entries());
         lemonContext.getParameterAll().putAll(decoder.parameters());
         lemonContext.addHeaders(httpHeaders.entries());
