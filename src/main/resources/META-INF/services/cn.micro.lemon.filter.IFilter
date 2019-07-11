@@ -1,2 +1,2 @@
-cn.micro.lemon.filter.support.LogFilter
+cn.micro.lemon.filter.support.LemonLogFilter
 cn.micro.lemon.filter.support.LemonInvokeFilter
