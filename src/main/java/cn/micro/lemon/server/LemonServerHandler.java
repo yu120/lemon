@@ -1,13 +1,17 @@
 package cn.micro.lemon.server;
 
+import cn.micro.lemon.MicroConfig;
 import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.filter.LemonContext;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
+import org.micro.neural.common.thread.StandardThreadExecutor;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Lemon Server Handler
@@ -16,16 +20,42 @@ import java.nio.charset.StandardCharsets;
  */
 public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
+    private StandardThreadExecutor standardThreadExecutor = null;
+
+    public LemonServerHandler(MicroConfig microConfig) {
+        if (microConfig.getBizCoreThread() > 0) {
+            ThreadFactoryBuilder bizBuilder = new ThreadFactoryBuilder();
+            bizBuilder.setDaemon(true);
+            bizBuilder.setNameFormat("lemon-biz");
+            this.standardThreadExecutor = new StandardThreadExecutor(
+                    microConfig.getBizCoreThread(),
+                    microConfig.getBizMaxThread(),
+                    microConfig.getBizKeepAliveTime(),
+                    TimeUnit.MILLISECONDS,
+                    microConfig.getBizQueueCapacity(),
+                    bizBuilder.build());
+        }
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;
             LemonContext lemonContext = buildChainContext(ctx, request);
-
-            try {
-                LemonChain.processor(lemonContext);
-            } catch (Throwable t) {
-                t.printStackTrace();
+            if (standardThreadExecutor == null) {
+                try {
+                    LemonChain.processor(lemonContext);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            } else {
+                standardThreadExecutor.execute(() -> {
+                    try {
+                        LemonChain.processor(lemonContext);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
             }
         }
     }

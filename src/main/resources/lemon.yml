@@ -1,5 +1,8 @@
 port: 8080
 application: micro-dubbo-provider
+ioThread: 0
+workThread: 0
+bizThread: 0
 wrapperMeta: false
 dubbo:
   registryAddress: zookeeper://127.0.0.1:2181

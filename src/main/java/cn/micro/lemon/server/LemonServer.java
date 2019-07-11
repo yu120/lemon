@@ -3,6 +3,7 @@ package cn.micro.lemon.server;
 import cn.micro.lemon.Lemon;
 import cn.micro.lemon.MicroConfig;
 import cn.micro.lemon.filter.FilterFactory;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -32,9 +33,16 @@ public class LemonServer {
         MicroConfig microConfig = load();
         FilterFactory.INSTANCE.initialize(microConfig);
 
+        ThreadFactoryBuilder ioBuilder = new ThreadFactoryBuilder();
+        ioBuilder.setDaemon(true);
+        ioBuilder.setNameFormat("lemon-biz");
+        ThreadFactoryBuilder workBuilder = new ThreadFactoryBuilder();
+        workBuilder.setDaemon(true);
+        workBuilder.setNameFormat("lemon-work");
+
         try {
-            bossGroup = new NioEventLoopGroup();
-            workerGroup = new NioEventLoopGroup();
+            this.bossGroup = new NioEventLoopGroup(microConfig.getIoThread(), ioBuilder.build());
+            this.workerGroup = new NioEventLoopGroup(microConfig.getWorkThread(), workBuilder.build());
             ServerBootstrap serverBootstrap = new ServerBootstrap()
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
@@ -48,7 +56,7 @@ public class LemonServer {
                             ch.pipeline().addLast(new HttpResponseEncoder());
                             // Convert multiple requests from HTTP to FullHttpRequest/FullHttpResponse
                             ch.pipeline().addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-                            ch.pipeline().addLast(new LemonServerHandler());
+                            ch.pipeline().addLast(new LemonServerHandler(microConfig));
                         }
                     });
             ChannelFuture channelFuture = serverBootstrap.bind(microConfig.getPort()).sync();
@@ -81,7 +89,7 @@ public class LemonServer {
             if (workerGroup != null) {
                 workerGroup.shutdownGracefully();
             }
-            
+
             FilterFactory.INSTANCE.destroy();
         } catch (Exception e) {
             log.error("The destroy server is fail", e);
