@@ -1,2 +1,2 @@
 cn.micro.lemon.filter.LogFilter
-cn.micro.lemon.dubbo.DubboInvokeFilter
+cn.micro.lemon.filter.LemonInvokeFilter
