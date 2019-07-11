@@ -68,9 +68,19 @@ public class LemonContext {
     public void writeAndFlush(Object obj) {
         ByteBuf byteBuf = Unpooled.wrappedBuffer(JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8));
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
-        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-        response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+
+        int contentLength = 0;
+        ByteBuf content = response.content();
+        if (content != null) {
+            contentLength = content.readableBytes();
+        }
+
+        HttpHeaders headers = response.headers();
+        headers.set(HttpHeaderNames.CONTENT_LENGTH, contentLength);
+        headers.set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
+        headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        headers.set(HttpHeaderNames.CONTENT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
+
         ctx.writeAndFlush(response);
     }
 

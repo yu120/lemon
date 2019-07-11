@@ -21,7 +21,12 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;
             LemonContext lemonContext = buildChainContext(ctx, request);
-            new LemonChain().doFilter(lemonContext);
+
+            try {
+                LemonChain.processor(lemonContext);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         }
     }
 
