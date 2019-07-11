@@ -46,7 +46,7 @@ public class LemonContext {
     private ChannelHandlerContext ctx;
 
     private Object result;
-    
+
     /**
      * The add headers
      *
