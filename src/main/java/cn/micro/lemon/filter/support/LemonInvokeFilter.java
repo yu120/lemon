@@ -1,6 +1,7 @@
 package cn.micro.lemon.filter.support;
 
 import cn.micro.lemon.LemonInvoke;
+import cn.micro.lemon.LemonStatusCode;
 import cn.micro.lemon.MicroConfig;
 import cn.micro.lemon.dubbo.DubboLemonInvoke;
 import cn.micro.lemon.filter.IFilter;
@@ -39,6 +40,9 @@ public class LemonInvokeFilter implements IFilter {
         future.whenComplete((result, throwable) -> {
             if (throwable != null) {
                 log.error(throwable.getMessage(), throwable);
+                LemonStatusCode statusCode = lemonInvoke.failure(context, throwable);
+                context.writeAndFlush(statusCode, null);
+                return;
             }
 
             try {
@@ -46,7 +50,7 @@ public class LemonInvokeFilter implements IFilter {
             } catch (Throwable t) {
                 log.error(t.getMessage(), t);
             } finally {
-                context.writeAndFlush(result);
+                context.writeAndFlush(LemonStatusCode.SUCCESS, result);
             }
         });
     }

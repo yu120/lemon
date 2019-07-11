@@ -37,6 +37,15 @@ public interface LemonInvoke {
     CompletableFuture<Object> invokeAsync(LemonContext context);
 
     /**
+     * The build failure status code
+     *
+     * @param context   {@link LemonContext}
+     * @param throwable throw exception
+     * @return {@link LemonStatusCode}
+     */
+    LemonStatusCode failure(LemonContext context, Throwable throwable);
+
+    /**
      * The destroy
      */
     void destroy();

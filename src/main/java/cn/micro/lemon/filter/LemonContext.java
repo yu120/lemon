@@ -1,5 +1,6 @@
 package cn.micro.lemon.filter;
 
+import cn.micro.lemon.LemonStatusCode;
 import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -8,6 +9,7 @@ import io.netty.handler.codec.http.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
+import org.slf4j.MDC;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -25,7 +27,10 @@ import java.util.Map;
 @ToString
 public class LemonContext {
 
+    public final static String TRACE_KEY = "TraceId";
     private final static String APPLICATION_JSON = "application/json;charset=UTF-8";
+    private final static String LEMON_CODE_KEY = "Lemon-Code";
+    private final static String LEMON_CODE_MESSAGE = "Lemon-Message";
 
     private String path;
     private String uri;
@@ -65,9 +70,14 @@ public class LemonContext {
         }
     }
 
-    public void writeAndFlush(Object obj) {
-        ByteBuf byteBuf = Unpooled.wrappedBuffer(JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8));
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
+    public void writeAndFlush(LemonStatusCode statusCode, Object obj) {
+        FullHttpResponse response;
+        if (LemonStatusCode.SUCCESS != statusCode) {
+            response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+        } else {
+            ByteBuf byteBuf = Unpooled.wrappedBuffer(JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8));
+            response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
+        }
 
         int contentLength = 0;
         ByteBuf content = response.content();
@@ -76,10 +86,14 @@ public class LemonContext {
         }
 
         HttpHeaders headers = response.headers();
+        headers.set(LEMON_CODE_KEY, statusCode.getCode());
+        headers.set(LEMON_CODE_MESSAGE, statusCode.getMessage());
         headers.set(HttpHeaderNames.CONTENT_LENGTH, contentLength);
         headers.set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
         headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         headers.set(HttpHeaderNames.CONTENT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
+
+        MDC.remove(TRACE_KEY);
 
         ctx.writeAndFlush(response);
     }

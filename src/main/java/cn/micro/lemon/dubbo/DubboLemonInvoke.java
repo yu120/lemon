@@ -1,6 +1,7 @@
 package cn.micro.lemon.dubbo;
 
 import cn.micro.lemon.LemonInvoke;
+import cn.micro.lemon.LemonStatusCode;
 import cn.micro.lemon.MicroConfig;
 import cn.micro.lemon.dubbo.metadata.MetadataCollectorFactory;
 import cn.micro.lemon.filter.LemonContext;
@@ -21,6 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Dubbo Lemon Invoke
+ *
+ * @author lry
+ */
 @Slf4j
 @Extension("dubbo")
 public class DubboLemonInvoke implements LemonInvoke {
@@ -46,34 +52,9 @@ public class DubboLemonInvoke implements LemonInvoke {
     @Override
     public Object invoke(LemonContext context) {
         ServiceDefinition serviceDefinition = buildServiceDefinition(context);
-
-        try {
-            GenericService genericService = buildGenericService(serviceDefinition);
-            log.debug("Dubbo generic invoke is starting, service definition is {}, generic service is {}.", serviceDefinition, genericService);
-            Object result = genericService.$invoke(serviceDefinition.getMethod(),
-                    serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
-            log.debug("Dubbo generic invoke is end, service definition is {}, return result is {}.", serviceDefinition, result);
-            return result;
-        } catch (Exception e) {
-            log.error("Dubbo generic invoke failed", e);
-            if (e instanceof RpcException) {
-                RpcException e1 = (RpcException) e;
-                if (e1.isTimeout()) {
-                    return ResultCode.TIMEOUT;
-                }
-                if (e1.isBiz()) {
-                    return ResultCode.BIZ_ERROR;
-                }
-                if (e1.isNetwork()) {
-                    return ResultCode.NETWORK_ERROR;
-                }
-                if (e1.isSerialization()) {
-                    return ResultCode.SERIALIZATION;
-                }
-            }
-
-            throw e;
-        }
+        GenericService genericService = buildGenericService(serviceDefinition);
+        return genericService.$invoke(serviceDefinition.getMethod(),
+                serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
     }
 
     @Override
@@ -82,6 +63,24 @@ public class DubboLemonInvoke implements LemonInvoke {
         GenericService genericService = buildGenericService(serviceDefinition);
         return genericService.$invokeAsync(serviceDefinition.getMethod(),
                 serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
+    }
+
+    @Override
+    public LemonStatusCode failure(LemonContext context, Throwable throwable) {
+        if (throwable instanceof RpcException) {
+            RpcException e = (RpcException) throwable;
+            if (e.isTimeout()) {
+                return LemonStatusCode.CALL_ORIGINAL_TIMEOUT;
+            } else if (e.isBiz()) {
+                return LemonStatusCode.CALL_ORIGINAL_BIZ_ERROR;
+            } else if (e.isNetwork()) {
+                return LemonStatusCode.CALL_ORIGINAL_NETWORK_ERROR;
+            } else if (e.isSerialization()) {
+                return LemonStatusCode.CALL_ORIGINAL_SERIALIZATION;
+            }
+        }
+
+        return LemonStatusCode.CALL_ORIGINAL_UNKNOWN;
     }
 
     @Override
