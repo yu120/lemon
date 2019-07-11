@@ -1,14 +1,15 @@
 package cn.micro.lemon.dubbo.metadata;
 
+import cn.micro.lemon.dubbo.MetadataCollector;
 import cn.micro.lemon.dubbo.ServiceDefinition;
 import com.alibaba.fastjson.JSON;
-import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.constants.CommonConstants;
-import org.apache.dubbo.common.extension.ExtensionLoader;
 import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.metadata.definition.model.FullServiceDefinition;
 import org.apache.dubbo.metadata.definition.model.MethodDefinition;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
+import org.micro.neural.common.URL;
+import org.micro.neural.extension.ExtensionLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class MetadataCollectorFactory {
     public void initialize(String metadataAddress) {
         if (StringUtils.isNotEmpty(metadataAddress)) {
             URL metadataUrl = URL.valueOf(metadataAddress);
-            this.metadataCollector = ExtensionLoader.getExtensionLoader(
+            this.metadataCollector = ExtensionLoader.getLoader(
                     MetadataCollector.class).getExtension(metadataUrl.getProtocol());
             metadataCollector.initialize(metadataUrl);
         }
@@ -35,7 +36,7 @@ public class MetadataCollectorFactory {
         MetadataIdentifier identifier = new MetadataIdentifier(
                 serviceDefinition.getService(), serviceDefinition.getVersion(),
                 serviceDefinition.getGroup(), CommonConstants.PROVIDER_SIDE, serviceDefinition.getApplication());
-        String metadata = metadataCollector.getProviderMetaData(identifier);
+        String metadata = metadataCollector.pullMetaData(identifier);
         System.out.println(metadata);
         if (StringUtils.isBlank(metadata)) {
             return;

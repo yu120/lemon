@@ -1,2 +1,0 @@
-zookeeper=cn.micro.lemon.dubbo.metadata.ZookeeperMetadataCollector
-redis=cn.micro.lemon.dubbo.metadata.RedisMetadataCollector

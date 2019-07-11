@@ -1,11 +1,13 @@
 package cn.micro.lemon.dubbo.metadata;
 
+import cn.micro.lemon.dubbo.MetadataCollector;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 import org.apache.dubbo.rpc.RpcException;
+import org.micro.neural.common.URL;
+import org.micro.neural.extension.Extension;
 import redis.clients.jedis.*;
 
 import java.util.HashSet;
@@ -18,6 +20,7 @@ import java.util.Set;
  * @author lry
  */
 @Slf4j
+@Extension("redis")
 public class RedisMetadataCollector implements MetadataCollector {
 
     private JedisPool pool;
@@ -43,7 +46,7 @@ public class RedisMetadataCollector implements MetadataCollector {
     }
 
     @Override
-    public String getProviderMetaData(MetadataIdentifier metadataIdentifier) {
+    public String pullMetaData(MetadataIdentifier metadataIdentifier) {
         if (pool != null) {
             return getMetadataStandalone(metadataIdentifier);
         } else {

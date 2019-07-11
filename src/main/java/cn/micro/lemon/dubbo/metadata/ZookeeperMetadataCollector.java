@@ -1,12 +1,14 @@
 package cn.micro.lemon.dubbo.metadata;
 
+import cn.micro.lemon.dubbo.MetadataCollector;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
+import org.micro.neural.common.URL;
+import org.micro.neural.extension.Extension;
 
 /**
  * Zookeeper Metadata Collector
@@ -14,6 +16,7 @@ import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
  * @author lry
  */
 @Slf4j
+@Extension("zookeeper")
 public class ZookeeperMetadataCollector implements MetadataCollector {
 
     private CuratorFramework client;
@@ -35,7 +38,7 @@ public class ZookeeperMetadataCollector implements MetadataCollector {
     }
 
     @Override
-    public String getProviderMetaData(MetadataIdentifier metadataIdentifier) {
+    public String pullMetaData(MetadataIdentifier metadataIdentifier) {
         try {
             String path = getNodePath(metadataIdentifier);
             if (client.checkExists().forPath(path) == null) {
