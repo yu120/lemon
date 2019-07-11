@@ -6,7 +6,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Micro Status Code
+ * Lemon Status Code
  *
  * @author lry
  */

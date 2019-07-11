@@ -2,7 +2,7 @@ package cn.micro.lemon.filter.support;
 
 import cn.micro.lemon.LemonInvoke;
 import cn.micro.lemon.LemonStatusCode;
-import cn.micro.lemon.MicroConfig;
+import cn.micro.lemon.LemonConfig;
 import cn.micro.lemon.dubbo.DubboLemonInvoke;
 import cn.micro.lemon.filter.IFilter;
 import cn.micro.lemon.filter.LemonChain;
@@ -24,9 +24,9 @@ public class LemonInvokeFilter implements IFilter {
     private LemonInvoke lemonInvoke;
 
     @Override
-    public void initialize(MicroConfig microConfig) {
+    public void initialize(LemonConfig lemonConfig) {
         this.lemonInvoke = new DubboLemonInvoke();
-        lemonInvoke.initialize(microConfig);
+        lemonInvoke.initialize(lemonConfig);
     }
 
     @Override

@@ -5,6 +5,11 @@ import lombok.ToString;
 
 import java.io.Serializable;
 
+/**
+ * Service Definition
+ *
+ * @author lry
+ */
 @Data
 @ToString
 public class ServiceDefinition implements Serializable {

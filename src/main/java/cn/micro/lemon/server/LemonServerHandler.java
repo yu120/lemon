@@ -1,6 +1,6 @@
 package cn.micro.lemon.server;
 
-import cn.micro.lemon.MicroConfig;
+import cn.micro.lemon.LemonConfig;
 import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.filter.LemonContext;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -22,17 +22,17 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
     private StandardThreadExecutor standardThreadExecutor = null;
 
-    public LemonServerHandler(MicroConfig microConfig) {
-        if (microConfig.getBizCoreThread() > 0) {
+    public LemonServerHandler(LemonConfig lemonConfig) {
+        if (lemonConfig.getBizCoreThread() > 0) {
             ThreadFactoryBuilder bizBuilder = new ThreadFactoryBuilder();
             bizBuilder.setDaemon(true);
             bizBuilder.setNameFormat("lemon-biz");
             this.standardThreadExecutor = new StandardThreadExecutor(
-                    microConfig.getBizCoreThread(),
-                    microConfig.getBizMaxThread(),
-                    microConfig.getBizKeepAliveTime(),
+                    lemonConfig.getBizCoreThread(),
+                    lemonConfig.getBizMaxThread(),
+                    lemonConfig.getBizKeepAliveTime(),
                     TimeUnit.MILLISECONDS,
-                    microConfig.getBizQueueCapacity(),
+                    lemonConfig.getBizQueueCapacity(),
                     bizBuilder.build());
         }
     }

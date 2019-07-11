@@ -12,8 +12,19 @@ import org.micro.neural.extension.SPI;
 @SPI("zookeeper")
 public interface MetadataCollector {
 
+    /**
+     * The initialize
+     *
+     * @param url {@link URL}
+     */
     void initialize(URL url);
 
+    /**
+     * The pull metaData
+     *
+     * @param metadataIdentifier {@link MetadataIdentifier}
+     * @return meta data
+     */
     String pullMetaData(MetadataIdentifier metadataIdentifier);
 
 }

@@ -1,6 +1,6 @@
 package cn.micro.lemon.filter.support;
 
-import cn.micro.lemon.MicroConfig;
+import cn.micro.lemon.LemonConfig;
 import cn.micro.lemon.filter.IFilter;
 import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.filter.LemonContext;
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class LemonTraceFilter implements IFilter {
 
     @Override
-    public void initialize(MicroConfig microConfig) {
+    public void initialize(LemonConfig lemonConfig) {
 
     }
 

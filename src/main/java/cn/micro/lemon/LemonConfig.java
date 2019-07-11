@@ -8,13 +8,13 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Micro Service Config
+ * Lemon Config
  *
  * @author lry
  */
 @Data
 @ToString
-public class MicroConfig implements Serializable {
+public class LemonConfig implements Serializable {
 
     private String protocol;
     private int port = 8080;

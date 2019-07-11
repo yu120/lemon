@@ -1,7 +1,6 @@
 package cn.micro.lemon.server;
 
-import cn.micro.lemon.Lemon;
-import cn.micro.lemon.MicroConfig;
+import cn.micro.lemon.LemonConfig;
 import cn.micro.lemon.filter.FilterFactory;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -23,6 +22,11 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.FileInputStream;
 import java.net.URL;
 
+/**
+ * Lemon Server by Netty
+ *
+ * @author lry
+ */
 @Slf4j
 public class LemonServer {
 
@@ -30,8 +34,8 @@ public class LemonServer {
     private EventLoopGroup workerGroup;
 
     public LemonServer() {
-        MicroConfig microConfig = load();
-        FilterFactory.INSTANCE.initialize(microConfig);
+        LemonConfig lemonConfig = loadConfig();
+        FilterFactory.INSTANCE.initialize(lemonConfig);
 
         ThreadFactoryBuilder ioBuilder = new ThreadFactoryBuilder();
         ioBuilder.setDaemon(true);
@@ -41,8 +45,8 @@ public class LemonServer {
         workBuilder.setNameFormat("lemon-work");
 
         try {
-            this.bossGroup = new NioEventLoopGroup(microConfig.getIoThread(), ioBuilder.build());
-            this.workerGroup = new NioEventLoopGroup(microConfig.getWorkThread(), workBuilder.build());
+            this.bossGroup = new NioEventLoopGroup(lemonConfig.getIoThread(), ioBuilder.build());
+            this.workerGroup = new NioEventLoopGroup(lemonConfig.getWorkThread(), workBuilder.build());
             ServerBootstrap serverBootstrap = new ServerBootstrap()
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
@@ -56,10 +60,10 @@ public class LemonServer {
                             ch.pipeline().addLast(new HttpResponseEncoder());
                             // Convert multiple requests from HTTP to FullHttpRequest/FullHttpResponse
                             ch.pipeline().addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-                            ch.pipeline().addLast(new LemonServerHandler(microConfig));
+                            ch.pipeline().addLast(new LemonServerHandler(lemonConfig));
                         }
                     });
-            ChannelFuture channelFuture = serverBootstrap.bind(microConfig.getPort()).sync();
+            ChannelFuture channelFuture = serverBootstrap.bind(lemonConfig.getPort()).sync();
 
             Runtime.getRuntime().addShutdownHook(new Thread(LemonServer.this::destroy));
             channelFuture.channel().closeFuture().sync();
@@ -68,11 +72,15 @@ public class LemonServer {
         }
     }
 
-    private MicroConfig load() {
-        URL url = Lemon.class.getClassLoader().getResource("lemon.yml");
+    /**
+     * The load config
+     * @return
+     */
+    private LemonConfig loadConfig() {
+        URL url = this.getClass().getClassLoader().getResource("lemon.yml");
         if (url != null) {
             try {
-                return new Yaml().loadAs(new FileInputStream(url.getFile()), MicroConfig.class);
+                return new Yaml().loadAs(new FileInputStream(url.getFile()), LemonConfig.class);
             } catch (Exception e) {
                 throw new RuntimeException("The load as yaml is exception", e);
             }
@@ -81,6 +89,9 @@ public class LemonServer {
         throw new RuntimeException("Not found lemon.yml");
     }
 
+    /**
+     * The destroy
+     */
     public void destroy() {
         try {
             if (bossGroup != null) {

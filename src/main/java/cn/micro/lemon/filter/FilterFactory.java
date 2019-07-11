@@ -1,6 +1,6 @@
 package cn.micro.lemon.filter;
 
-import cn.micro.lemon.MicroConfig;
+import cn.micro.lemon.LemonConfig;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.extension.Extension;
@@ -24,7 +24,7 @@ public enum FilterFactory {
 
     private final List<IFilter> filters = new ArrayList<>();
 
-    public void initialize(MicroConfig microConfig) {
+    public void initialize(LemonConfig lemonConfig) {
         List<IFilter> filterList = ExtensionLoader.getLoader(IFilter.class).getExtensions();
         if (filterList.size() > 0) {
             for (IFilter filter : filterList) {
@@ -36,7 +36,7 @@ public enum FilterFactory {
         }
 
         for (IFilter filter : filters) {
-            filter.initialize(microConfig);
+            filter.initialize(lemonConfig);
             log.info("The filter[{}] initialize is success.", filter);
         }
     }

@@ -47,6 +47,11 @@ public class LemonContext {
     private String content;
     private ChannelHandlerContext ctx;
 
+    /**
+     * The add parameters
+     *
+     * @param parameterAll {@link Map}
+     */
     public void addParameters(Map<String, List<String>> parameterAll) {
         if (parameterAll == null || parameterAll.size() == 0) {
             return;
@@ -61,6 +66,11 @@ public class LemonContext {
         }
     }
 
+    /**
+     * The add headers
+     *
+     * @param headersAll {@link List}
+     */
     public void addHeaders(List<Map.Entry<String, String>> headersAll) {
         if (headersAll == null || headersAll.size() == 0) {
             return;
@@ -70,6 +80,12 @@ public class LemonContext {
         }
     }
 
+    /**
+     * The write and flush
+     *
+     * @param statusCode {@link LemonStatusCode}
+     * @param obj        object
+     */
     public void writeAndFlush(LemonStatusCode statusCode, Object obj) {
         FullHttpResponse response;
         if (LemonStatusCode.SUCCESS != statusCode) {

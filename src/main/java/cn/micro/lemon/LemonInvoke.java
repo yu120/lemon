@@ -16,9 +16,9 @@ public interface LemonInvoke {
     /**
      * The initialize
      *
-     * @param microConfig {@link MicroConfig}
+     * @param lemonConfig {@link LemonConfig}
      */
-    void initialize(MicroConfig microConfig);
+    void initialize(LemonConfig lemonConfig);
 
     /**
      * The sync invoke

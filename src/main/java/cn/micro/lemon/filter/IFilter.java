@@ -1,6 +1,6 @@
 package cn.micro.lemon.filter;
 
-import cn.micro.lemon.MicroConfig;
+import cn.micro.lemon.LemonConfig;
 import org.micro.neural.extension.SPI;
 
 /**
@@ -14,9 +14,9 @@ public interface IFilter {
     /**
      * The initialize
      *
-     * @param microConfig {@link MicroConfig}
+     * @param lemonConfig {@link LemonConfig}
      */
-    void initialize(MicroConfig microConfig);
+    void initialize(LemonConfig lemonConfig);
 
     /**
      * The filter

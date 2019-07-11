@@ -23,6 +23,11 @@ public class MetadataCollectorFactory {
 
     private MetadataCollector metadataCollector;
 
+    /**
+     * The initialize
+     *
+     * @param metadataAddress metadata address
+     */
     public void initialize(String metadataAddress) {
         if (StringUtils.isNotEmpty(metadataAddress)) {
             URL metadataUrl = URL.valueOf(metadataAddress);
@@ -32,6 +37,11 @@ public class MetadataCollectorFactory {
         }
     }
 
+    /**
+     * The wrapper types from metadata
+     *
+     * @param serviceDefinition {@link ServiceDefinition}
+     */
     public void wrapperTypesFromMetadata(ServiceDefinition serviceDefinition) {
         MetadataIdentifier identifier = new MetadataIdentifier(
                 serviceDefinition.getService(), serviceDefinition.getVersion(),
@@ -61,7 +71,7 @@ public class MetadataCollectorFactory {
         }
     }
 
-    private static boolean sameMethod(MethodDefinition m, String methodName, int paramLen) {
+    private boolean sameMethod(MethodDefinition m, String methodName, int paramLen) {
         return (m.getName().equals(methodName) && m.getParameterTypes().length == paramLen);
     }
 

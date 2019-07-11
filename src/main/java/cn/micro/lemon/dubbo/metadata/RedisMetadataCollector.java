@@ -23,12 +23,10 @@ import java.util.Set;
 @Extension("redis")
 public class RedisMetadataCollector implements MetadataCollector {
 
-    private JedisPool pool;
     private Set<HostAndPort> clusterNodes;
+    private JedisPool pool;
     private int timeout;
     private URL url;
-
-    private final static String DEFAULT_ROOT = "dubbo";
 
     @Override
     public void initialize(URL url) {
@@ -54,20 +52,20 @@ public class RedisMetadataCollector implements MetadataCollector {
         }
     }
 
+    private String getMetadataStandalone(MetadataIdentifier metadataIdentifier) {
+        try (Jedis jedis = pool.getResource()) {
+            return jedis.get(metadataIdentifier.getUniqueKey(MetadataIdentifier.KeyTypeEnum.UNIQUE_KEY));
+        } catch (Throwable e) {
+            throw new RpcException("Failed to get " + metadataIdentifier + " to redis, cause: " + e.getMessage(), e);
+        }
+    }
+
     private String getMetadataInCluster(MetadataIdentifier metadataIdentifier) {
         try (JedisCluster jedisCluster = new JedisCluster(clusterNodes, timeout,
                 timeout, 2, url.getPassword(), new GenericObjectPoolConfig())) {
             return jedisCluster.get(metadataIdentifier.getIdentifierKey() + MetadataIdentifier.META_DATA_STORE_TAG);
         } catch (Throwable e) {
             throw new RpcException("Failed to get " + metadataIdentifier + " to redis cluster, cause: " + e.getMessage(), e);
-        }
-    }
-
-    private String getMetadataStandalone(MetadataIdentifier metadataIdentifier) {
-        try (Jedis jedis = pool.getResource()) {
-            return jedis.get(metadataIdentifier.getUniqueKey(MetadataIdentifier.KeyTypeEnum.UNIQUE_KEY));
-        } catch (Throwable e) {
-            throw new RpcException("Failed to get " + metadataIdentifier + " to redis, cause: " + e.getMessage(), e);
         }
     }
 

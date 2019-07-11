@@ -14,7 +14,13 @@ import java.io.Serializable;
 @ToString
 public class DubboConfig implements Serializable {
 
+    /**
+     * The registry address
+     */
     private String registryAddress;
+    /**
+     * The metadata address
+     */
     private String metadataAddress;
 
 }

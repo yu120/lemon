@@ -1,5 +1,11 @@
 port: 8080
 application: micro-dubbo-provider
+ioThread: 0
+workThread: 0
+bizCoreThread: 20
+bizMaxThread: 200
+bizQueueCapacity: 800
+bizKeepAliveTime: 60000
 wrapperMeta: false
 dubbo:
   registryAddress: zookeeper://127.0.0.1:2181

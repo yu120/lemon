@@ -2,7 +2,7 @@ package cn.micro.lemon.dubbo;
 
 import cn.micro.lemon.LemonInvoke;
 import cn.micro.lemon.LemonStatusCode;
-import cn.micro.lemon.MicroConfig;
+import cn.micro.lemon.LemonConfig;
 import cn.micro.lemon.dubbo.metadata.MetadataCollectorFactory;
 import cn.micro.lemon.filter.LemonContext;
 import com.alibaba.fastjson.JSON;
@@ -35,13 +35,13 @@ public class DubboLemonInvoke implements LemonInvoke {
     private MetadataCollectorFactory metadataCollectorFactory;
 
     @Override
-    public void initialize(MicroConfig microConfig) {
+    public void initialize(LemonConfig lemonConfig) {
         RegistryConfig registryConfig = new RegistryConfig();
-        registryConfig.setAddress(microConfig.getDubbo().getRegistryAddress());
+        registryConfig.setAddress(lemonConfig.getDubbo().getRegistryAddress());
         this.registry = registryConfig;
 
         this.metadataCollectorFactory = new MetadataCollectorFactory();
-        metadataCollectorFactory.initialize(microConfig.getDubbo().getMetadataAddress());
+        metadataCollectorFactory.initialize(lemonConfig.getDubbo().getMetadataAddress());
     }
 
     @Override
