@@ -19,6 +19,7 @@ public class MicroConfig implements Serializable {
     private String protocol;
     private int port = 8080;
     private String application;
+    private boolean wrapperMeta = true;
     private DubboConfig dubbo;
     private List<ServiceMapping> services;
 

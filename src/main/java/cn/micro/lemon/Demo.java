@@ -28,8 +28,8 @@ public class Demo {
         serviceDefinition1.setService(serviceId);
         serviceDefinition1.setMethod("sayHello");
         serviceDefinition1.setParamValues(new Object[]{"张三"});
-        Object result1 = lemonInvoke.invoke(serviceDefinition1);
-        System.out.println("sayHello: " + result1);
+        //Object result1 = lemonInvoke.invoke(serviceDefinition1);
+        //System.out.println("sayHello: " + result1);
 
         // 测试案例2
         Map<String, Object> map2 = new HashMap<>();
@@ -40,8 +40,8 @@ public class Demo {
         serviceDefinition2.setService(serviceId);
         serviceDefinition2.setMethod("test");
         serviceDefinition2.setParamValues(new Object[]{map2});
-        Object result2 = lemonInvoke.invoke(serviceDefinition2);
-        System.out.println("test: " + result2);
+        //Object result2 = lemonInvoke.invoke(serviceDefinition2);
+        //System.out.println("test: " + result2);
 
         // 测试案例3
         Map<String, Object> map3 = new HashMap<>();
@@ -55,8 +55,8 @@ public class Demo {
         serviceDefinition3.setService(serviceId);
         serviceDefinition3.setMethod("demo");
         serviceDefinition3.setParamValues(new Object[]{list3});
-        Object result3 = lemonInvoke.invoke(serviceDefinition3);
-        System.out.println("demo: " + result3);
+        //Object result3 = lemonInvoke.invoke(serviceDefinition3);
+        //System.out.println("demo: " + result3);
     }
 
 }
