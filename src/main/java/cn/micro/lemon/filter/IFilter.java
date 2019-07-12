@@ -19,13 +19,22 @@ public interface IFilter {
     void initialize(LemonConfig lemonConfig);
 
     /**
-     * The filter
+     * The pre filter
      *
      * @param chain   {@link LemonChain}
      * @param context {@link LemonContext}
      * @throws Throwable throw exception
      */
-    void doFilter(LemonChain chain, LemonContext context) throws Throwable;
+    void preFilter(LemonChain chain, LemonContext context) throws Throwable;
+
+    /**
+     * The post filter
+     *
+     * @param chain   {@link LemonChain}
+     * @param context {@link LemonContext}
+     * @throws Throwable throw exception
+     */
+    void postFilter(LemonChain chain, LemonContext context) throws Throwable;
 
     /**
      * The destroy

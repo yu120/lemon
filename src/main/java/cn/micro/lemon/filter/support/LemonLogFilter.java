@@ -5,23 +5,27 @@ import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.filter.LemonContext;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.extension.Extension;
-import org.slf4j.MDC;
-
-import java.util.UUID;
 
 /**
- * Lemon Trace Filter
+ * Lemon Log Filter
  *
  * @author lry
  */
 @Slf4j
-@Extension(order = 10)
-public class LemonTraceFilter extends AbstractFilter {
+@Extension(order = 30)
+public class LemonLogFilter extends AbstractFilter {
+
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
-        MDC.put(LemonContext.TRACE_KEY, UUID.randomUUID().toString());
+        log.debug("The pre log lemon context: {}", context);
         super.preFilter(chain, context);
+    }
+
+    @Override
+    public void postFilter(LemonChain chain, LemonContext context) throws Throwable {
+        log.debug("The post log lemon context: {}", context);
+        super.postFilter(chain, context);
     }
 
 }
