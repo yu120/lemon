@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.common.thread.StandardThreadExecutor;
 
 import java.nio.charset.StandardCharsets;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author lry
  */
+@Slf4j
 public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
     private LemonConfig lemonConfig;
@@ -60,14 +62,16 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                 try {
                     LemonChain.processor(lemonContext);
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    log.error(t.getMessage(), t);
+                    lemonContext.writeAndFlush(LemonStatusCode.MICRO_ERROR_EXCEPTION);
                 }
             } else {
                 standardThreadExecutor.execute(() -> {
                     try {
                         LemonChain.processor(lemonContext);
                     } catch (Throwable t) {
-                        t.printStackTrace();
+                        log.error(t.getMessage(), t);
+                        lemonContext.writeAndFlush(LemonStatusCode.MICRO_ERROR_EXCEPTION);
                     }
                 });
             }
@@ -76,7 +80,10 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        ctx.close();
+        log.error("The handler exception caught: " + cause.getMessage(), cause);
+        if (ctx != null) {
+            ctx.close();
+        }
     }
 
     private void wrapperChainContext(LemonContext lemonContext, ChannelHandlerContext ctx, FullHttpRequest request) {

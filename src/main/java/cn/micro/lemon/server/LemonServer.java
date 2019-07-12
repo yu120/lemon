@@ -16,6 +16,7 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
 
@@ -56,11 +57,12 @@ public class LemonServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new HttpRequestDecoder());
-                            ch.pipeline().addLast(new HttpResponseEncoder());
+                            ch.pipeline().addLast("http-decoder", new HttpRequestDecoder());
                             // Convert multiple requests from HTTP to FullHttpRequest/FullHttpResponse
-                            ch.pipeline().addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-                            ch.pipeline().addLast(new LemonServerHandler(lemonConfig));
+                            ch.pipeline().addLast("http-aggregator", new HttpObjectAggregator(lemonConfig.getMaxContentLength()));
+                            ch.pipeline().addLast("http-encoder", new HttpResponseEncoder());
+                            ch.pipeline().addLast("http-chunked", new ChunkedWriteHandler());
+                            ch.pipeline().addLast("serverHandler", new LemonServerHandler(lemonConfig));
                         }
                     });
             ChannelFuture channelFuture = serverBootstrap.bind(lemonConfig.getPort()).sync();

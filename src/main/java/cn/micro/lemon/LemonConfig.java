@@ -23,6 +23,10 @@ public class LemonConfig implements Serializable {
     private String application;
     private int ioThread = 0;
     private int workThread = 0;
+    /**
+     * The default value: 64MB
+     */
+    private int maxContentLength = 1024 * 1024 * 64;
 
     private int bizCoreThread = 20;
     private int bizMaxThread = 200;
