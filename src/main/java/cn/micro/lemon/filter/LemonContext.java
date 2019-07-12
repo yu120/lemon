@@ -7,7 +7,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
-import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 import org.slf4j.MDC;
@@ -21,7 +20,6 @@ import java.util.*;
  * @author lry
  */
 @Data
-@Builder
 @ToString
 public class LemonContext {
 
@@ -31,8 +29,8 @@ public class LemonContext {
     private final static String LEMON_CODE_MESSAGE = "Lemon-Message";
     private final static String APPLICATION_JSON = "application/json;charset=UTF-8";
 
-    private String id = UUID.randomUUID().toString();
-    private long startTime = System.currentTimeMillis();
+    private String id;
+    private long startTime;
 
     private String path;
     private String uri;
@@ -53,6 +51,14 @@ public class LemonContext {
     private ChannelHandlerContext ctx;
 
     private Object result;
+
+    public LemonContext(LemonConfig lemonConfig, ChannelHandlerContext ctx) {
+        this.id = UUID.randomUUID().toString();
+        this.startTime = System.currentTimeMillis();
+        this.lemonConfig = lemonConfig;
+        this.ctx = ctx;
+    }
+
 
     /**
      * The add headers
