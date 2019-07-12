@@ -123,6 +123,12 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
         HttpHeaders httpHeaders = request.headers();
 
+        // use header Lemon-Id as lemon id
+        String lemonId = httpHeaders.get(LemonContext.LEMON_ID);
+        if (lemonId != null && lemonId.length() > 0) {
+            lemonContext.setId(lemonId);
+        }
+
         lemonContext.setUri(request.uri());
         lemonContext.setPath(decoder.path());
         lemonContext.setMethod(request.method().name());
