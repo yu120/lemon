@@ -56,7 +56,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
         if (channels.size() >= lemonConfig.getMaxChannel()) {
-            // 超过最大连接数限制，直接close连接
+            // Direct close connection beyond maximum connection limit
             log.warn("The connected channel size out of limit: limit={} current={}", lemonConfig.getMaxChannel(), channels.size());
             channel.close();
         } else {
