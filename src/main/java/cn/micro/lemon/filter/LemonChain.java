@@ -84,4 +84,11 @@ public class LemonChain {
         }
     }
 
+    public static void destroy() {
+        for (IFilter filter : filters) {
+            filter.destroy();
+            log.info("The filter[{}] destroy.", filter);
+        }
+    }
+
 }

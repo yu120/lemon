@@ -75,7 +75,7 @@ public class LemonServer {
     /**
      * The load config
      *
-     * @return
+     * @return {@link LemonConfig}
      */
     private LemonConfig loadConfig() {
         URL url = this.getClass().getClassLoader().getResource("lemon.yml");
@@ -101,6 +101,7 @@ public class LemonServer {
             if (workerGroup != null) {
                 workerGroup.shutdownGracefully();
             }
+            LemonChain.destroy();
         } catch (Exception e) {
             log.error("The destroy server is fail", e);
         }
