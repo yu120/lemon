@@ -1,6 +1,9 @@
 package cn.micro.lemon.filter;
 
+import cn.micro.lemon.LemonConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.micro.neural.extension.Extension;
+import org.micro.neural.extension.ExtensionLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +20,28 @@ public class LemonChain {
 
     public final static String ROUTER = "ROUTER";
 
-    private int filterSize;
-    private List<IFilter> filters = new ArrayList<>();
+    private static int filterSize;
+    private static List<IFilter> filters = new ArrayList<>();
+
     private AtomicBoolean flag = new AtomicBoolean(true);
     private AtomicInteger index = new AtomicInteger(0);
 
-    private LemonChain() {
-        this.filters.addAll(FilterFactory.INSTANCE.getFilters());
-        this.filterSize = filters.size();
+    public static void initialize(LemonConfig lemonConfig) {
+        List<IFilter> filterList = ExtensionLoader.getLoader(IFilter.class).getExtensions();
+        if (filterList.size() > 0) {
+            for (IFilter filter : filterList) {
+                Extension extension = filter.getClass().getAnnotation(Extension.class);
+                if (extension != null) {
+                    filters.add(filter);
+                }
+            }
+        }
+
+        for (IFilter filter : filters) {
+            filter.initialize(lemonConfig);
+            log.info("The filter[{}] initialize is success.", filter);
+        }
+        filterSize = filters.size();
     }
 
     /**
@@ -48,7 +65,6 @@ public class LemonChain {
             int tempIndex = index.getAndIncrement();
             IFilter filter = filters.get(tempIndex);
             if (filter != null) {
-                log.info("The pre filter[{}]", filter);
                 filter.preFilter(this, context);
             }
 
@@ -63,7 +79,6 @@ public class LemonChain {
             int tempIndex = index.decrementAndGet();
             IFilter filter = filters.get(tempIndex);
             if (filter != null) {
-                log.info("The post filter[{}]", filter);
                 filter.postFilter(this, context);
             }
         }

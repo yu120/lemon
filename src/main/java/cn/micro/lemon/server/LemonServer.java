@@ -1,7 +1,7 @@
 package cn.micro.lemon.server;
 
 import cn.micro.lemon.LemonConfig;
-import cn.micro.lemon.filter.FilterFactory;
+import cn.micro.lemon.filter.LemonChain;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -35,7 +35,7 @@ public class LemonServer {
 
     public LemonServer() {
         LemonConfig lemonConfig = loadConfig();
-        FilterFactory.INSTANCE.initialize(lemonConfig);
+        LemonChain.initialize(lemonConfig);
 
         ThreadFactoryBuilder ioBuilder = new ThreadFactoryBuilder();
         ioBuilder.setDaemon(true);
@@ -74,6 +74,7 @@ public class LemonServer {
 
     /**
      * The load config
+     *
      * @return
      */
     private LemonConfig loadConfig() {
@@ -100,8 +101,6 @@ public class LemonServer {
             if (workerGroup != null) {
                 workerGroup.shutdownGracefully();
             }
-
-            FilterFactory.INSTANCE.destroy();
         } catch (Exception e) {
             log.error("The destroy server is fail", e);
         }
