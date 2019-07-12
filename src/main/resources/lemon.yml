@@ -2,7 +2,9 @@ port: 8080
 application: lemon
 ioThread: 0
 workThread: 0
-maxContentLength: 0
+# 64 * 1024 * 1024 = 64 MB
+maxContentLength: 67108864
+maxChannel: 100000
 bizCoreThread: 20
 bizMaxThread: 200
 bizQueueCapacity: 800
