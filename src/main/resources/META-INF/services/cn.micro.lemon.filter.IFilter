@@ -1,4 +1,3 @@
-cn.micro.lemon.filter.support.LemonTraceFilter
 cn.micro.lemon.filter.support.LemonExceptionFilter
 cn.micro.lemon.filter.support.LemonLogFilter
 cn.micro.lemon.filter.support.LemonInvokeFilter

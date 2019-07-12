@@ -62,6 +62,7 @@ public class LemonContext {
         this.startTime = System.currentTimeMillis();
         this.lemonConfig = lemonConfig;
         this.ctx = ctx;
+        MDC.put(LEMON_ID, id);
     }
 
 
