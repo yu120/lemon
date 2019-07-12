@@ -56,7 +56,7 @@
 
     <Loggers>
         <!-- 配置日志的根节点 -->
-        <root level="debug">
+        <root level="INFO">
             <appender-ref ref="Console"/>
         </root>
 

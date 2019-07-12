@@ -130,7 +130,7 @@ public class LemonContext {
         headers.set(HttpHeaderNames.CONTENT_LENGTH, contentLength);
         headers.set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
         headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-        headers.set(HttpHeaderNames.CONTENT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
+        headers.set(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
 
         MDC.remove(TRACE_KEY);
 
