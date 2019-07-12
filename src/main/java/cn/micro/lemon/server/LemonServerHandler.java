@@ -6,6 +6,7 @@ import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.filter.LemonContext;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -15,7 +16,11 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.common.thread.StandardThreadExecutor;
 
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,11 +31,14 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
+
     private LemonConfig lemonConfig;
+    private ConcurrentMap<String, Channel> channels;
     private StandardThreadExecutor standardThreadExecutor = null;
 
     public LemonServerHandler(LemonConfig lemonConfig) {
         this.lemonConfig = lemonConfig;
+        this.channels = new ConcurrentHashMap<>(lemonConfig.getMaxChannel());
         if (lemonConfig.getBizCoreThread() > 0) {
             ThreadFactoryBuilder bizBuilder = new ThreadFactoryBuilder();
             bizBuilder.setDaemon(true);
@@ -42,6 +50,20 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                     TimeUnit.MILLISECONDS,
                     lemonConfig.getBizQueueCapacity(),
                     bizBuilder.build());
+        }
+    }
+
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        Channel channel = ctx.channel();
+        if (channels.size() >= lemonConfig.getMaxChannel()) {
+            // 超过最大连接数限制，直接close连接
+            log.warn("The connected channel size out of limit: limit={} current={}", lemonConfig.getMaxChannel(), channels.size());
+            channel.close();
+        } else {
+            String channelKey = getChannelKey((InetSocketAddress) channel.localAddress(), (InetSocketAddress) channel.remoteAddress());
+            channels.put(channelKey, channel);
+            ctx.fireChannelRegistered();
         }
     }
 
@@ -86,6 +108,18 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        Channel channel = ctx.channel();
+        String channelKey = getChannelKey((InetSocketAddress) channel.localAddress(), (InetSocketAddress) channel.remoteAddress());
+        channels.remove(channelKey);
+        ctx.fireChannelUnregistered();
+    }
+
+    public Map<String, Channel> getChannels() {
+        return channels;
+    }
+
     private void wrapperChainContext(LemonContext lemonContext, ChannelHandlerContext ctx, FullHttpRequest request) {
         QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
         HttpHeaders httpHeaders = request.headers();
@@ -118,6 +152,30 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         lemonContext.getParameterAll().putAll(decoder.parameters());
         lemonContext.addHeaders(httpHeaders.entries());
         lemonContext.addParameters(decoder.parameters());
+    }
+
+    /**
+     * key = remote address + local address
+     *
+     * @param local  {@link InetSocketAddress}
+     * @param remote {@link InetSocketAddress}
+     * @return channel key
+     */
+    private String getChannelKey(InetSocketAddress local, InetSocketAddress remote) {
+        String key = "";
+        if (local == null || local.getAddress() == null) {
+            key += "null-";
+        } else {
+            key += local.getAddress().getHostAddress() + ":" + local.getPort() + "-";
+        }
+
+        if (remote == null || remote.getAddress() == null) {
+            key += "null";
+        } else {
+            key += remote.getAddress().getHostAddress() + ":" + remote.getPort();
+        }
+
+        return key;
     }
 
 }
