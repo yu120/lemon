@@ -6,6 +6,7 @@ import org.micro.neural.extension.Extension;
 import org.micro.neural.extension.ExtensionLoader;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,18 +21,30 @@ public class LemonChain {
 
     public final static String ROUTER = "ROUTER";
 
-    private static int filterSize;
+    private static int routerFilterIndex = -1;
     private static List<IFilter> filters = new ArrayList<>();
 
     private AtomicBoolean flag = new AtomicBoolean(true);
     private AtomicInteger index = new AtomicInteger(0);
 
+    private LemonChain() {
+
+    }
+
+    /**
+     * The initialize filter chain
+     *
+     * @param lemonConfig {@link LemonConfig}
+     */
     public static void initialize(LemonConfig lemonConfig) {
         List<IFilter> filterList = ExtensionLoader.getLoader(IFilter.class).getExtensions();
         if (filterList.size() > 0) {
             for (IFilter filter : filterList) {
                 Extension extension = filter.getClass().getAnnotation(Extension.class);
                 if (extension != null) {
+                    if (routerFilterIndex < 0 && Arrays.asList(extension.category()).contains(ROUTER)) {
+                        routerFilterIndex = filters.size() - 1;
+                    }
                     filters.add(filter);
                 }
             }
@@ -41,7 +54,6 @@ public class LemonChain {
             filter.initialize(lemonConfig);
             log.info("The filter[{}] initialize is success.", filter);
         }
-        filterSize = filters.size();
     }
 
     /**
@@ -68,7 +80,7 @@ public class LemonChain {
                 filter.preFilter(this, context);
             }
 
-            if (tempIndex + 1 >= filterSize) {
+            if (tempIndex >= routerFilterIndex) {
                 flag.set(false);
             }
         } else {
@@ -84,6 +96,9 @@ public class LemonChain {
         }
     }
 
+    /**
+     * The destroy filter chain
+     */
     public static void destroy() {
         for (IFilter filter : filters) {
             filter.destroy();
