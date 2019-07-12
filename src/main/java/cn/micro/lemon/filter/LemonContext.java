@@ -1,5 +1,6 @@
 package cn.micro.lemon.filter;
 
+import cn.micro.lemon.LemonConfig;
 import cn.micro.lemon.LemonStatusCode;
 import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
@@ -24,10 +25,14 @@ import java.util.*;
 @ToString
 public class LemonContext {
 
-    public final static String TRACE_KEY = "TraceId";
-    private final static String APPLICATION_JSON = "application/json;charset=UTF-8";
+    public final static String LEMON_ID = "Lemon-Id";
+    private final static String LEMON_TIME = "Lemon-Time";
     private final static String LEMON_CODE_KEY = "Lemon-Code";
     private final static String LEMON_CODE_MESSAGE = "Lemon-Message";
+    private final static String APPLICATION_JSON = "application/json;charset=UTF-8";
+
+    private String id = UUID.randomUUID().toString();
+    private long startTime = System.currentTimeMillis();
 
     private String path;
     private String uri;
@@ -43,6 +48,8 @@ public class LemonContext {
 
     private byte[] contentByte;
     private String content;
+
+    private LemonConfig lemonConfig;
     private ChannelHandlerContext ctx;
 
     private Object result;
@@ -125,16 +132,24 @@ public class LemonContext {
         }
 
         HttpHeaders headers = response.headers();
+        headers.set(LEMON_ID, id);
+        headers.set(LEMON_TIME, System.currentTimeMillis());
         headers.set(LEMON_CODE_KEY, statusCode.getCode());
         headers.set(LEMON_CODE_MESSAGE, statusCode.getMessage());
+
         headers.set(HttpHeaderNames.CONTENT_LENGTH, contentLength);
         headers.set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
         headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         headers.set(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
 
-        MDC.remove(TRACE_KEY);
+        Map<String, Object> resHeaders = lemonConfig.getResHeaders();
+        if (resHeaders != null && resHeaders.size() > 0) {
+            for (Map.Entry<String, Object> entry : resHeaders.entrySet()) {
+                headers.set(entry.getKey(), entry.getValue());
+            }
+        }
 
-        ctx.writeAndFlush(response);
+        ctx.writeAndFlush(response).addListener(future -> MDC.remove(LEMON_ID));
     }
 
 }

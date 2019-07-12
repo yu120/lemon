@@ -20,7 +20,7 @@ public class LemonTraceFilter extends AbstractFilter {
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
-        MDC.put(LemonContext.TRACE_KEY, UUID.randomUUID().toString());
+        MDC.put(LemonContext.LEMON_ID, UUID.randomUUID().toString());
         super.preFilter(chain, context);
     }
 

@@ -43,14 +43,21 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
+            long startTime = System.currentTimeMillis();
+
             FullHttpRequest request = (FullHttpRequest) msg;
             String uri = request.uri();
             if (!uri.startsWith("/" + lemonConfig.getApplication() + "/")) {
-                LemonContext.builder().ctx(ctx).build().writeAndFlush(LemonStatusCode.NO_HANDLER_FOUND_EXCEPTION);
+                LemonContext.LemonContextBuilder builder = LemonContext.builder();
+                builder.lemonConfig(lemonConfig);
+                builder.ctx(ctx);
+                builder.startTime(startTime);
+                LemonContext lemonContext = builder.build();
+                lemonContext.writeAndFlush(LemonStatusCode.NO_HANDLER_FOUND_EXCEPTION);
                 return;
             }
 
-            LemonContext lemonContext = buildChainContext(ctx, request);
+            LemonContext lemonContext = buildChainContext(startTime, ctx, request);
             if (standardThreadExecutor == null) {
                 try {
                     LemonChain.processor(lemonContext);
@@ -74,11 +81,12 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    private LemonContext buildChainContext(ChannelHandlerContext ctx, FullHttpRequest request) {
+    private LemonContext buildChainContext(long startTime, ChannelHandlerContext ctx, FullHttpRequest request) {
         QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
         HttpHeaders httpHeaders = request.headers();
 
         LemonContext.LemonContextBuilder builder = LemonContext.builder();
+        builder.startTime(startTime);
         builder.uri(request.uri());
         builder.path(decoder.path());
         builder.method(request.method().name());
@@ -103,6 +111,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         builder.content(new String(contentByte, StandardCharsets.UTF_8));
 
         LemonContext lemonContext = builder.build();
+        lemonContext.setLemonConfig(lemonConfig);
         lemonContext.setCtx(ctx);
         lemonContext.addPaths(decoder.path());
         lemonContext.getHeaderAll().addAll(httpHeaders.entries());

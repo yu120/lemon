@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Lemon Config
@@ -26,6 +28,8 @@ public class LemonConfig implements Serializable {
     private int bizMaxThread = 200;
     private int bizQueueCapacity = 800;
     private long bizKeepAliveTime = 60000L;
+
+    private Map<String, Object> resHeaders = new LinkedHashMap<>();
 
     private boolean wrapperMeta = true;
     private DubboConfig dubbo;
