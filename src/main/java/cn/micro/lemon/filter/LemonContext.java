@@ -144,6 +144,7 @@ public class LemonContext {
         headers.set(LEMON_CODE_MESSAGE, statusCode.getMessage());
 
         headers.set(HttpHeaderNames.CONTENT_LENGTH, contentLength);
+
         headers.set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
         headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         headers.set(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);

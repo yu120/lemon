@@ -7,8 +7,9 @@ bizMaxThread: 200
 bizQueueCapacity: 800
 bizKeepAliveTime: 60000
 resHeaders:
-  key1: value1
-  key2: value2
+  Content-Type: application/json;charset=UTF-8
+  Connection: keep-alive
+  Accept-Encoding: gzip,deflate
 wrapperMeta: false
 dubbo:
   registryAddress: zookeeper://127.0.0.1:2181
