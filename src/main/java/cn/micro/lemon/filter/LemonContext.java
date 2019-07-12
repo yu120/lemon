@@ -9,6 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import lombok.Data;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
 import java.nio.charset.StandardCharsets;
@@ -20,6 +21,7 @@ import java.util.*;
  * @author lry
  */
 @Data
+@Slf4j
 @ToString
 public class LemonContext {
 
@@ -31,6 +33,9 @@ public class LemonContext {
 
     private String id;
     private long startTime;
+    private long sendTime;
+    private long receiveTime;
+    private long endTime;
 
     private String path;
     private String uri;
@@ -142,9 +147,7 @@ public class LemonContext {
         headers.set(LEMON_TIME, System.currentTimeMillis());
         headers.set(LEMON_CODE_KEY, statusCode.getCode());
         headers.set(LEMON_CODE_MESSAGE, statusCode.getMessage());
-
         headers.set(HttpHeaderNames.CONTENT_LENGTH, contentLength);
-
         headers.set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
         headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         headers.set(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
@@ -156,7 +159,12 @@ public class LemonContext {
             }
         }
 
-        ctx.writeAndFlush(response).addListener(future -> MDC.remove(LEMON_ID));
+
+        ctx.writeAndFlush(response).addListener(future -> {
+            this.endTime = System.currentTimeMillis();
+            log.debug("The writeAndFlush content: {}", content);
+            MDC.remove(LEMON_ID);
+        });
     }
 
 }

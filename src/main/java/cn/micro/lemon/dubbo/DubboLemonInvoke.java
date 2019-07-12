@@ -13,11 +13,13 @@ import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.config.utils.ReferenceConfigCache;
+import org.apache.dubbo.rpc.RpcContext;
 import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.service.GenericService;
 import org.micro.neural.extension.Extension;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -56,6 +58,13 @@ public class DubboLemonInvoke implements LemonInvoke {
     public CompletableFuture<Object> invokeAsync(LemonContext context) {
         ServiceDefinition serviceDefinition = buildServiceDefinition(context);
         GenericService genericService = buildGenericService(serviceDefinition);
+
+        Map<String, String> attachment = new LinkedHashMap<>();
+        attachment.put(LemonContext.LEMON_ID, context.getId());
+        RpcContext.getContext().setAttachments(attachment);
+
+        context.setSendTime(System.currentTimeMillis());
+
         return genericService.$invokeAsync(serviceDefinition.getMethod(),
                 serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
     }

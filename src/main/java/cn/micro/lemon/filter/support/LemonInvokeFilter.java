@@ -38,6 +38,7 @@ public class LemonInvokeFilter extends AbstractFilter {
         }
 
         future.whenComplete((result, throwable) -> {
+            context.setReceiveTime(System.currentTimeMillis());
             if (throwable != null) {
                 log.error(throwable.getMessage(), throwable);
                 LemonStatusCode statusCode = lemonInvoke.failure(context, throwable);
