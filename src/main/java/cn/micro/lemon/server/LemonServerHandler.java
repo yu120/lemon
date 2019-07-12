@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
-
     private LemonConfig lemonConfig;
     private ConcurrentMap<String, Channel> channels;
     private StandardThreadExecutor standardThreadExecutor = null;
