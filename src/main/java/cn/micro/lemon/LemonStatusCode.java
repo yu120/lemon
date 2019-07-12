@@ -33,7 +33,7 @@ public enum LemonStatusCode {
     CALL_ORIGINAL_SERIALIZATION(604, "Call Original Serialization"),
     CALL_ORIGINAL_UNKNOWN(699, "Call Original Unknown");
 
-    private final Integer code;
+    private final int code;
     private final String message;
 
 }
