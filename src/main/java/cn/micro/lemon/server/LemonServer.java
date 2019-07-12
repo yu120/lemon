@@ -4,10 +4,7 @@ import cn.micro.lemon.LemonConfig;
 import cn.micro.lemon.filter.LemonChain;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -18,10 +15,13 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.micro.neural.common.thread.StandardThreadExecutor;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
 import java.net.URL;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Lemon Server by Netty
@@ -31,12 +31,15 @@ import java.net.URL;
 @Slf4j
 public class LemonServer {
 
+    private Channel channel;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
+    private StandardThreadExecutor standardThreadExecutor;
 
     public LemonServer() {
         LemonConfig lemonConfig = loadConfig();
         LemonChain.initialize(lemonConfig);
+        log.info("The starting open server by config:{}", lemonConfig);
 
         ThreadFactoryBuilder ioBuilder = new ThreadFactoryBuilder();
         ioBuilder.setDaemon(true);
@@ -44,6 +47,21 @@ public class LemonServer {
         ThreadFactoryBuilder workBuilder = new ThreadFactoryBuilder();
         workBuilder.setDaemon(true);
         workBuilder.setNameFormat("lemon-work");
+
+        if (lemonConfig.getBizCoreThread() > 0) {
+            ThreadFactoryBuilder bizBuilder = new ThreadFactoryBuilder();
+            bizBuilder.setDaemon(true);
+            bizBuilder.setNameFormat("lemon-biz");
+            this.standardThreadExecutor = new StandardThreadExecutor(
+                    lemonConfig.getBizCoreThread(),
+                    lemonConfig.getBizMaxThread(),
+                    lemonConfig.getBizKeepAliveTime(),
+                    TimeUnit.MILLISECONDS,
+                    lemonConfig.getBizQueueCapacity(),
+                    bizBuilder.build(),
+                    new ThreadPoolExecutor.AbortPolicy());
+            standardThreadExecutor.prestartAllCoreThreads();
+        }
 
         try {
             this.bossGroup = new NioEventLoopGroup(lemonConfig.getIoThread(), ioBuilder.build());
@@ -57,18 +75,23 @@ public class LemonServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast("http-decoder", new HttpRequestDecoder());
+                            ChannelPipeline pipeline = ch.pipeline();
+                            pipeline.addLast("http-decoder", new HttpRequestDecoder());
                             // Convert multiple requests from HTTP to FullHttpRequest/FullHttpResponse
-                            ch.pipeline().addLast("http-aggregator", new HttpObjectAggregator(lemonConfig.getMaxContentLength()));
-                            ch.pipeline().addLast("http-encoder", new HttpResponseEncoder());
-                            ch.pipeline().addLast("http-chunked", new ChunkedWriteHandler());
-                            ch.pipeline().addLast("serverHandler", new LemonServerHandler(lemonConfig));
+                            pipeline.addLast("http-aggregator", new HttpObjectAggregator(lemonConfig.getMaxContentLength()));
+                            pipeline.addLast("http-encoder", new HttpResponseEncoder());
+                            pipeline.addLast("http-chunked", new ChunkedWriteHandler());
+                            pipeline.addLast("serverHandler", new LemonServerHandler(lemonConfig, standardThreadExecutor));
                         }
                     });
-            ChannelFuture channelFuture = serverBootstrap.bind(lemonConfig.getPort()).sync();
 
+            ChannelFuture channelFuture = serverBootstrap.bind(lemonConfig.getPort()).sync();
+            channelFuture.addListener((future) -> log.info("The start server is success"));
+            this.channel = channelFuture.channel();
             Runtime.getRuntime().addShutdownHook(new Thread(LemonServer.this::destroy));
-            channelFuture.channel().closeFuture().sync();
+            if (lemonConfig.isServer()) {
+                channel.closeFuture().sync();
+            }
         } catch (Exception e) {
             log.error("The start server is fail", e);
         }
@@ -96,13 +119,22 @@ public class LemonServer {
      * The destroy
      */
     public void destroy() {
+        log.info("The starting close server...");
+
         try {
+            if (channel != null) {
+                channel.close();
+            }
             if (bossGroup != null) {
                 bossGroup.shutdownGracefully();
             }
             if (workerGroup != null) {
                 workerGroup.shutdownGracefully();
             }
+            if (standardThreadExecutor != null) {
+                standardThreadExecutor.shutdown();
+            }
+
             LemonChain.destroy();
         } catch (Exception e) {
             log.error("The destroy server is fail", e);

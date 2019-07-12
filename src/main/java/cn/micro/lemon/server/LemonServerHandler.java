@@ -4,7 +4,6 @@ import cn.micro.lemon.LemonConfig;
 import cn.micro.lemon.LemonStatusCode;
 import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.filter.LemonContext;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Lemon Server Handler
@@ -33,23 +31,16 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
     private LemonConfig lemonConfig;
     private ConcurrentMap<String, Channel> channels;
-    private StandardThreadExecutor standardThreadExecutor = null;
+    private StandardThreadExecutor standardThreadExecutor;
 
-    public LemonServerHandler(LemonConfig lemonConfig) {
+    public LemonServerHandler(LemonConfig lemonConfig, StandardThreadExecutor standardThreadExecutor) {
         this.lemonConfig = lemonConfig;
+        this.standardThreadExecutor = standardThreadExecutor;
         this.channels = new ConcurrentHashMap<>(lemonConfig.getMaxChannel());
-        if (lemonConfig.getBizCoreThread() > 0) {
-            ThreadFactoryBuilder bizBuilder = new ThreadFactoryBuilder();
-            bizBuilder.setDaemon(true);
-            bizBuilder.setNameFormat("lemon-biz");
-            this.standardThreadExecutor = new StandardThreadExecutor(
-                    lemonConfig.getBizCoreThread(),
-                    lemonConfig.getBizMaxThread(),
-                    lemonConfig.getBizKeepAliveTime(),
-                    TimeUnit.MILLISECONDS,
-                    lemonConfig.getBizQueueCapacity(),
-                    bizBuilder.build());
-        }
+    }
+
+    public Map<String, Channel> getChannels() {
+        return channels;
     }
 
     @Override
@@ -113,10 +104,6 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         String channelKey = getChannelKey((InetSocketAddress) channel.localAddress(), (InetSocketAddress) channel.remoteAddress());
         channels.remove(channelKey);
         ctx.fireChannelUnregistered();
-    }
-
-    public Map<String, Channel> getChannels() {
-        return channels;
     }
 
     private void wrapperChainContext(LemonContext lemonContext, ChannelHandlerContext ctx, FullHttpRequest request) {

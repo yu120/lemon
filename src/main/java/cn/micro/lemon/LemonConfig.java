@@ -32,6 +32,10 @@ public class LemonConfig implements Serializable {
      * The max server conn (all clients conn)
      **/
     private int maxChannel = 100000;
+    /**
+     * The server model: true
+     */
+    private boolean server = true;
 
     private int bizCoreThread = 20;
     private int bizMaxThread = 200;
