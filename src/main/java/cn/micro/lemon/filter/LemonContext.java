@@ -65,7 +65,6 @@ public class LemonContext {
         MDC.put(LEMON_ID, id);
     }
 
-
     /**
      * The add headers
      *
