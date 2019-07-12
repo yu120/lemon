@@ -58,7 +58,7 @@ public class LemonContext {
     private Object result;
 
     public LemonContext(LemonConfig lemonConfig, ChannelHandlerContext ctx) {
-        this.id = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID().toString().replace("-", "");
         this.startTime = System.currentTimeMillis();
         this.lemonConfig = lemonConfig;
         this.ctx = ctx;
