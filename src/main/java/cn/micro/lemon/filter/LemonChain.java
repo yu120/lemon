@@ -39,11 +39,12 @@ public class LemonChain {
     public static void initialize(LemonConfig lemonConfig) {
         List<IFilter> filterList = ExtensionLoader.getLoader(IFilter.class).getExtensions();
         if (filterList.size() > 0) {
-            for (IFilter filter : filterList) {
+            for (int i = 0; i < filterList.size(); i++) {
+                IFilter filter = filterList.get(i);
                 Extension extension = filter.getClass().getAnnotation(Extension.class);
                 if (extension != null) {
                     if (routerFilterIndex < 0 && Arrays.asList(extension.category()).contains(ROUTER)) {
-                        routerFilterIndex = filters.size() - 1;
+                        routerFilterIndex = i;
                     }
                     filters.add(filter);
                 }
@@ -75,13 +76,13 @@ public class LemonChain {
     public void doFilter(LemonContext context) throws Throwable {
         if (flag.get()) {
             int tempIndex = index.getAndIncrement();
+            if (tempIndex >= routerFilterIndex) {
+                flag.set(false);
+            }
+
             IFilter filter = filters.get(tempIndex);
             if (filter != null) {
                 filter.preFilter(this, context);
-            }
-
-            if (tempIndex >= routerFilterIndex) {
-                flag.set(false);
             }
         } else {
             if (index.get() <= 0) {

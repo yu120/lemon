@@ -10,15 +10,17 @@ bizMaxThread: 200
 bizQueueCapacity: 800
 bizKeepAliveTime: 60000
 resHeaders:
-  Content-Type: application/json;charset=UTF-8
   Connection: keep-alive
   Accept-Encoding: gzip,deflate
+  Content-Type: application/json;charset=UTF-8
 wrapperMeta: false
 dubbo:
   registryAddress: zookeeper://127.0.0.1:2181
   metadataAddress: zookeeper://127.0.0.1:2181
 services:
   - category: jsoup
-    service: https://www.baidu.com
+    service: /baidu/**
+    url: https://www.baidu.com
   - category: jsoup
-    service: https://www.oschina.net
+    service: /oschina/**
+    url: https://www.oschina.net

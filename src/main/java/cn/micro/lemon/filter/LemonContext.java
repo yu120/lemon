@@ -30,6 +30,7 @@ public class LemonContext {
     private final static String LEMON_TIME = "Lemon-Time";
     private final static String LEMON_CODE_KEY = "Lemon-Code";
     private final static String LEMON_CODE_MESSAGE = "Lemon-Message";
+    private final static String LEMON_PROTOCOL = "Lemon-Protocol";
     private final static String APPLICATION_JSON = "application/json;charset=UTF-8";
 
     private String id;
@@ -38,7 +39,10 @@ public class LemonContext {
     private long receiveTime;
     private long endTime;
 
+    private String protocol = "jsoup";
+
     private String path;
+    private String contextPath;
     private String uri;
     private String method;
     private boolean keepAlive;
@@ -119,6 +123,9 @@ public class LemonContext {
             return;
         }
         for (Map.Entry<String, String> entry : headersAll) {
+            if (LEMON_PROTOCOL.equals(entry.getKey())) {
+                this.protocol = entry.getValue();
+            }
             headers.put(entry.getKey(), entry.getValue());
         }
     }

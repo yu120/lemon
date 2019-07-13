@@ -3,14 +3,17 @@ package cn.micro.lemon.filter.support;
 import cn.micro.lemon.LemonInvoke;
 import cn.micro.lemon.LemonStatusCode;
 import cn.micro.lemon.LemonConfig;
-import cn.micro.lemon.dubbo.DubboLemonInvoke;
 import cn.micro.lemon.filter.AbstractFilter;
 import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.filter.LemonContext;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.extension.Extension;
+import org.micro.neural.extension.ExtensionLoader;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Lemon Invoke Filter
@@ -21,16 +24,28 @@ import java.util.concurrent.CompletableFuture;
 @Extension(order = 100, category = LemonChain.ROUTER)
 public class LemonInvokeFilter extends AbstractFilter {
 
-    private LemonInvoke lemonInvoke;
+    private final ConcurrentMap<String, LemonInvoke> lemonInvokes = new ConcurrentHashMap<>();
 
     @Override
     public void initialize(LemonConfig lemonConfig) {
-        this.lemonInvoke = new DubboLemonInvoke();
-        lemonInvoke.initialize(lemonConfig);
+        List<LemonInvoke> lemonInvokeList = ExtensionLoader.getLoader(LemonInvoke.class).getExtensions();
+        for (LemonInvoke lemonInvoke : lemonInvokeList) {
+            Extension extension = lemonInvoke.getClass().getAnnotation(Extension.class);
+            if (extension != null) {
+                lemonInvokes.put(extension.value(), lemonInvoke);
+                lemonInvoke.initialize(lemonConfig);
+            }
+        }
     }
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
+        LemonInvoke lemonInvoke = lemonInvokes.get(context.getProtocol());
+        if (lemonInvoke == null) {
+            context.writeAndFlush(LemonStatusCode.NOT_FOUND);
+            return;
+        }
+
         CompletableFuture<Object> future = lemonInvoke.invokeAsync(context);
         if (future == null) {
             log.error("The completable future is null by context:{}", context);
@@ -60,8 +75,8 @@ public class LemonInvokeFilter extends AbstractFilter {
 
     @Override
     public void destroy() {
-        if (lemonInvoke != null) {
-            lemonInvoke.destroy();
+        for (ConcurrentMap.Entry<String, LemonInvoke> entry : lemonInvokes.entrySet()) {
+            entry.getValue().destroy();
         }
     }
 

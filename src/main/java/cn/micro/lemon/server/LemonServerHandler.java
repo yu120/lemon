@@ -66,7 +66,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
             FullHttpRequest request = (FullHttpRequest) msg;
             String uri = request.uri();
             if (!uri.startsWith(LemonContext.URL_DELIMITER + lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
-                lemonContext.writeAndFlush(LemonStatusCode.NO_HANDLER_FOUND_EXCEPTION);
+                lemonContext.writeAndFlush(LemonStatusCode.NOT_FOUND);
                 return;
             }
 
@@ -76,7 +76,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                     LemonChain.processor(lemonContext);
                 } catch (Throwable t) {
                     log.error(t.getMessage(), t);
-                    lemonContext.writeAndFlush(LemonStatusCode.MICRO_ERROR_EXCEPTION);
+                    lemonContext.writeAndFlush(LemonStatusCode.INTERNAL_SERVER_ERROR);
                 }
             } else {
                 standardThreadExecutor.execute(() -> {
@@ -84,7 +84,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                         LemonChain.processor(lemonContext);
                     } catch (Throwable t) {
                         log.error(t.getMessage(), t);
-                        lemonContext.writeAndFlush(LemonStatusCode.MICRO_ERROR_EXCEPTION);
+                        lemonContext.writeAndFlush(LemonStatusCode.INTERNAL_SERVER_ERROR);
                     }
                 });
             }
@@ -108,7 +108,8 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void wrapperChainContext(LemonContext lemonContext, FullHttpRequest request) {
-        QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
+        String uri = request.uri();
+        QueryStringDecoder decoder = new QueryStringDecoder(uri);
         HttpHeaders httpHeaders = request.headers();
 
         // use header Lemon-Id as lemon id
@@ -121,6 +122,11 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         lemonContext.setPath(decoder.path());
         lemonContext.setMethod(request.method().name());
         lemonContext.setKeepAlive(HttpUtil.isKeepAlive(request));
+
+        String applicationPath = LemonContext.URL_DELIMITER + lemonConfig.getApplication();
+        if (uri.startsWith(applicationPath)) {
+            lemonContext.setContextPath(request.uri().substring(applicationPath.length()));
+        }
 
         int contentLength;
         byte[] contentByte;

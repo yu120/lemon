@@ -20,12 +20,12 @@ public enum LemonStatusCode {
 
     SUCCESS(200, "Success"),
 
-    MICRO_BAD_REQUEST_EXCEPTION(400, "Bad Request"),
-    MICRO_PERMISSION_EXCEPTION(401, "Unauthorized"),
-    MICRO_TOKEN_NOT_FOUND_EXCEPTION(402, "Not Logged On"),
-    MICRO_TOKEN_EXPIRED_EXCEPTION(403, "Token Has Expired"),
-    NO_HANDLER_FOUND_EXCEPTION(404, "Not Found"),
-    MICRO_ERROR_EXCEPTION(500, "Internal Server Error"),
+    BAD_REQUEST(400, "Bad Request"),
+    UNAUTHORIZED(401, "Unauthorized"),
+    NOT_LOGGED_ON(402, "Not Logged On"),
+    TOKEN_EXPIRED(403, "Token Has Expired"),
+    NOT_FOUND(404, "Not Found"),
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
 
     CALL_ORIGINAL_TIMEOUT(601, "Call Original Timeout"),
     CALL_ORIGINAL_BIZ_ERROR(602, "Call Original BIZ Error"),

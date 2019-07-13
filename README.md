@@ -19,3 +19,6 @@ http://localhost:8080/lemon/micro-dubbo-provider/cn.micro.biz.dubbo.provider.Dem
 ## Motan Lemon
 
 ## HTTP Lemon
+```
+http://[host]:[port]/lemon/[service]/**?group=[group]&version=[version]
+```
