@@ -17,3 +17,8 @@ wrapperMeta: false
 dubbo:
   registryAddress: zookeeper://127.0.0.1:2181
   metadataAddress: zookeeper://127.0.0.1:2181
+services:
+  - category: jsoup
+    service: https://www.baidu.com
+  - category: jsoup
+    service: https://www.oschina.net

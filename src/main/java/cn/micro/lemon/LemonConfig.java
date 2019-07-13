@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,6 @@ public class LemonConfig implements Serializable {
 
     private boolean wrapperMeta = true;
     private DubboConfig dubbo;
-    private List<ServiceMapping> services;
+    private List<ServiceMapping> services = new ArrayList<>();
 
 }
