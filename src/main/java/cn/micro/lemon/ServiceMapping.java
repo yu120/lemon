@@ -21,9 +21,4 @@ public class ServiceMapping implements Serializable {
     private String version;
     private String url;
 
-    public String identity() {
-        StringBuilder sb = new StringBuilder();
-        return sb.toString();
-    }
-
 }

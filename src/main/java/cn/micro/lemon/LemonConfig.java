@@ -5,10 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Lemon Config
@@ -44,6 +41,7 @@ public class LemonConfig implements Serializable {
     private long bizKeepAliveTime = 60000L;
 
     private Map<String, Object> resHeaders = new LinkedHashMap<>();
+    private Set<String> originalHeaders = new LinkedHashSet<>();
 
     private boolean wrapperMeta = true;
     private DubboConfig dubbo;

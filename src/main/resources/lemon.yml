@@ -13,6 +13,7 @@ resHeaders:
   Connection: keep-alive
   Accept-Encoding: gzip,deflate
   Content-Type: application/json;charset=UTF-8
+originalHeaders: [Connection, Content-Type, Set-Cookie]
 wrapperMeta: false
 dubbo:
   registryAddress: zookeeper://127.0.0.1:2181

@@ -141,7 +141,16 @@ public class LemonContext {
         if (LemonStatusCode.SUCCESS != statusCode) {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
         } else {
-            ByteBuf byteBuf = Unpooled.wrappedBuffer(JSON.toJSONString(result).getBytes(StandardCharsets.UTF_8));
+            byte[] resultByte;
+            if (result instanceof String) {
+                resultByte = ((String) result).getBytes(StandardCharsets.UTF_8);
+            } else if (result instanceof byte[]) {
+                resultByte = (byte[]) result;
+            } else {
+                resultByte = JSON.toJSONString(result).getBytes(StandardCharsets.UTF_8);
+            }
+
+            ByteBuf byteBuf = Unpooled.wrappedBuffer(resultByte);
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
         }
 
@@ -173,7 +182,9 @@ public class LemonContext {
         Map<String, Object> resHeaders = getResHeaders();
         if (resHeaders != null && resHeaders.size() > 0) {
             for (Map.Entry<String, Object> entry : resHeaders.entrySet()) {
-                headers.set(entry.getKey(), entry.getValue());
+                if (lemonConfig.getOriginalHeaders().contains(entry.getKey())) {
+                    headers.set(entry.getKey(), entry.getValue());
+                }
             }
         }
 

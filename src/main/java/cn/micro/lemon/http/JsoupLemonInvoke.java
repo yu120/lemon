@@ -6,14 +6,12 @@ import cn.micro.lemon.LemonStatusCode;
 import cn.micro.lemon.ServiceMapping;
 import cn.micro.lemon.filter.LemonContext;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.micro.neural.common.micro.AntPathMatcher;
 import org.micro.neural.extension.Extension;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -51,8 +49,8 @@ public class JsoupLemonInvoke implements LemonInvoke {
         request.method(buildMethod(context.getMethod()));
         try {
             Connection.Response response = connection.execute();
-            context.getResHeaders().put("Content-Type", response.header("Content-Type"));
-            return response.body();
+            context.getResHeaders().putAll(response.headers());
+            return response.bodyAsBytes();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
