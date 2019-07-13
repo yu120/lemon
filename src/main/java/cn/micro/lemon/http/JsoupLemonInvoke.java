@@ -50,7 +50,11 @@ public class JsoupLemonInvoke implements LemonInvoke {
             return null;
         }
 
-        Connection connection = Jsoup.connect(mapping.getUrl());
+        String servicePrefix = mapping.getService();
+        servicePrefix = servicePrefix.substring(0, servicePrefix.lastIndexOf("/"));
+        String originalUrl = mapping.getUrl() + context.getContextPath().substring(servicePrefix.length());
+
+        Connection connection = Jsoup.connect(originalUrl);
         Connection.Request request = connection.request();
         request.method(ConnectionMethod.valueOf(context.getMethod()).getMethod());
         for (Map.Entry<String, String> entry : context.getHeaderAll()) {
