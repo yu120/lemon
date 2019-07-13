@@ -1,4 +1,4 @@
-package cn.micro.lemon;
+package cn.micro.lemon.common;
 
 import lombok.Data;
 import lombok.ToString;

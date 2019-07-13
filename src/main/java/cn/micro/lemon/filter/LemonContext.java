@@ -1,7 +1,7 @@
 package cn.micro.lemon.filter;
 
-import cn.micro.lemon.LemonConfig;
-import cn.micro.lemon.LemonStatusCode;
+import cn.micro.lemon.common.LemonConfig;
+import cn.micro.lemon.common.LemonStatusCode;
 import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

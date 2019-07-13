@@ -1,4 +1,4 @@
-package cn.micro.lemon;
+package cn.micro.lemon.common;
 
 import cn.micro.lemon.dubbo.DubboConfig;
 import cn.micro.lemon.server.RejectedStrategy;

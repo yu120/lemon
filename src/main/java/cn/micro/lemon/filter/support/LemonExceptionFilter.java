@@ -1,6 +1,6 @@
 package cn.micro.lemon.filter.support;
 
-import cn.micro.lemon.LemonStatusCode;
+import cn.micro.lemon.common.LemonStatusCode;
 import cn.micro.lemon.filter.AbstractFilter;
 import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.filter.LemonContext;

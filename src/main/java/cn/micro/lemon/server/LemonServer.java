@@ -1,6 +1,6 @@
 package cn.micro.lemon.server;
 
-import cn.micro.lemon.LemonConfig;
+import cn.micro.lemon.common.LemonConfig;
 import cn.micro.lemon.filter.LemonChain;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -20,7 +20,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
 import java.net.URL;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**

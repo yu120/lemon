@@ -1,6 +1,6 @@
 package cn.micro.lemon.filter;
 
-import cn.micro.lemon.LemonConfig;
+import cn.micro.lemon.common.LemonConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.extension.Extension;
 import org.micro.neural.extension.ExtensionLoader;
