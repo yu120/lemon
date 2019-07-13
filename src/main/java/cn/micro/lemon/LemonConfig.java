@@ -68,7 +68,6 @@ public class LemonConfig implements Serializable {
     private long originalTimeout = 30000L;
     private Set<String> originalHeaders = new LinkedHashSet<>();
 
-    private boolean wrapperMeta = true;
     private DubboConfig dubbo;
     private List<ServiceMapping> services = new ArrayList<>();
 
