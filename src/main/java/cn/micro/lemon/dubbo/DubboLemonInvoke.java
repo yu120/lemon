@@ -3,6 +3,7 @@ package cn.micro.lemon.dubbo;
 import cn.micro.lemon.LemonInvoke;
 import cn.micro.lemon.LemonStatusCode;
 import cn.micro.lemon.LemonConfig;
+import cn.micro.lemon.ServiceDefinition;
 import cn.micro.lemon.dubbo.metadata.MetadataCollectorFactory;
 import cn.micro.lemon.filter.LemonContext;
 import com.alibaba.fastjson.JSON;
@@ -48,25 +49,27 @@ public class DubboLemonInvoke implements LemonInvoke {
 
     @Override
     public Object invoke(LemonContext context) {
-        ServiceDefinition serviceDefinition = buildServiceDefinition(context);
-        GenericService genericService = buildGenericService(serviceDefinition);
-        return genericService.$invoke(serviceDefinition.getMethod(),
-                serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
-    }
-
-    @Override
-    public CompletableFuture<Object> invokeAsync(LemonContext context) {
-        ServiceDefinition serviceDefinition = buildServiceDefinition(context);
-        GenericService genericService = buildGenericService(serviceDefinition);
-
         Map<String, String> attachment = new LinkedHashMap<>();
         attachment.put(LemonContext.LEMON_ID, context.getId());
         RpcContext.getContext().setAttachments(attachment);
 
         context.setSendTime(System.currentTimeMillis());
 
-        return genericService.$invokeAsync(serviceDefinition.getMethod(),
+        ServiceDefinition serviceDefinition = buildServiceDefinition(context);
+        GenericService genericService = buildGenericService(serviceDefinition);
+        return genericService.$invoke(serviceDefinition.getMethod(),
                 serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public CompletableFuture<Object> invokeAsync(LemonContext context) {
+        Object object = invoke(context);
+        if (object instanceof CompletableFuture) {
+            return (CompletableFuture<Object>) object;
+        }
+
+        return CompletableFuture.completedFuture(object);
     }
 
     @Override

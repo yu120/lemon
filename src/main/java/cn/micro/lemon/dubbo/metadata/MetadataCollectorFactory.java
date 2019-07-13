@@ -1,7 +1,7 @@
 package cn.micro.lemon.dubbo.metadata;
 
 import cn.micro.lemon.dubbo.MetadataCollector;
-import cn.micro.lemon.dubbo.ServiceDefinition;
+import cn.micro.lemon.ServiceDefinition;
 import com.alibaba.fastjson.JSON;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.common.utils.StringUtils;
