@@ -12,7 +12,7 @@ The micro service gateway framework.
 - HTTP to Motan
 - HTTP to SpringCloud
 
-## Config Introduce
+## 1 Config Introduce
 Config Path: `src/main/resources/lemon.yml`
 
 ```
@@ -50,7 +50,7 @@ services:
     url: https://www.oschina.net
 ```
 
-## Dubbo Lemon
+## 2 Dubbo Lemon
 The support apache dubbo 2.7.2 generic service proxy.
 
 **Format:**
@@ -69,13 +69,13 @@ http://localhost:8080/lemon/micro-dubbo-provider/cn.micro.biz.dubbo.provider.Dem
 [{"name":"lemon", "age":23}, {"10001"}]
 ```
 
-## HTTP Lemon
+## 3 HTTP Lemon
 ```
 http://[host]:[port]/lemon/[service]/**?group=[group]&version=[version]
 ```
 
-## Motan Lemon
+## 4 Motan Lemon
 TODO
 
-## Spring Cloud Lemon
+## 5 Spring Cloud Lemon
 TODO
