@@ -8,10 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpUtil;
-import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.common.thread.StandardThreadExecutor;
 
@@ -21,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Lemon Server Handler
@@ -79,14 +77,18 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                     lemonContext.writeAndFlush(LemonStatusCode.INTERNAL_SERVER_ERROR);
                 }
             } else {
-                standardThreadExecutor.execute(() -> {
-                    try {
-                        LemonChain.processor(lemonContext);
-                    } catch (Throwable t) {
-                        log.error(t.getMessage(), t);
-                        lemonContext.writeAndFlush(LemonStatusCode.INTERNAL_SERVER_ERROR);
-                    }
-                });
+                try {
+                    standardThreadExecutor.execute(() -> {
+                        try {
+                            LemonChain.processor(lemonContext);
+                        } catch (Throwable t) {
+                            log.error(t.getMessage(), t);
+                            lemonContext.writeAndFlush(LemonStatusCode.INTERNAL_SERVER_ERROR);
+                        }
+                    });
+                } catch (RejectedExecutionException e) {
+                    lemonContext.writeAndFlush(LemonStatusCode.TOO_MANY_REQUESTS);
+                }
             }
         }
     }

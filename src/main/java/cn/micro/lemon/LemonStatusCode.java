@@ -22,10 +22,17 @@ public enum LemonStatusCode {
 
     BAD_REQUEST(400, "Bad Request"),
     UNAUTHORIZED(401, "Unauthorized"),
-    NOT_LOGGED_ON(402, "Not Logged On"),
-    TOKEN_EXPIRED(403, "Token Has Expired"),
+    PAYMENT_REQUIRED(402, "Token Expired"),
+    FORBIDDEN(403, "Forbidden"),
     NOT_FOUND(404, "Not Found"),
+    REQUEST_ENTITY_TOO_LARGE(413, "Request Entity Too Large"),
+    EXPECTATION_FAILED(417, "Expectation Failed"),
+    TOO_MANY_REQUESTS(429, "Too Many Requests"),
+
     INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
+    BAD_GATEWAY(502, "Bad Gateway"),
+    SERVICE_UNAVAILABLE(503, "Service Unavailable"),
+    GATEWAY_TIMEOUT(504, "Gateway Timeout"),
 
     CALL_ORIGINAL_TIMEOUT(601, "Call Original Timeout"),
     CALL_ORIGINAL_BIZ_ERROR(602, "Call Original BIZ Error"),

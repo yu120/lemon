@@ -1,6 +1,7 @@
 package cn.micro.lemon;
 
 import cn.micro.lemon.dubbo.DubboConfig;
+import cn.micro.lemon.server.RejectedStrategy;
 import lombok.Data;
 import lombok.ToString;
 
@@ -56,9 +57,10 @@ public class LemonConfig implements Serializable {
      * The biz keep alive time(ms)
      */
     private long bizKeepAliveTime = 60000L;
+    private RejectedStrategy rejectedStrategy = RejectedStrategy.ABORT_POLICY;
 
-    /**     * The configure fixed response header list
-
+    /**
+     * The configure fixed response header list
      */
     private Map<String, Object> resHeaders = new LinkedHashMap<>();
 
