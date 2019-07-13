@@ -5,6 +5,8 @@ import cn.micro.lemon.LemonInvoke;
 import cn.micro.lemon.LemonStatusCode;
 import cn.micro.lemon.ServiceMapping;
 import cn.micro.lemon.filter.LemonContext;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -50,7 +52,7 @@ public class JsoupLemonInvoke implements LemonInvoke {
 
         Connection connection = Jsoup.connect(mapping.getUrl());
         Connection.Request request = connection.request();
-        request.method(buildMethod(context.getMethod()));
+        request.method(ConnectionMethod.valueOf(context.getMethod()).getMethod());
         for (Map.Entry<String, String> entry : context.getHeaderAll()) {
             request.header(entry.getKey(), entry.getValue());
         }
@@ -110,25 +112,23 @@ public class JsoupLemonInvoke implements LemonInvoke {
         return null;
     }
 
-    private Connection.Method buildMethod(String method) {
-        switch (method) {
-            case "POST":
-                return Connection.Method.POST;
-            case "PUT":
-                return Connection.Method.PUT;
-            case "DELETE":
-                return Connection.Method.DELETE;
-            case "PATCH":
-                return Connection.Method.PATCH;
-            case "HEAD":
-                return Connection.Method.HEAD;
-            case "OPTIONS":
-                return Connection.Method.OPTIONS;
-            case "TRACE":
-                return Connection.Method.TRACE;
-            default:
-                return Connection.Method.GET;
-        }
+    @Getter
+    @AllArgsConstructor
+    public enum ConnectionMethod {
+
+        // ====
+
+        GET(Connection.Method.GET),
+        POST(Connection.Method.POST),
+        PUT(Connection.Method.PUT),
+        DELETE(Connection.Method.DELETE),
+        PATCH(Connection.Method.PATCH),
+        HEAD(Connection.Method.HEAD),
+        OPTIONS(Connection.Method.OPTIONS),
+        TRACE(Connection.Method.TRACE);
+
+        private Connection.Method method;
+
     }
 
 }
