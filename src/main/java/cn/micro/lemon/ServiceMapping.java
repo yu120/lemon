@@ -20,6 +20,7 @@ public class ServiceMapping implements Serializable {
     private String group;
     private String version;
     private String url;
+    private boolean fullUrl = false;
     /**
      * The current call original server timeout(ms)
      */

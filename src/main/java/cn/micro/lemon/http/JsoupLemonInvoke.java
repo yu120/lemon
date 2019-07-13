@@ -50,9 +50,14 @@ public class JsoupLemonInvoke implements LemonInvoke {
             return null;
         }
 
-        String servicePrefix = mapping.getService();
-        servicePrefix = servicePrefix.substring(0, servicePrefix.lastIndexOf("/"));
-        String originalUrl = mapping.getUrl() + context.getContextPath().substring(servicePrefix.length());
+        String originalUrl = mapping.getUrl();
+        if (mapping.isFullUrl()) {
+            originalUrl += context.getContextPath();
+        } else {
+            String servicePrefix = mapping.getService();
+            servicePrefix = servicePrefix.substring(0, servicePrefix.lastIndexOf("/"));
+            originalUrl += context.getContextPath().substring(servicePrefix.length());
+        }
 
         Connection connection = Jsoup.connect(originalUrl);
         Connection.Request request = connection.request();
