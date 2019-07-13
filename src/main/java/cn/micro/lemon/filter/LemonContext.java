@@ -25,6 +25,7 @@ import java.util.*;
 @ToString
 public class LemonContext {
 
+    public final static String URL_DELIMITER = "/";
     public final static String LEMON_ID = "Lemon-Id";
     private final static String LEMON_TIME = "Lemon-Time";
     private final static String LEMON_CODE_KEY = "Lemon-Code";
@@ -76,14 +77,14 @@ public class LemonContext {
         }
 
         String tempPath = path;
-        if (tempPath.startsWith("/")) {
+        if (tempPath.startsWith(URL_DELIMITER)) {
             tempPath = tempPath.substring(1);
         }
-        if (tempPath.endsWith("/")) {
+        if (tempPath.endsWith(URL_DELIMITER)) {
             tempPath = tempPath.substring(0, tempPath.length() - 1);
         }
 
-        String[] pathArray = tempPath.split("/");
+        String[] pathArray = tempPath.split(URL_DELIMITER);
         if (pathArray.length > 0) {
             paths.addAll(Arrays.asList(pathArray));
         }

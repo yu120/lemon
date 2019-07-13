@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.common.thread.StandardThreadExecutor;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +52,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
             log.warn("The connected channel size out of limit: limit={} current={}", lemonConfig.getMaxChannel(), channels.size());
             channel.close();
         } else {
-            String channelKey = getChannelKey((InetSocketAddress) channel.localAddress(), (InetSocketAddress) channel.remoteAddress());
+            String channelKey = getChannelKey(channel.localAddress(), channel.remoteAddress());
             channels.put(channelKey, channel);
             ctx.fireChannelRegistered();
         }
@@ -64,12 +65,12 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
             FullHttpRequest request = (FullHttpRequest) msg;
             String uri = request.uri();
-            if (!uri.startsWith("/" + lemonConfig.getApplication() + "/")) {
+            if (!uri.startsWith(LemonContext.URL_DELIMITER + lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
                 lemonContext.writeAndFlush(LemonStatusCode.NO_HANDLER_FOUND_EXCEPTION);
                 return;
             }
 
-            wrapperChainContext(lemonContext, ctx, request);
+            wrapperChainContext(lemonContext, request);
             if (standardThreadExecutor == null) {
                 try {
                     LemonChain.processor(lemonContext);
@@ -101,12 +102,12 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
-        String channelKey = getChannelKey((InetSocketAddress) channel.localAddress(), (InetSocketAddress) channel.remoteAddress());
+        String channelKey = getChannelKey(channel.localAddress(), channel.remoteAddress());
         channels.remove(channelKey);
         ctx.fireChannelUnregistered();
     }
 
-    private void wrapperChainContext(LemonContext lemonContext, ChannelHandlerContext ctx, FullHttpRequest request) {
+    private void wrapperChainContext(LemonContext lemonContext, FullHttpRequest request) {
         QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
         HttpHeaders httpHeaders = request.headers();
 
@@ -147,13 +148,16 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     * key = remote address + local address
+     * key = local address + remote address
      *
-     * @param local  {@link InetSocketAddress}
-     * @param remote {@link InetSocketAddress}
+     * @param localSocketAddress  {@link SocketAddress}
+     * @param remoteSocketAddress {@link SocketAddress}
      * @return channel key
      */
-    private String getChannelKey(InetSocketAddress local, InetSocketAddress remote) {
+    private String getChannelKey(SocketAddress localSocketAddress, SocketAddress remoteSocketAddress) {
+        InetSocketAddress local = (InetSocketAddress) localSocketAddress;
+        InetSocketAddress remote = (InetSocketAddress) remoteSocketAddress;
+
         String key = "";
         if (local == null || local.getAddress() == null) {
             key += "null-";
