@@ -33,6 +33,9 @@ public class LemonContext {
     private final static String LEMON_PROTOCOL = "Lemon-Protocol";
     private final static String APPLICATION_JSON = "application/json;charset=UTF-8";
 
+    public final static String CALL_CODE = "Call-Code";
+    public final static String CALL_MESSAGE = "Call-Message";
+
     private String id;
     private long startTime;
     private long sendTime;

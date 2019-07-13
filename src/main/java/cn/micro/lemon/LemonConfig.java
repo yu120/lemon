@@ -19,9 +19,15 @@ public class LemonConfig implements Serializable {
     private String protocol;
     private int port = 8080;
     private String application;
-    private int ioThread = 0;
-    private int workThread = 0;
 
+    /**
+     * The IO thread number
+     */
+    private int ioThread = 0;
+    /**
+     * The work thread number
+     */
+    private int workThread = 0;
     /**
      * The default value: 64MB
      */
@@ -34,13 +40,32 @@ public class LemonConfig implements Serializable {
      * The server model: true
      */
     private boolean server = true;
-
+    /**
+     * The biz core thread number
+     */
     private int bizCoreThread = 20;
+    /**
+     * The biz max thread number
+     */
     private int bizMaxThread = 200;
+    /**
+     * The biz queue capacity
+     */
     private int bizQueueCapacity = 800;
+    /**
+     * The biz keep alive time(ms)
+     */
     private long bizKeepAliveTime = 60000L;
 
+    /**     * The configure fixed response header list
+
+     */
     private Map<String, Object> resHeaders = new LinkedHashMap<>();
+
+    /**
+     * The global call original server timeout(ms)
+     */
+    private long originalTimeout = 30000L;
     private Set<String> originalHeaders = new LinkedHashSet<>();
 
     private boolean wrapperMeta = true;

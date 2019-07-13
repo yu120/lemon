@@ -11,7 +11,9 @@ import org.jsoup.Jsoup;
 import org.micro.neural.common.micro.AntPathMatcher;
 import org.micro.neural.extension.Extension;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -25,11 +27,13 @@ import java.util.concurrent.ConcurrentMap;
 @Extension("jsoup")
 public class JsoupLemonInvoke implements LemonInvoke {
 
+    private LemonConfig lemonConfig;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
     private final ConcurrentMap<String, ServiceMapping> mappings = new ConcurrentHashMap<>();
 
     @Override
     public void initialize(LemonConfig lemonConfig) {
+        this.lemonConfig = lemonConfig;
         List<ServiceMapping> services = lemonConfig.getServices();
         for (ServiceMapping serviceMapping : services) {
             mappings.put(serviceMapping.getService(), serviceMapping);
@@ -47,13 +51,29 @@ public class JsoupLemonInvoke implements LemonInvoke {
         Connection connection = Jsoup.connect(mapping.getUrl());
         Connection.Request request = connection.request();
         request.method(buildMethod(context.getMethod()));
+        for (Map.Entry<String, String> entry : context.getHeaderAll()) {
+            request.header(entry.getKey(), entry.getValue());
+        }
+        request.requestBody(context.getContent());
+
+        // setter timeout(ms)
+        Long timeout = mapping.getTimeout();
+        if (timeout == null) {
+            timeout = lemonConfig.getOriginalTimeout();
+        }
+        if (timeout > 0) {
+            request.timeout(timeout.intValue());
+        }
+
         try {
             Connection.Response response = connection.execute();
             context.getResHeaders().putAll(response.headers());
+            context.getResHeaders().put(LemonContext.CALL_CODE, response.statusCode());
+            context.getResHeaders().put(LemonContext.CALL_MESSAGE, response.statusMessage());
             return response.bodyAsBytes();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        } catch (IOException e) {
+            context.getResHeaders().put(LemonContext.CALL_MESSAGE, e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
