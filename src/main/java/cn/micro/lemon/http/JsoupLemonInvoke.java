@@ -54,7 +54,9 @@ public class JsoupLemonInvoke implements LemonInvoke {
         for (Map.Entry<String, String> entry : context.getHeaderAll()) {
             request.header(entry.getKey(), entry.getValue());
         }
-        request.requestBody(context.getContent());
+        if (!(context.getContent() == null || context.getContent().length() == 0)) {
+            request.requestBody(context.getContent());
+        }
 
         // setter timeout(ms)
         Long timeout = mapping.getTimeout();

@@ -168,10 +168,10 @@ public class LemonContext {
         headers.set(LEMON_TIME, System.currentTimeMillis());
         headers.set(LEMON_CODE_KEY, statusCode.getCode());
         headers.set(LEMON_CODE_MESSAGE, statusCode.getMessage());
-        headers.set(HttpHeaderNames.CONTENT_LENGTH, contentLength);
-        headers.set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
-        headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-        headers.set(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
+        headers.set(com.google.common.net.HttpHeaders.CONTENT_LENGTH, contentLength);
+        headers.set(com.google.common.net.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON);
+        headers.set(com.google.common.net.HttpHeaders.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        headers.set(com.google.common.net.HttpHeaders.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
 
         // setter global response header list
         Map<String, Object> globalResHeaders = lemonConfig.getResHeaders();
