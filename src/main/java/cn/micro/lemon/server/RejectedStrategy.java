@@ -6,6 +6,11 @@ import lombok.Getter;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * Rejected Strategy
+ *
+ * @author lry
+ */
 @Getter
 @AllArgsConstructor
 public enum RejectedStrategy {

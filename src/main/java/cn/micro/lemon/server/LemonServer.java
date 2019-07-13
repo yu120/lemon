@@ -59,7 +59,7 @@ public class LemonServer {
                     TimeUnit.MILLISECONDS,
                     lemonConfig.getBizQueueCapacity(),
                     bizBuilder.build(),
-                    new ThreadPoolExecutor.AbortPolicy());
+                    lemonConfig.getRejectedStrategy().getHandler());
             standardThreadExecutor.prestartAllCoreThreads();
         }
 
