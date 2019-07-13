@@ -1,6 +1,5 @@
 package cn.micro.lemon;
 
-import cn.micro.lemon.ServiceMapping;
 import lombok.Data;
 import lombok.ToString;
 
