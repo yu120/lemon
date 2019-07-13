@@ -13,6 +13,7 @@ import org.micro.neural.common.micro.AntPathMatcher;
 import org.micro.neural.extension.Extension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -50,6 +51,7 @@ public class JsoupLemonInvoke implements LemonInvoke {
         request.method(buildMethod(context.getMethod()));
         try {
             Connection.Response response = connection.execute();
+            context.getResHeaders().put("Content-Type", response.header("Content-Type"));
             return response.body();
         } catch (Exception e) {
             e.printStackTrace();

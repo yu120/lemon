@@ -61,6 +61,7 @@ public class LemonContext {
     private ChannelHandlerContext ctx;
 
     private Object result;
+    private final Map<String, Object> resHeaders = new HashMap<>();
 
     public LemonContext(LemonConfig lemonConfig, ChannelHandlerContext ctx) {
         this.id = UUID.randomUUID().toString().replace("-", "");
@@ -160,13 +161,21 @@ public class LemonContext {
         headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         headers.set(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
 
-        Map<String, Object> resHeaders = lemonConfig.getResHeaders();
+        // setter global response header list
+        Map<String, Object> globalResHeaders = lemonConfig.getResHeaders();
+        if (globalResHeaders != null && globalResHeaders.size() > 0) {
+            for (Map.Entry<String, Object> entry : globalResHeaders.entrySet()) {
+                headers.set(entry.getKey(), entry.getValue());
+            }
+        }
+
+        // setter current response header list
+        Map<String, Object> resHeaders = getResHeaders();
         if (resHeaders != null && resHeaders.size() > 0) {
             for (Map.Entry<String, Object> entry : resHeaders.entrySet()) {
                 headers.set(entry.getKey(), entry.getValue());
             }
         }
-
 
         ctx.writeAndFlush(response).addListener(future -> {
             this.endTime = System.currentTimeMillis();
