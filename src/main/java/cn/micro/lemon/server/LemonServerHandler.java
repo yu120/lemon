@@ -10,6 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
+import org.micro.neural.common.collection.MapEntry;
 import org.micro.neural.common.thread.StandardThreadExecutor;
 
 import java.net.InetSocketAddress;
@@ -60,15 +61,13 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
             LemonContext lemonContext = new LemonContext(lemonConfig, ctx);
-
-            FullHttpRequest request = (FullHttpRequest) msg;
-            String uri = request.uri();
-            if (!uri.startsWith(LemonContext.URL_DELIMITER + lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
+            wrapperChainContext(lemonContext, (FullHttpRequest) msg);
+            if (!lemonContext.getUri().startsWith(LemonContext.URL_DELIMITER +
+                    lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
                 lemonContext.writeAndFlush(LemonStatusCode.NOT_FOUND);
                 return;
             }
 
-            wrapperChainContext(lemonContext, request);
             if (standardThreadExecutor == null) {
                 try {
                     LemonChain.processor(lemonContext);
@@ -118,6 +117,9 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         String lemonId = httpHeaders.get(LemonContext.LEMON_ID);
         if (lemonId != null && lemonId.length() > 0) {
             lemonContext.setId(lemonId);
+        } else {
+            lemonContext.getHeaders().put(LemonContext.LEMON_ID, lemonContext.getId());
+            lemonContext.getHeaderAll().add(new MapEntry<>(LemonContext.LEMON_ID, lemonContext.getId()));
         }
 
         lemonContext.setUri(request.uri());

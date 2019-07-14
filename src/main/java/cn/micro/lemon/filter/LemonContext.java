@@ -26,15 +26,16 @@ import java.util.*;
 public class LemonContext {
 
     public final static String URL_DELIMITER = "/";
-    public final static String LEMON_ID = "Lemon-Id";
-    private final static String LEMON_TIME = "Lemon-Time";
-    private final static String LEMON_CODE_KEY = "Lemon-Code";
-    private final static String LEMON_CODE_MESSAGE = "Lemon-Message";
-    private final static String LEMON_PROTOCOL = "Lemon-Protocol";
+    public final static String HEADER_PREFIX = "X-";
+    public final static String LEMON_ID = "X-Lemon-Id";
+    private final static String LEMON_TIME = "X-Lemon-Time";
+    private final static String LEMON_CODE_KEY = "X-Lemon-Code";
+    private final static String LEMON_CODE_MESSAGE = "X-Lemon-Message";
+    private final static String LEMON_PROTOCOL = "X-Lemon-Protocol";
     private final static String APPLICATION_JSON = "application/json;charset=UTF-8";
 
-    public final static String CALL_CODE = "Call-Code";
-    public final static String CALL_MESSAGE = "Call-Message";
+    public final static String CALL_CODE = "X-Call-Code";
+    public final static String CALL_MESSAGE = "X-Call-Message";
 
     private String id;
     private long startTime;
@@ -185,7 +186,7 @@ public class LemonContext {
         Map<String, Object> resHeaders = getResHeaders();
         if (resHeaders != null && resHeaders.size() > 0) {
             for (Map.Entry<String, Object> entry : resHeaders.entrySet()) {
-                if (lemonConfig.getOriginalHeaders().contains(entry.getKey())) {
+                if (lemonConfig.getOriginalResHeaders().contains(entry.getKey())) {
                     headers.set(entry.getKey(), entry.getValue());
                 }
             }

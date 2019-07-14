@@ -20,7 +20,6 @@ import org.apache.dubbo.rpc.service.GenericService;
 import org.micro.neural.extension.Extension;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -34,11 +33,13 @@ import java.util.concurrent.CompletableFuture;
 @Extension("dubbo")
 public class DubboLemonInvoke implements LemonInvoke {
 
+    private LemonConfig lemonConfig;
     private RegistryConfig registry;
     private MetadataCollectorFactory metadataCollectorFactory;
 
     @Override
     public void initialize(LemonConfig lemonConfig) {
+        this.lemonConfig = lemonConfig;
         RegistryConfig registryConfig = new RegistryConfig();
         registryConfig.setAddress(lemonConfig.getDubbo().getRegistryAddress());
         this.registry = registryConfig;
@@ -49,16 +50,32 @@ public class DubboLemonInvoke implements LemonInvoke {
 
     @Override
     public Object invoke(LemonContext context) {
-        Map<String, String> attachment = new LinkedHashMap<>();
-        attachment.put(LemonContext.LEMON_ID, context.getId());
-        RpcContext.getContext().setAttachments(attachment);
-
         context.setSendTime(System.currentTimeMillis());
+        // setter request header list
+        for (Map.Entry<String, String> entry : context.getHeaders().entrySet()) {
+            // originalReqHeaders contains or starts with 'X-'
+            if (lemonConfig.getOriginalReqHeaders().contains(entry.getKey())
+                    || entry.getKey().startsWith(LemonContext.HEADER_PREFIX)) {
+                RpcContext.getContext().setAttachment(entry.getKey(), entry.getValue());
+            }
+        }
 
+        // call original remote
         ServiceDefinition serviceDefinition = buildServiceDefinition(context);
         GenericService genericService = buildGenericService(serviceDefinition);
-        return genericService.$invoke(serviceDefinition.getMethod(),
+        Object result = genericService.$invoke(serviceDefinition.getMethod(),
                 serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
+
+        // setter response header list
+        for (Map.Entry<String, String> entry : RpcContext.getContext().getAttachments().entrySet()) {
+            // originalResHeaders contains or starts with 'X-'
+            if (lemonConfig.getOriginalResHeaders().contains(entry.getKey())
+                    || entry.getKey().startsWith(LemonContext.HEADER_PREFIX)) {
+                context.getResHeaders().put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return result;
     }
 
     @SuppressWarnings("unchecked")

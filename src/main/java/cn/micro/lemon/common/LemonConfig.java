@@ -68,7 +68,14 @@ public class LemonConfig implements Serializable {
      * The global call original server timeout(ms)
      */
     private long originalTimeout = 30000L;
-    private Set<String> originalHeaders = new LinkedHashSet<>();
+    /**
+     * The call original request header list key
+     */
+    private Set<String> originalReqHeaders = new LinkedHashSet<>();
+    /**
+     * The call original response header list key
+     */
+    private Set<String> originalResHeaders = new LinkedHashSet<>();
 
     private DubboConfig dubbo;
     private List<ServiceMapping> services = new ArrayList<>();
