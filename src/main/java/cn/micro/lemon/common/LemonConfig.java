@@ -20,8 +20,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 @ToString
 public class LemonConfig implements Serializable {
 
-    private String protocol;
+    /**
+     * The lemon http application port
+     */
     private int port = 8080;
+    /**
+     * The lemon http application path
+     */
     private String application;
 
     /**
@@ -83,7 +88,13 @@ public class LemonConfig implements Serializable {
      */
     private Set<String> originalResHeaders = new LinkedHashSet<>();
 
+    /**
+     * The dubbo config
+     */
     private DubboConfig dubbo;
+    /**
+     * The direct connection service mapping list
+     */
     private List<ServiceMapping> services = new ArrayList<>();
 
     /**
