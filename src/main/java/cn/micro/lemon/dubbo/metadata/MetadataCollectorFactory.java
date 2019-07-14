@@ -13,6 +13,8 @@ import org.micro.neural.extension.ExtensionLoader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Metadata Collector Factory
@@ -22,6 +24,7 @@ import java.util.List;
 public class MetadataCollectorFactory {
 
     private MetadataCollector metadataCollector;
+    private ConcurrentMap<String, FullServiceDefinition> serviceDefinitions = new ConcurrentHashMap<>();
 
     /**
      * The initialize
@@ -46,13 +49,18 @@ public class MetadataCollectorFactory {
         MetadataIdentifier identifier = new MetadataIdentifier(
                 serviceDefinition.getService(), serviceDefinition.getVersion(),
                 serviceDefinition.getGroup(), CommonConstants.PROVIDER_SIDE, serviceDefinition.getApplication());
-        String metadata = metadataCollector.pullMetaData(identifier);
-        System.out.println(metadata);
-        if (StringUtils.isBlank(metadata)) {
-            return;
+        FullServiceDefinition fullServiceDefinition = serviceDefinitions.get(identifier.getIdentifierKey());
+        if (fullServiceDefinition == null) {
+            String metadata = metadataCollector.pullMetaData(identifier);
+            System.out.println(metadata);
+            if (StringUtils.isBlank(metadata)) {
+                return;
+            }
+
+            fullServiceDefinition = JSON.parseObject(metadata, FullServiceDefinition.class);
+            serviceDefinitions.put(identifier.getIdentifierKey(), fullServiceDefinition);
         }
 
-        FullServiceDefinition fullServiceDefinition = JSON.parseObject(metadata, FullServiceDefinition.class);
         List<MethodDefinition> methods = fullServiceDefinition.getMethods();
         if (methods != null) {
             for (MethodDefinition m : methods) {
