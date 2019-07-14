@@ -21,6 +21,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class LemonConfig implements Serializable {
 
     /**
+     * The operation token
+     */
+    private String token = "lemon";
+    /**
      * The lemon http application port
      */
     private int port = 8080;

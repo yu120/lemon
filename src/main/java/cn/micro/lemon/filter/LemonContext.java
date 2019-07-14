@@ -36,6 +36,8 @@ public class LemonContext {
 
     public final static String CALL_CODE = "X-Call-Code";
     public final static String CALL_MESSAGE = "X-Call-Message";
+    public final static String INVALIDATE_CACHE = "X-Invalidate-Cache";
+    public final static String LEMON_TOKEN = "X-Lemon-Token";
 
     private String id;
     private long startTime;

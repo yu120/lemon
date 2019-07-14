@@ -44,9 +44,9 @@ public class DubboLemonInvoke implements LemonInvoke {
         RegistryConfig registryConfig = new RegistryConfig();
         registryConfig.setAddress(dubboConfig.getRegistryAddress());
         this.registry = registryConfig;
-        
+
         this.metadataCollectorFactory = MetadataCollectorFactory.INSTANCE;
-        metadataCollectorFactory.initialize(dubboConfig.getMetadataAddress());
+        metadataCollectorFactory.initialize(lemonConfig);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class DubboLemonInvoke implements LemonInvoke {
 
         // call original remote
         ServiceDefinition serviceDefinition = buildServiceDefinition(context);
-        GenericService genericService = buildGenericService(serviceDefinition);
+        GenericService genericService = buildGenericService(context, serviceDefinition);
         Object result = genericService.$invoke(serviceDefinition.getMethod(),
                 serviceDefinition.getParamTypes(), serviceDefinition.getParamValues());
 
@@ -113,7 +113,7 @@ public class DubboLemonInvoke implements LemonInvoke {
 
     }
 
-    private GenericService buildGenericService(ServiceDefinition serviceDefinition) {
+    private GenericService buildGenericService(LemonContext context, ServiceDefinition serviceDefinition) {
         ReferenceConfig<GenericService> referenceConfig = new ReferenceConfig<>();
         referenceConfig.setApplication(new ApplicationConfig(serviceDefinition.getApplication()));
         referenceConfig.setGroup(serviceDefinition.getGroup());
@@ -123,7 +123,7 @@ public class DubboLemonInvoke implements LemonInvoke {
         referenceConfig.setGeneric(true);
 
         if (serviceDefinition.getParamTypes() == null) {
-            metadataCollectorFactory.wrapperTypesFromMetadata(serviceDefinition);
+            metadataCollectorFactory.wrapperTypesFromMetadata(context, serviceDefinition);
         }
 
         return ReferenceConfigCache.getCache().get(referenceConfig);

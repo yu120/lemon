@@ -1,7 +1,9 @@
 package cn.micro.lemon.dubbo.metadata;
 
+import cn.micro.lemon.common.LemonConfig;
 import cn.micro.lemon.dubbo.MetadataCollector;
 import cn.micro.lemon.common.ServiceDefinition;
+import cn.micro.lemon.filter.LemonContext;
 import com.alibaba.fastjson.JSON;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -32,17 +34,19 @@ public enum MetadataCollectorFactory {
 
     private final static String MAXIMUM_KEY = "cacheMaximum";
     private final static String DURATION_KEY = "cacheDuration";
+    private LemonConfig lemonConfig;
     private MetadataCollector metadataCollector;
     private Cache<String, FullServiceDefinition> cache = null;
 
     /**
      * The initialize
      *
-     * @param metadataAddress metadata address
+     * @param lemonConfig {@link LemonConfig}
      */
-    public void initialize(String metadataAddress) {
-        if (StringUtils.isNotEmpty(metadataAddress)) {
-            URL metadataUrl = URL.valueOf(metadataAddress);
+    public void initialize(LemonConfig lemonConfig) {
+        this.lemonConfig = lemonConfig;
+        if (StringUtils.isNotEmpty(lemonConfig.getDubbo().getMetadataAddress())) {
+            URL metadataUrl = URL.valueOf(lemonConfig.getDubbo().getMetadataAddress());
 
             CacheBuilder<String, FullServiceDefinition> builder = new CacheBuilder<>();
             builder.maximumSize(metadataUrl.getParameter(MAXIMUM_KEY, 2000));
@@ -86,12 +90,24 @@ public enum MetadataCollectorFactory {
     /**
      * The wrapper types from metadata
      *
+     * @param context           {@link LemonContext}
      * @param serviceDefinition {@link ServiceDefinition}
      */
-    public void wrapperTypesFromMetadata(ServiceDefinition serviceDefinition) {
+    public void wrapperTypesFromMetadata(LemonContext context, ServiceDefinition serviceDefinition) {
         MetadataIdentifier identifier = new MetadataIdentifier(
                 serviceDefinition.getService(), serviceDefinition.getVersion(),
                 serviceDefinition.getGroup(), CommonConstants.PROVIDER_SIDE, serviceDefinition.getApplication());
+
+        // whether to clear cached access
+        String invalidateCache = context.getHeaders().get(LemonContext.INVALIDATE_CACHE);
+        if (!StringUtils.isBlank(invalidateCache)) {
+            if (Boolean.valueOf(invalidateCache)) {
+                String lemonToken = context.getHeaders().get(LemonContext.LEMON_TOKEN);
+                if (lemonConfig.getToken().equals(lemonToken)) {
+                    cache.invalidate(identifier.getIdentifierKey());
+                }
+            }
+        }
 
         FullServiceDefinition fullServiceDefinition;
         try {
