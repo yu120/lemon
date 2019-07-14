@@ -4,6 +4,8 @@ The micro service gateway framework.
 基于Netty实现微服务网关（Micro Service Gateway）。
 同时支持Dubbo泛化调用和HTTP调用，并支持自定义实现微服务网关请求的代理转发功能。
 
+![lemon](doc/lemon.png)
+
 **Support Protocol**
 - HTTP proxy Dubbo
 - HTTP proxy HTTP
