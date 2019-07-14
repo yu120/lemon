@@ -40,12 +40,13 @@ public class DubboLemonInvoke implements LemonInvoke {
     @Override
     public void initialize(LemonConfig lemonConfig) {
         this.lemonConfig = lemonConfig;
+        DubboConfig dubboConfig = lemonConfig.getDubbo();
         RegistryConfig registryConfig = new RegistryConfig();
-        registryConfig.setAddress(lemonConfig.getDubbo().getRegistryAddress());
+        registryConfig.setAddress(dubboConfig.getRegistryAddress());
         this.registry = registryConfig;
-
-        this.metadataCollectorFactory = new MetadataCollectorFactory();
-        metadataCollectorFactory.initialize(lemonConfig.getDubbo().getMetadataAddress());
+        
+        this.metadataCollectorFactory = MetadataCollectorFactory.INSTANCE;
+        metadataCollectorFactory.initialize(dubboConfig.getMetadataAddress());
     }
 
     @Override
