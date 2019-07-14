@@ -5,12 +5,13 @@ The micro service gateway framework.
 同时支持Dubbo泛化调用和HTTP调用，并支持自定义实现微服务网关请求的代理转发功能。
 
 **Support Protocol**
-- HTTP to Dubbo
-- HTTP to HTTP
+- HTTP proxy Dubbo
+- HTTP proxy HTTP
 
 **TODO Protocol**
-- HTTP to Motan
-- HTTP to SpringCloud
+- HTTP proxy Motan
+- HTTP proxy SpringCloud
+- TCP proxy other
 
 ## 1 Config Introduce
 Config Path: `src/main/resources/lemon.yml`
