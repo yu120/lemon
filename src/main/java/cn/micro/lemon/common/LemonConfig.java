@@ -1,12 +1,15 @@
 package cn.micro.lemon.common;
 
 import cn.micro.lemon.dubbo.DubboConfig;
-import cn.micro.lemon.server.RejectedStrategy;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Lemon Config
@@ -57,6 +60,9 @@ public class LemonConfig implements Serializable {
      * The biz keep alive time(ms)
      */
     private long bizKeepAliveTime = 60000L;
+    /**
+     * The biz thread rejected strategy
+     */
     private RejectedStrategy rejectedStrategy = RejectedStrategy.ABORT_POLICY;
 
     /**
@@ -79,5 +85,25 @@ public class LemonConfig implements Serializable {
 
     private DubboConfig dubbo;
     private List<ServiceMapping> services = new ArrayList<>();
+
+    /**
+     * Rejected Strategy
+     *
+     * @author lry
+     */
+    @Getter
+    @AllArgsConstructor
+    public enum RejectedStrategy {
+
+        // ===
+
+        ABORT_POLICY(new ThreadPoolExecutor.AbortPolicy()),
+        CALLER_RUNS_POLICY(new ThreadPoolExecutor.CallerRunsPolicy()),
+        DISCARD_OLDEST_POLICY(new ThreadPoolExecutor.DiscardOldestPolicy()),
+        DISCARD_POLICY(new ThreadPoolExecutor.DiscardPolicy());
+
+        private RejectedExecutionHandler handler;
+
+    }
 
 }
