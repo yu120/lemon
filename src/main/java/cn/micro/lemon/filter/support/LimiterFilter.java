@@ -7,23 +7,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.extension.Extension;
 
 /**
- * Lemon Log Filter
+ * Limiter Filter
+ * <p>
+ * TODO
  *
  * @author lry
  */
 @Slf4j
-@Extension(order = 20)
-public class LemonLogFilter extends AbstractFilter {
+@Extension(order = 150)
+public class LimiterFilter extends AbstractFilter {
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
-        log.debug("The pre log lemon context: {}", context);
         super.preFilter(chain, context);
     }
 
     @Override
     public void postFilter(LemonChain chain, LemonContext context) throws Throwable {
-        log.debug("The post log lemon context: {}", context);
         super.postFilter(chain, context);
     }
 
