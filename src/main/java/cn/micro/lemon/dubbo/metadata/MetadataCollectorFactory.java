@@ -48,7 +48,7 @@ public enum MetadataCollectorFactory {
         if (StringUtils.isNotEmpty(lemonConfig.getDubbo().getMetadataAddress())) {
             URL metadataUrl = URL.valueOf(lemonConfig.getDubbo().getMetadataAddress());
 
-            CacheBuilder<String, FullServiceDefinition> builder = new CacheBuilder<>();
+            CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
             builder.maximumSize(metadataUrl.getParameter(MAXIMUM_KEY, 2000));
             builder.expireAfterAccess(metadataUrl.getParameter(
                     DURATION_KEY, 2 * 60 * 60L), TimeUnit.MILLISECONDS);
