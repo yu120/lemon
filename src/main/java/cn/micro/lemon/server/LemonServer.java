@@ -35,7 +35,10 @@ public class LemonServer {
     private EventLoopGroup workerGroup;
     private StandardThreadExecutor standardThreadExecutor;
 
-    public LemonServer() {
+    /**
+     * The initialize
+     */
+    public void initialize() {
         LemonConfig lemonConfig = loadConfig();
         LemonFactory.INSTANCE.initialize(lemonConfig);
         log.info("The starting open server by config:{}", lemonConfig);

@@ -52,8 +52,8 @@ public enum MetadataCollectorFactory {
             builder.maximumSize(metadataUrl.getParameter(MAXIMUM_KEY, 2000));
             builder.expireAfterAccess(metadataUrl.getParameter(
                     DURATION_KEY, 2 * 60 * 60L), TimeUnit.MILLISECONDS);
-            this.cache = builder.build();
 
+            this.cache = builder.build();
             this.metadataCollector = ExtensionLoader.getLoader(
                     MetadataCollector.class).getExtension(metadataUrl.getProtocol());
             metadataCollector.initialize(metadataUrl);
@@ -77,9 +77,7 @@ public enum MetadataCollectorFactory {
         } else {
             Set<String> keys = new HashSet<>();
             for (ServiceDefinition serviceDefinition : serviceDefinitions) {
-                MetadataIdentifier identifier = new MetadataIdentifier(
-                        serviceDefinition.getService(), serviceDefinition.getVersion(),
-                        serviceDefinition.getGroup(), CommonConstants.PROVIDER_SIDE, serviceDefinition.getApplication());
+                MetadataIdentifier identifier = build(serviceDefinition);
                 keys.add(identifier.getIdentifierKey());
             }
 
@@ -94,9 +92,7 @@ public enum MetadataCollectorFactory {
      * @param serviceDefinition {@link ServiceDefinition}
      */
     public void wrapperTypesFromMetadata(LemonContext context, ServiceDefinition serviceDefinition) {
-        MetadataIdentifier identifier = new MetadataIdentifier(
-                serviceDefinition.getService(), serviceDefinition.getVersion(),
-                serviceDefinition.getGroup(), CommonConstants.PROVIDER_SIDE, serviceDefinition.getApplication());
+        MetadataIdentifier identifier = build(serviceDefinition);
 
         // whether to clear cached access
         String invalidateCache = context.getHeaders().get(LemonContext.INVALIDATE_CACHE);
@@ -120,29 +116,45 @@ public enum MetadataCollectorFactory {
                 return null;
             });
         } catch (Exception e) {
-            throw new RuntimeException("");
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         List<MethodDefinition> methods = fullServiceDefinition.getMethods();
-        if (methods != null) {
-            for (MethodDefinition m : methods) {
-                if (sameMethod(m, serviceDefinition.getMethod(), serviceDefinition.getParamValues().length)) {
-                    List<String> parameterTypes = new ArrayList<>();
-                    for (String parameterType : m.getParameterTypes()) {
-                        if (parameterType.contains("<")) {
-                            parameterTypes.add(parameterType.substring(0, parameterType.indexOf("<")));
-                        } else {
-                            parameterTypes.add(parameterType);
-                        }
-                    }
-                    serviceDefinition.setParamTypes(parameterTypes.toArray(new String[0]));
+        if (methods == null) {
+            return;
+        }
+        for (MethodDefinition m : methods) {
+            if (!m.getName().equals(serviceDefinition.getMethod()) ||
+                    m.getParameterTypes().length != serviceDefinition.getParamValues().length) {
+                continue;
+            }
+
+            List<String> parameterTypes = new ArrayList<>();
+            for (String parameterType : m.getParameterTypes()) {
+                if (parameterType.contains("<")) {
+                    parameterTypes.add(parameterType.substring(0, parameterType.indexOf("<")));
+                } else {
+                    parameterTypes.add(parameterType);
                 }
             }
+
+            serviceDefinition.setParamTypes(parameterTypes.toArray(new String[0]));
         }
     }
 
-    private boolean sameMethod(MethodDefinition m, String methodName, int paramLen) {
-        return (m.getName().equals(methodName) && m.getParameterTypes().length == paramLen);
+    /**
+     * The build {@link ServiceDefinition}
+     *
+     * @param serviceDefinition {@link ServiceDefinition}
+     * @return {@link MetadataIdentifier}
+     */
+    private MetadataIdentifier build(ServiceDefinition serviceDefinition) {
+        return new MetadataIdentifier(
+                serviceDefinition.getService(),
+                serviceDefinition.getVersion(),
+                serviceDefinition.getGroup(),
+                CommonConstants.PROVIDER_SIDE,
+                serviceDefinition.getApplication());
     }
 
 }

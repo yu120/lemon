@@ -113,22 +113,12 @@ public class DubboLemonInvoke implements LemonInvoke {
 
     }
 
-    private GenericService buildGenericService(LemonContext context, ServiceDefinition serviceDefinition) {
-        ReferenceConfig<GenericService> referenceConfig = new ReferenceConfig<>();
-        referenceConfig.setApplication(new ApplicationConfig(serviceDefinition.getApplication()));
-        referenceConfig.setGroup(serviceDefinition.getGroup());
-        referenceConfig.setVersion(serviceDefinition.getVersion());
-        referenceConfig.setRegistry(registry);
-        referenceConfig.setInterface(serviceDefinition.getService());
-        referenceConfig.setGeneric(true);
-
-        if (serviceDefinition.getParamTypes() == null) {
-            metadataCollectorFactory.wrapperTypesFromMetadata(context, serviceDefinition);
-        }
-
-        return ReferenceConfigCache.getCache().get(referenceConfig);
-    }
-
+    /**
+     * The build {@link ServiceDefinition} by {@link LemonContext}
+     *
+     * @param context {@link LemonContext}
+     * @return {@link ServiceDefinition}
+     */
     private ServiceDefinition buildServiceDefinition(LemonContext context) {
         List<String> paths = context.getPaths();
         if (paths.size() != 4) {
@@ -168,6 +158,29 @@ public class DubboLemonInvoke implements LemonInvoke {
 
         serviceDefinition.setParamValues(paramValues.toArray(new Object[0]));
         return serviceDefinition;
+    }
+
+    /**
+     * The build {@link GenericService} by {@link ServiceDefinition}
+     *
+     * @param context           {@link LemonContext}
+     * @param serviceDefinition {@link ServiceDefinition}
+     * @return {@link GenericService}
+     */
+    private GenericService buildGenericService(LemonContext context, ServiceDefinition serviceDefinition) {
+        ReferenceConfig<GenericService> referenceConfig = new ReferenceConfig<>();
+        referenceConfig.setApplication(new ApplicationConfig(serviceDefinition.getApplication()));
+        referenceConfig.setGroup(serviceDefinition.getGroup());
+        referenceConfig.setVersion(serviceDefinition.getVersion());
+        referenceConfig.setRegistry(registry);
+        referenceConfig.setInterface(serviceDefinition.getService());
+        referenceConfig.setGeneric(true);
+
+        if (serviceDefinition.getParamTypes() == null) {
+            metadataCollectorFactory.wrapperTypesFromMetadata(context, serviceDefinition);
+        }
+
+        return ReferenceConfigCache.getCache().get(referenceConfig);
     }
 
 }

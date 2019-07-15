@@ -94,8 +94,13 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.error("The handler exception caught: " + cause.getMessage(), cause);
-        if (ctx != null) {
+        Channel channel = ctx.channel();
+        String channelKey = getChannelKey(channel.localAddress(), channel.remoteAddress());
+        log.error("The handler channel[" + channelKey + "] exception caught: " + cause.getMessage(), cause);
+        if (channel.isOpen()) {
+            channel.close();
+        }
+        if (!ctx.isRemoved()) {
             ctx.close();
         }
     }
@@ -175,17 +180,17 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         InetSocketAddress local = (InetSocketAddress) localSocketAddress;
         InetSocketAddress remote = (InetSocketAddress) remoteSocketAddress;
 
-        String key = "";
-        if (local == null || local.getAddress() == null) {
-            key += "null-";
+        String key;
+        if (remote == null || remote.getAddress() == null) {
+            key = "unknown->";
         } else {
-            key += local.getAddress().getHostAddress() + ":" + local.getPort() + "-";
+            key = remote.getAddress().getHostAddress() + ":" + remote.getPort() + "->";
         }
 
-        if (remote == null || remote.getAddress() == null) {
-            key += "null";
+        if (local == null || local.getAddress() == null) {
+            key += "unknown";
         } else {
-            key += remote.getAddress().getHostAddress() + ":" + remote.getPort();
+            key += local.getAddress().getHostAddress() + ":" + local.getPort();
         }
 
         return key;

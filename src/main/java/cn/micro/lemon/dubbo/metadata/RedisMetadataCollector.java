@@ -33,7 +33,7 @@ public class RedisMetadataCollector implements MetadataCollector {
         this.url = url;
         this.timeout = url.getParameter(CommonConstants.TIMEOUT_KEY, CommonConstants.DEFAULT_TIMEOUT);
         if (url.getParameter(CommonConstants.CLUSTER_KEY, false)) {
-            this.clusterNodes = new HashSet<HostAndPort>();
+            this.clusterNodes = new HashSet<>();
             List<URL> urls = url.getBackupUrls();
             for (URL tmpUrl : urls) {
                 clusterNodes.add(new HostAndPort(tmpUrl.getHost(), tmpUrl.getPort()));
@@ -46,13 +46,19 @@ public class RedisMetadataCollector implements MetadataCollector {
     @Override
     public String pullMetaData(MetadataIdentifier metadataIdentifier) {
         if (pool != null) {
-            return getMetadataStandalone(metadataIdentifier);
+            return getMetadataInStandAlone(metadataIdentifier);
         } else {
             return getMetadataInCluster(metadataIdentifier);
         }
     }
 
-    private String getMetadataStandalone(MetadataIdentifier metadataIdentifier) {
+    /**
+     * The get metadata in StandAlone by {@link MetadataIdentifier}
+     *
+     * @param metadataIdentifier {@link MetadataIdentifier}
+     * @return metadata json
+     */
+    private String getMetadataInStandAlone(MetadataIdentifier metadataIdentifier) {
         try (Jedis jedis = pool.getResource()) {
             return jedis.get(metadataIdentifier.getUniqueKey(MetadataIdentifier.KeyTypeEnum.UNIQUE_KEY));
         } catch (Throwable e) {
@@ -60,6 +66,12 @@ public class RedisMetadataCollector implements MetadataCollector {
         }
     }
 
+    /**
+     * The get metadata in Cluster by {@link MetadataIdentifier}
+     *
+     * @param metadataIdentifier {@link MetadataIdentifier}
+     * @return metadata json
+     */
     private String getMetadataInCluster(MetadataIdentifier metadataIdentifier) {
         try (JedisCluster jedisCluster = new JedisCluster(clusterNodes, timeout,
                 timeout, 2, url.getPassword(), new GenericObjectPoolConfig())) {

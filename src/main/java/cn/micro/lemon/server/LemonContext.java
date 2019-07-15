@@ -3,6 +3,7 @@ package cn.micro.lemon.server;
 import cn.micro.lemon.common.LemonConfig;
 import cn.micro.lemon.common.LemonStatusCode;
 import com.alibaba.fastjson.JSON;
+import com.google.common.net.HttpHeaders;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -166,15 +167,15 @@ public class LemonContext {
             contentLength = content.readableBytes();
         }
 
-        HttpHeaders headers = response.headers();
+        io.netty.handler.codec.http.HttpHeaders headers = response.headers();
         headers.set(LEMON_ID, id);
         headers.set(LEMON_TIME, System.currentTimeMillis());
         headers.set(LEMON_CODE_KEY, statusCode.getCode());
         headers.set(LEMON_CODE_MESSAGE, statusCode.getMessage());
-        headers.set(com.google.common.net.HttpHeaders.CONTENT_LENGTH, contentLength);
-        headers.set(com.google.common.net.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON);
-        headers.set(com.google.common.net.HttpHeaders.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-        headers.set(com.google.common.net.HttpHeaders.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
+        headers.set(HttpHeaders.CONTENT_LENGTH, contentLength);
+        headers.set(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON);
+        headers.set(HttpHeaders.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        headers.set(HttpHeaders.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
 
         // setter global response header list
         Map<String, Object> globalResHeaders = lemonConfig.getResHeaders();

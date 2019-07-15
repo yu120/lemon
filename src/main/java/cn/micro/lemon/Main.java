@@ -10,7 +10,7 @@ import cn.micro.lemon.server.LemonServer;
 public class Main {
 
     public static void main(String[] args) {
-        new LemonServer();
+        new LemonServer().initialize();
     }
 
 }

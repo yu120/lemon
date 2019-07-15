@@ -14,12 +14,33 @@ import java.io.Serializable;
 @ToString
 public class ServiceMapping implements Serializable {
 
+    /**
+     * The category
+     */
     private String category;
+    /**
+     * The application of service
+     */
     private String application;
+    /**
+     * The service name
+     */
     private String service;
+    /**
+     * The group of service
+     */
     private String group;
+    /**
+     * The version of service
+     */
     private String version;
+    /**
+     * The url of service direct connection
+     */
     private String url;
+    /**
+     * The full url is true
+     */
     private boolean fullUrl = false;
     /**
      * The current call original server timeout(ms)
