@@ -42,7 +42,7 @@ public class LemonServer {
 
         ThreadFactoryBuilder ioBuilder = new ThreadFactoryBuilder();
         ioBuilder.setDaemon(true);
-        ioBuilder.setNameFormat("lemon-biz");
+        ioBuilder.setNameFormat("lemon-io");
         ThreadFactoryBuilder workBuilder = new ThreadFactoryBuilder();
         workBuilder.setDaemon(true);
         workBuilder.setNameFormat("lemon-work");
