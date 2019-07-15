@@ -1,0 +1,27 @@
+port: 8080
+application: lemon
+ioThread: 0
+workThread: 0
+# 64 * 1024 * 1024 = 64 MB
+maxContentLength: 67108864
+maxChannel: 100000
+bizCoreThread: 20
+bizMaxThread: 200
+bizQueueCapacity: 800
+bizKeepAliveTime: 60000
+resHeaders:
+  Connection: keep-alive
+  Accept-Encoding: gzip,deflate
+  Content-Type: application/json;charset=UTF-8
+originalReqHeaders: [Connection, Content-Type, Set-Cookie, Call-Code, Call-Message]
+originalResHeaders: [Connection, Content-Type, Set-Cookie, Call-Code, Call-Message]
+dubbo:
+  registryAddress: zookeeper://127.0.0.1:2181
+  metadataAddress: zookeeper://127.0.0.1:2181
+services:
+  - category: jsoup
+    service: /baidu/**
+    url: https://www.baidu.com
+  - category: jsoup
+    service: /oschina/**
+    url: https://www.oschina.net
