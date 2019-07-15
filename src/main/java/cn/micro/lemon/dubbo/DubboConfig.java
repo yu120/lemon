@@ -15,6 +15,10 @@ import java.io.Serializable;
 public class DubboConfig implements Serializable {
 
     /**
+     * The service name simple
+     */
+    private Boolean serviceSimpleName = true;
+    /**
      * The registry address
      */
     private String registryAddress;
