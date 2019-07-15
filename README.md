@@ -1,21 +1,34 @@
 # lemon
-The micro service gateway framework.
+**The Micro Service Gateway Framework.**
 
-基于Netty实现微服务网关（Micro Service Gateway）。
+基于Netty4的微服务网关（Micro Service Gateway）。
+
 同时支持Dubbo泛化调用和HTTP调用，并支持自定义实现微服务网关请求的代理转发功能。
 
+## Architecture
 ![lemon](doc/lemon.png)
 
-**Support Protocol**
-- HTTP proxy Dubbo
-- HTTP proxy HTTP
+## Features
+- HTTP to Dubbo Gateway
+- HTTP to HTTP Gateway
+- High Performance
+- Dynamic Discovery
+- Generalized Agent
+- Extensible Chain of Responsibility
+- Two-way LOG Printing Filter
 
-**TODO Protocol**
+## TODO
 - HTTP proxy Motan
 - HTTP proxy SpringCloud
 - TCP proxy other
+- CircuitBreaker Filter
+- Degrade Filter
+- Idempotent Filter
+- Limiter Filter
+- Retry Filter
 
-## 1 Config Introduce
+
+## Config Introduce
 Config Path: `src/main/resources/lemon.yml`
 
 ```
@@ -53,7 +66,7 @@ services:
     url: https://www.oschina.net
 ```
 
-## 2 Dubbo Lemon
+## Dubbo Lemon
 The support apache dubbo 2.7.2 generic service proxy.
 
 **Format:**
@@ -72,13 +85,18 @@ http://localhost:8080/lemon/micro-dubbo-provider/cn.micro.biz.dubbo.provider.Dem
 [{"name":"lemon", "age":23}, {"10001"}]
 ```
 
-## 3 HTTP Lemon
+## HTTP Lemon
+Proxy forwarding using jsoup.
+
 ```
 http://[host]:[port]/lemon/[service]/**?group=[group]&version=[version]
 ```
 
-## 4 Motan Lemon
+## Motan Lemon
 TODO
 
-## 5 Spring Cloud Lemon
+## Spring Cloud Lemon
 TODO
+
+## License
+Lemon is under the MIT license. See the LICENSE file for details.
