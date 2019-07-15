@@ -74,7 +74,7 @@ The support apache dubbo 2.7.2 generic service proxy.
 **Format:**
 ```
 URL:
-http://[host]:[port]/lemon/[application]/[service]/[method]?group=[group]&version=[version]
+http://[host]:[port]/lemon/[application]/[service/serviceSimpleName]/[method]?group=[group]&version=[version]
 
 Body:
 List[Map{...}, Map{...}, ...]
@@ -83,6 +83,10 @@ List[Map{...}, Map{...}, ...]
 **Example:**
 ```
 http://localhost:8080/lemon/micro-dubbo-provider/cn.micro.biz.dubbo.provider.DemoService/test
+
+or
+
+http://localhost:8080/lemon/micro-dubbo-provider/demo/test
 
 [{"name":"lemon", "age":23}, {"10001"}]
 ```
