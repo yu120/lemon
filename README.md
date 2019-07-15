@@ -1,6 +1,8 @@
 # lemon
 **The Micro Service Gateway Framework.**
 
+Lemon is a high-performance, Java based open source gateway framework. 
+
 基于Netty4的微服务网关（Micro Service Gateway）。
 
 同时支持Dubbo泛化调用和HTTP调用，并支持自定义实现微服务网关请求的代理转发功能。
