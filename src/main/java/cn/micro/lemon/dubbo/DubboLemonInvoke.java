@@ -7,7 +7,6 @@ import cn.micro.lemon.common.ServiceDefinition;
 import cn.micro.lemon.dubbo.metadata.MetadataCollectorFactory;
 import cn.micro.lemon.server.LemonContext;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.config.ApplicationConfig;
@@ -146,12 +145,7 @@ public class DubboLemonInvoke implements LemonInvoke {
 
         List<Object> paramValues = new ArrayList<>();
         if (JSON.isValid(context.getContent())) {
-            Object object = JSON.parse(context.getContent());
-            if (object instanceof JSONArray) {
-                paramValues.addAll(((JSONArray) object).toJavaList(Map.class));
-            } else {
-                paramValues.add(object);
-            }
+            paramValues.add(JSON.parse(context.getContent()));
         } else {
             paramValues.add(context.getContent());
         }
