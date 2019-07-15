@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Slf4j
 @Getter
-public enum LemonChainFactory {
+public enum LemonFactory {
 
     // ====
 

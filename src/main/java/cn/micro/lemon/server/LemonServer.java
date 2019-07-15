@@ -1,8 +1,7 @@
 package cn.micro.lemon.server;
 
 import cn.micro.lemon.common.LemonConfig;
-import cn.micro.lemon.filter.LemonChain;
-import cn.micro.lemon.filter.LemonChainFactory;
+import cn.micro.lemon.filter.LemonFactory;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -38,7 +37,7 @@ public class LemonServer {
 
     public LemonServer() {
         LemonConfig lemonConfig = loadConfig();
-        LemonChainFactory.INSTANCE.initialize(lemonConfig);
+        LemonFactory.INSTANCE.initialize(lemonConfig);
         log.info("The starting open server by config:{}", lemonConfig);
 
         ThreadFactoryBuilder ioBuilder = new ThreadFactoryBuilder();
@@ -135,7 +134,7 @@ public class LemonServer {
                 standardThreadExecutor.shutdown();
             }
 
-            LemonChainFactory.INSTANCE.destroy();
+            LemonFactory.INSTANCE.destroy();
         } catch (Exception e) {
             log.error("The destroy server is fail", e);
         }

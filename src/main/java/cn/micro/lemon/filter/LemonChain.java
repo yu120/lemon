@@ -25,7 +25,7 @@ public class LemonChain {
      * @throws Throwable throw exception
      */
     public void doFilter(LemonContext context) throws Throwable {
-        LemonChainFactory factory = LemonChainFactory.INSTANCE;
+        LemonFactory factory = LemonFactory.INSTANCE;
         List<IFilter> filters = factory.getFilters();
 
         if (flag.get()) {
