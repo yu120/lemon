@@ -47,6 +47,7 @@ public class RegistryServiceSubscribe implements NotifyListener {
 
     private RegistryService registryService;
     private final ConcurrentHashMap<String, Long> URL_IDS_MAPPER = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, ConcurrentMap<String, String>> serviceNames = new ConcurrentHashMap<>();
     /**
      * ConcurrentMap<category, ConcurrentMap<serviceName, Map<Long, URL>>>
      */
@@ -80,7 +81,7 @@ public class RegistryServiceSubscribe implements NotifyListener {
         registryService.register(url);
     }
 
-    public void destroy() throws Exception {
+    public void destroy() {
         registryService.unsubscribe(SUBSCRIBE, this);
 
     }
@@ -93,6 +94,7 @@ public class RegistryServiceSubscribe implements NotifyListener {
         if (urls == null || urls.isEmpty()) {
             return;
         }
+
         final Map<String, Map<String, Map<Long, URL>>> categories = new HashMap<>();
         for (URL url : urls) {
             String category = url.getParameter(RegistryConstants.CATEGORY_KEY, RegistryConstants.PROVIDERS_CATEGORY);
@@ -128,6 +130,22 @@ public class RegistryServiceSubscribe implements NotifyListener {
                     ids.put(currentId, url);
                     URL_IDS_MAPPER.putIfAbsent(url.toFullString(), currentId);
                 }
+
+                if (RegistryConstants.PROVIDERS_CATEGORY.equalsIgnoreCase(category)) {
+                    String application = url.getParameter(CommonConstants.APPLICATION_KEY);
+                    if (StringUtils.isBlank(application)) {
+                        continue;
+                    }
+                    Map<String, String> appServiceNames = serviceNames.computeIfAbsent(application, k -> new ConcurrentHashMap<>());
+                    String serviceName = getSimpleServiceName(url.getServiceInterface());
+                    String serviceInterface = url.getServiceInterface();
+                    String hasServiceName = appServiceNames.get(serviceName);
+                    if (appServiceNames.containsKey(serviceName)) {
+                        log.warn("The service name is same[{}] and[{}].", hasServiceName, serviceInterface);
+                        return;
+                    }
+                    appServiceNames.put(serviceName, serviceInterface);
+                }
             }
         }
 
@@ -139,6 +157,23 @@ public class RegistryServiceSubscribe implements NotifyListener {
                 registryCache.put(category, services);
             }
             services.putAll(categoryEntry.getValue());
+        }
+    }
+
+    private String getSimpleServiceName(String serviceInterface) {
+        String name = serviceInterface.substring(serviceInterface.lastIndexOf(".") + 1);
+        if (name.endsWith("Service")) {
+            name = name.substring(0, name.length() - 7);
+        }
+
+        return toLowerCaseFirstOne(name);
+    }
+
+    public static String toLowerCaseFirstOne(String s) {
+        if (Character.isLowerCase(s.charAt(0))) {
+            return s;
+        } else {
+            return Character.toLowerCase(s.charAt(0)) + s.substring(1);
         }
     }
 

@@ -27,6 +27,10 @@ public class ServiceMapping implements Serializable {
      */
     private String service;
     /**
+     * The real service name
+     */
+    private String serviceName;
+    /**
      * The group of service
      */
     private String group;

@@ -35,6 +35,7 @@ public class DubboLemonInvoke implements LemonInvoke {
     private LemonConfig lemonConfig;
     private RegistryConfig registry;
     private MetadataCollectorFactory metadataCollectorFactory;
+    private RegistryServiceSubscribe registryServiceSubscribe;
 
     @Override
     public void initialize(LemonConfig lemonConfig) {
@@ -46,6 +47,8 @@ public class DubboLemonInvoke implements LemonInvoke {
 
         this.metadataCollectorFactory = MetadataCollectorFactory.INSTANCE;
         metadataCollectorFactory.initialize(lemonConfig);
+        this.registryServiceSubscribe = new RegistryServiceSubscribe();
+        registryServiceSubscribe.initialize(dubboConfig.getRegistryAddress());
     }
 
     @Override
@@ -109,7 +112,9 @@ public class DubboLemonInvoke implements LemonInvoke {
 
     @Override
     public void destroy() {
-
+        if (registryServiceSubscribe != null) {
+            registryServiceSubscribe.destroy();
+        }
     }
 
     /**
