@@ -108,6 +108,12 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         ctx.fireChannelUnregistered();
     }
 
+    /**
+     * The wrapper chain context
+     *
+     * @param lemonContext {@link LemonContext}
+     * @param request      {@link FullHttpRequest}
+     */
     private void wrapperChainContext(LemonContext lemonContext, FullHttpRequest request) {
         String uri = request.uri();
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
@@ -150,6 +156,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         lemonContext.setContentByte(contentByte);
         lemonContext.setContent(new String(contentByte, StandardCharsets.UTF_8));
 
+        // wrapper complex value
         lemonContext.addPaths(decoder.path());
         lemonContext.getHeaderAll().addAll(httpHeaders.entries());
         lemonContext.getParameterAll().putAll(decoder.parameters());
