@@ -9,6 +9,7 @@ import cn.micro.lemon.server.LemonContext;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.common.constants.CommonConstants;
+import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Dubbo Lemon Invoke
@@ -134,6 +136,9 @@ public class DubboLemonInvoke implements LemonInvoke {
         serviceDefinition.setService(paths.get(2));
         serviceDefinition.setMethod(paths.get(3));
 
+        // wrapper service name
+        wrapperServiceName(serviceDefinition);
+
         Map<String, String> parameters = context.getParameters();
         if (parameters.containsKey(CommonConstants.GROUP_KEY)) {
             String group = parameters.get(CommonConstants.GROUP_KEY);
@@ -159,6 +164,23 @@ public class DubboLemonInvoke implements LemonInvoke {
         return serviceDefinition;
     }
 
+    private void wrapperServiceName(ServiceDefinition serviceDefinition) {
+        ConcurrentMap<String, String> serviceNames =
+                registryServiceSubscribe.getServiceNames().get(serviceDefinition.getApplication());
+        if (serviceNames == null || serviceNames.isEmpty()) {
+            serviceDefinition.setServiceName(serviceDefinition.getService());
+            return;
+        }
+
+        String serviceName = serviceNames.get(serviceDefinition.getService());
+        if (StringUtils.isBlank(serviceName)) {
+            serviceDefinition.setServiceName(serviceDefinition.getService());
+            return;
+        }
+
+        serviceDefinition.setServiceName(serviceName);
+    }
+
     /**
      * The build {@link GenericService} by {@link ServiceDefinition}
      *
@@ -172,7 +194,7 @@ public class DubboLemonInvoke implements LemonInvoke {
         referenceConfig.setGroup(serviceDefinition.getGroup());
         referenceConfig.setVersion(serviceDefinition.getVersion());
         referenceConfig.setRegistry(registry);
-        referenceConfig.setInterface(serviceDefinition.getService());
+        referenceConfig.setInterface(serviceDefinition.getServiceName());
         referenceConfig.setGeneric(true);
 
         if (serviceDefinition.getParamTypes() == null) {

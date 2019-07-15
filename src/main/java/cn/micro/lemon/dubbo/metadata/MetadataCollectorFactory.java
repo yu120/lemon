@@ -150,7 +150,7 @@ public enum MetadataCollectorFactory {
      */
     private MetadataIdentifier build(ServiceDefinition serviceDefinition) {
         return new MetadataIdentifier(
-                serviceDefinition.getService(),
+                serviceDefinition.getServiceName(),
                 serviceDefinition.getVersion(),
                 serviceDefinition.getGroup(),
                 CommonConstants.PROVIDER_SIDE,
