@@ -21,7 +21,6 @@ public class ZookeeperMetadataCollector implements MetadataCollector {
 
     private CuratorFramework client;
     private String root;
-    private final static String METADATA_NODE_NAME = "service.data";
     private final static String DEFAULT_ROOT = "dubbo";
 
     @Override
@@ -65,8 +64,7 @@ public class ZookeeperMetadataCollector implements MetadataCollector {
             rootDir = root + CommonConstants.PATH_SEPARATOR;
         }
         
-        return rootDir + metadataIdentifier.getUniqueKey(MetadataIdentifier.KeyTypeEnum.PATH) +
-                CommonConstants.PATH_SEPARATOR + METADATA_NODE_NAME;
+        return rootDir + metadataIdentifier.getUniqueKey(MetadataIdentifier.KeyTypeEnum.PATH);
     }
 
 }
