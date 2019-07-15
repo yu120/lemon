@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Demo {
+public class GenericInvokeDemo {
 
     public static void main(String[] args) {
         RegistryConfig registryConfig = new RegistryConfig();
