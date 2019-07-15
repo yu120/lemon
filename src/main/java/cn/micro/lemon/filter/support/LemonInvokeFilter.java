@@ -5,6 +5,7 @@ import cn.micro.lemon.common.LemonStatusCode;
 import cn.micro.lemon.common.LemonConfig;
 import cn.micro.lemon.filter.AbstractFilter;
 import cn.micro.lemon.filter.LemonChain;
+import cn.micro.lemon.filter.LemonFactory;
 import cn.micro.lemon.server.LemonContext;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.extension.Extension;
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author lry
  */
 @Slf4j
-@Extension(order = 200, category = LemonChain.ROUTER)
+@Extension(order = 200, category = LemonFactory.ROUTER)
 public class LemonInvokeFilter extends AbstractFilter {
 
     private final ConcurrentMap<String, LemonInvoke> lemonInvokes = new ConcurrentHashMap<>();
