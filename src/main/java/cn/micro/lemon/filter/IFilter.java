@@ -1,6 +1,7 @@
 package cn.micro.lemon.filter;
 
 import cn.micro.lemon.common.LemonConfig;
+import cn.micro.lemon.server.LemonContext;
 import org.micro.neural.extension.SPI;
 
 /**

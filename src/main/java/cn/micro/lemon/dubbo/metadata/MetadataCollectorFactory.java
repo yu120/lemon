@@ -3,7 +3,7 @@ package cn.micro.lemon.dubbo.metadata;
 import cn.micro.lemon.common.LemonConfig;
 import cn.micro.lemon.dubbo.MetadataCollector;
 import cn.micro.lemon.common.ServiceDefinition;
-import cn.micro.lemon.filter.LemonContext;
+import cn.micro.lemon.server.LemonContext;
 import com.alibaba.fastjson.JSON;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

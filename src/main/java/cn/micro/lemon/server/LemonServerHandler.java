@@ -3,7 +3,6 @@ package cn.micro.lemon.server;
 import cn.micro.lemon.common.LemonConfig;
 import cn.micro.lemon.common.LemonStatusCode;
 import cn.micro.lemon.filter.LemonChain;
-import cn.micro.lemon.filter.LemonContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;

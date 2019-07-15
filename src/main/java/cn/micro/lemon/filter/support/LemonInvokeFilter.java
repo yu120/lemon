@@ -5,7 +5,7 @@ import cn.micro.lemon.common.LemonStatusCode;
 import cn.micro.lemon.common.LemonConfig;
 import cn.micro.lemon.filter.AbstractFilter;
 import cn.micro.lemon.filter.LemonChain;
-import cn.micro.lemon.filter.LemonContext;
+import cn.micro.lemon.server.LemonContext;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.extension.Extension;
 import org.micro.neural.extension.ExtensionLoader;
