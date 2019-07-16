@@ -50,7 +50,7 @@ public class LemonServer {
         LemonFactory.INSTANCE.initialize(lemonConfig);
         log.info("The starting open server by config:{}", lemonConfig);
 
-        URL url = URL.valueOf(lemonConfig.getDubbo().getRegistryAddress());
+        URL url = URL.valueOf(lemonConfig.getLemonRegistry());
         RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getExtension(url.getProtocol());
         registryService = registryFactory.getRegistry(url);
 

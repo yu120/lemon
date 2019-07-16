@@ -32,6 +32,10 @@ public class LemonConfig implements Serializable {
      * The lemon http application path
      */
     private String application;
+    /**
+     * The registry address
+     */
+    private String lemonRegistry;
 
     /**
      * The IO thread number

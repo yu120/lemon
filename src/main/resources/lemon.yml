@@ -1,5 +1,6 @@
 port: 8080
 application: lemon
+lemonRegistry: zookeeper://127.0.0.1:2181
 ioThread: 0
 workThread: 0
 # 64 * 1024 * 1024 = 64 MB
