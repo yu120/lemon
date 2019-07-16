@@ -111,6 +111,21 @@ TODO
 ## Spring Cloud Lemon
 TODO
 
+## Packing and Installation
+```
+mvn clean install -Denforcer.skip=true -Dmaven.test.skip=true
+```
+The target directory: `target/lemon-1.0.0-SNAPSHOT-dist.tar.gz`
+
+After successful execution, `lemon-1.0.0-SNAPSHOT-dist.tar.gz` will be generated in the directory of `target`.
+
+## Start lemon
+```
+> tar -zxvf lemon-1.0.0-SNAPSHOT-dist.tar.gz
+> cd bin
+> ./app start
+```
+
 ## Start service provider
 The metadata report config must be used.
 
@@ -157,26 +172,6 @@ public class ProviderDemo {
         // Local export and register
         service.export();
         System.in.read();
-    }
-
-}
-```
-
-## Start lemon
-```
-package cn.micro.lemon;
-
-import cn.micro.lemon.server.LemonServer;
-
-/**
- * Main
- *
- * @author lry
- */
-public class Main {
-
-    public static void main(String[] args) {
-        new LemonServer().initialize();
     }
 
 }

@@ -10,6 +10,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <maven.version>3.3.3</maven.version>
 
         <neural-core.version>1.0.0-SNAPSHOT</neural-core.version>
         <snakeyaml.version>1.20</snakeyaml.version>
@@ -101,15 +103,249 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
+            <!-- Specify JDK compiler version -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.7.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
+            </plugin>
+            <!-- Specify the configuration files that do not need to be packaged into the jar package -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <!-- The exclusion rule is recommended to be consistent with the import rules in the assembly.xml file -->
+                    <excludes>
+                        <!-- Custom configuration -->
+                        <exclude>*.yml</exclude>
+                        <exclude>*.xml</exclude>
+                        <exclude>*.properties</exclude>
+                        <exclude>static/**</exclude>
+                        <!-- Must be configured -->
+                        <exclude>*.conf</exclude>
+                        <exclude>tools/**</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Use enforcer to mandatory agreement rule: mvn validate -->
+            <!-- mvn clean install -Denforcer.skip=true -Dmaven.test.skip=true -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M2</version>
+                <executions>
+                    <execution>
+                        <id>default-cli</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <message>
+                                        <![CDATA[You are running an older version of Maven. This application requires at least Maven ${maven.version}.]]>
+                                    </message>
+                                    <version>[${maven.version},)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <message>
+                                        <![CDATA[You are running an older version of Java. This application requires at least JDK ${java.version}.0.]]>
+                                    </message>
+                                    <version>[${java.version}.0,)</version>
+                                </requireJavaVersion>
+                                <!--
+                                <requireReleaseVersion>
+                                    <message>No Snapshots Allowed!</message>
+                                </requireReleaseVersion>
+                                -->
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Git commit change log plugin -->
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <verbose>true</verbose>
+                    <dateFormat>yyyy-MM-dd'T'HH:mm:ssZ</dateFormat>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.directory}/dist/jsw/app/conf/git.properties
+                    </generateGitPropertiesFilename>
+                </configuration>
+            </plugin>
+            <!-- Packing command: mvn clean package appassembler:generate-daemons -Dmaven.test.skip=true -->
+            <!-- Using JSW services to create scaffolding for target material packages -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <binFolder>bin</binFolder>
+                    <tempDirectory>tmp</tempDirectory>
+                    <logsDirectory>logs</logsDirectory>
+                    <repositoryName>lib</repositoryName>
+                    <repositoryLayout>flat</repositoryLayout>
+                    <target>${project.build.directory}/dist</target>
+                    <configurationDirectory>conf</configurationDirectory>
+                    <copyConfigurationDirectory>true</copyConfigurationDirectory>
+                    <configurationSourceDirectory>src/main/resources</configurationSourceDirectory>
+                    <daemons>
+                        <daemon>
+                            <id>app</id>
+                            <!-- Main Class -->
+                            <mainClass>cn.micro.lemon.Main</mainClass>
+                            <platforms>
+                                <!-- Java Service Wrapper -->
+                                <platform>jsw</platform>
+                            </platforms>
+                            <generatorConfigurations>
+                                <generatorConfiguration>
+                                    <generator>jsw</generator>
+                                    <includes>
+                                        <include>aix-ppc-32</include>
+                                        <include>aix-ppc-64</include>
+                                        <include>linux-ppc-64</include>
+                                        <include>linux-x86-32</include>
+                                        <include>linux-x86-64</include>
+                                        <include>windows-x86-32</include>
+                                        <include>windows-x86-64</include>
+                                        <include>hpux-parisc-64</include>
+                                        <include>solaris-x86-32</include>
+                                        <include>solaris-sparc-32</include>
+                                        <include>solaris-sparc-64</include>
+                                        <include>macosx-ppc-32</include>
+                                        <include>macosx-universal-32</include>
+                                        <include>macosx-universal-64</include>
+                                    </includes>
+                                    <configuration>
+                                        <property>
+                                            <name>configuration.directory.in.classpath.first</name>
+                                            <value>conf</value>
+                                        </property>
+                                        <property>
+                                            <name>wrapper.ping.timeout</name>
+                                            <value>120</value>
+                                        </property>
+                                        <property>
+                                            <name>set.default.REPO_DIR</name>
+                                            <value>lib</value>
+                                        </property>
+                                        <property>
+                                            <name>wrapper.logfile</name>
+                                            <value>logs/wrapper.log</value>
+                                        </property>
+                                    </configuration>
+                                </generatorConfiguration>
+                            </generatorConfigurations>
+                            <jvmSettings>
+                                <!-- JMX -->
+                                <!--
+                                <systemProperties>
+                                    <systemProperty>java.security.policy=conf/policy.all</systemProperty>
+                                    <systemProperty>com.sun.management.jmxremote</systemProperty>
+                                    <systemProperty>com.sun.management.jmxremote.port=8777</systemProperty>
+                                    <systemProperty>com.sun.management.jmxremote.authenticate=false</systemProperty>
+                                    <systemProperty>com.sun.management.jmxremote.ssl=false</systemProperty>
+                                </systemProperties>
+                                 -->
+                                <!-- https://blog.csdn.net/wo541075754/article/details/75008617 -->
+                                <!-- https://zhaoyanblog.com/archives/440.html -->
+                                <!-- https://www.javadoop.com/post/g1 -->
+                                <extraArguments>
+                                    <extraArgument>-server</extraArgument>
+                                    <!-- Remote Debug -->
+                                    <extraArgument>-Xdebug</extraArgument>
+                                    <!--
+                                    <extraArgument>-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5010</extraArgument>
+                                    -->
+                                    <!-- Heap Dump -->
+                                    <extraArgument>-XX:+HeapDumpOnOutOfMemoryError</extraArgument>
+                                    <extraArgument>-XX:HeapDumpPath=logs/heap-dump.hprof</extraArgument>
+                                    <!-- GC Config -->
+                                    <extraArgument>-XX:+UseG1GC</extraArgument>
+                                    <extraArgument>-XX:MaxGCPauseMillis=200</extraArgument>
+                                    <extraArgument>-XX:InitiatingHeapOccupancyPercent=45</extraArgument>
+                                    <extraArgument>-XX:G1ReservePercent=10</extraArgument>
+                                    <extraArgument>-XX:NewRatio=2</extraArgument>
+                                    <extraArgument>-XX:SurvivorRatio=8</extraArgument>
+                                    <extraArgument>-XX:MaxTenuringThreshold=15</extraArgument>
+                                    <!-- GC Log -->
+                                    <extraArgument>-Xloggc:logs/gc.log</extraArgument>
+                                    <extraArgument>-XX:GCLogFileSize=10M</extraArgument>
+                                    <extraArgument>-XX:NumberOfGCLogFiles=10</extraArgument>
+                                    <extraArgument>-XX:+UseGCLogFileRotation</extraArgument>
+                                    <extraArgument>-XX:+PrintGCDateStamps</extraArgument>
+                                    <extraArgument>-XX:+PrintGCTimeStamps</extraArgument>
+                                    <extraArgument>-XX:+PrintGCDetails</extraArgument>
+                                    <extraArgument>-XX:+PrintHeapAtGC</extraArgument>
+                                    <extraArgument>-XX:+PrintGCApplicationStoppedTime</extraArgument>
+                                    <extraArgument>-XX:+DisableExplicitGC</extraArgument>
+                                    <extraArgument>-verbose:gc</extraArgument>
+                                </extraArguments>
+                            </jvmSettings>
+                        </daemon>
+                    </daemons>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-jsw-scripts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-daemons</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Use assembly to package the scaffolding directory into compressed packets -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/resources/tools/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
