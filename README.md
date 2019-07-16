@@ -124,6 +124,7 @@ After successful execution, `lemon-1.0.0-SNAPSHOT-dist.tar.gz` will be generated
 > tar -zxvf lemon-1.0.0-SNAPSHOT-dist.tar.gz
 > cd bin
 > ./app start
+# Usage: app { console | start | stop | restart | status | dump }
 ```
 
 ## Start service provider
