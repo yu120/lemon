@@ -15,11 +15,15 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.common.URL;
+import org.apache.dubbo.common.extension.ExtensionLoader;
+import org.apache.dubbo.registry.RegistryFactory;
+import org.apache.dubbo.registry.RegistryService;
 import org.micro.neural.common.thread.StandardThreadExecutor;
+import org.micro.neural.common.utils.NetUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
-import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,6 +39,9 @@ public class LemonServer {
     private EventLoopGroup workerGroup;
     private StandardThreadExecutor standardThreadExecutor;
 
+    private URL serverUrl;
+    public static RegistryService registryService = null;
+
     /**
      * The initialize
      */
@@ -42,6 +49,10 @@ public class LemonServer {
         LemonConfig lemonConfig = loadConfig();
         LemonFactory.INSTANCE.initialize(lemonConfig);
         log.info("The starting open server by config:{}", lemonConfig);
+
+        URL url = URL.valueOf(lemonConfig.getDubbo().getRegistryAddress());
+        RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getExtension(url.getProtocol());
+        registryService = registryFactory.getRegistry(url);
 
         ThreadFactoryBuilder ioBuilder = new ThreadFactoryBuilder();
         ioBuilder.setDaemon(true);
@@ -90,6 +101,10 @@ public class LemonServer {
             ChannelFuture channelFuture = serverBootstrap.bind(lemonConfig.getPort()).sync();
             channelFuture.addListener((future) -> log.info("The start server is success"));
             this.channel = channelFuture.channel();
+
+            this.serverUrl = new URL("http", NetUtils.getLocalHost(), lemonConfig.getPort(), lemonConfig.getApplication());
+            registryService.register(serverUrl);
+
             Runtime.getRuntime().addShutdownHook(new Thread(LemonServer.this::destroy));
             if (lemonConfig.isServer()) {
                 channel.closeFuture().sync();
@@ -105,7 +120,7 @@ public class LemonServer {
      * @return {@link LemonConfig}
      */
     private LemonConfig loadConfig() {
-        URL url = this.getClass().getClassLoader().getResource("lemon.yml");
+        java.net.URL url = this.getClass().getClassLoader().getResource("lemon.yml");
         if (url != null) {
             try {
                 return new Yaml().loadAs(new FileInputStream(url.getFile()), LemonConfig.class);
@@ -124,6 +139,8 @@ public class LemonServer {
         log.info("The starting close server...");
 
         try {
+            registryService.unregister(serverUrl);
+
             if (channel != null) {
                 channel.close();
             }

@@ -1,17 +1,16 @@
 package cn.micro.lemon.dubbo;
 
+import cn.micro.lemon.server.LemonServer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.common.constants.RegistryConstants;
-import org.apache.dubbo.common.extension.ExtensionLoader;
 import org.apache.dubbo.common.utils.NetUtils;
 import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.registry.NotifyListener;
 
-import org.apache.dubbo.registry.RegistryFactory;
 import org.apache.dubbo.registry.RegistryService;
 import org.apache.dubbo.remoting.Constants;
 
@@ -56,11 +55,8 @@ public class RegistryServiceSubscribe implements NotifyListener {
             1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
             new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-registry-subscribe").build());
 
-    public void initialize(String registryUrl) {
-        URL url = URL.valueOf(registryUrl);
-        RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(
-                RegistryFactory.class).getExtension(url.getProtocol());
-        this.registryService = registryFactory.getRegistry(url);
+    public void initialize() {
+        this.registryService = LemonServer.registryService;
         threadPoolExecutor.submit(() -> {
             log.info("Init Lemon Dubbo Sync Cache...");
             registryService.subscribe(SUBSCRIBE, RegistryServiceSubscribe.this);
@@ -83,7 +79,6 @@ public class RegistryServiceSubscribe implements NotifyListener {
 
     public void destroy() {
         registryService.unsubscribe(SUBSCRIBE, this);
-
     }
 
     /**

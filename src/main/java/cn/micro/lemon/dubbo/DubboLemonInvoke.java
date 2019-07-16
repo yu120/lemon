@@ -50,7 +50,7 @@ public class DubboLemonInvoke implements LemonInvoke {
         this.metadataCollectorFactory = MetadataCollectorFactory.INSTANCE;
         metadataCollectorFactory.initialize(lemonConfig);
         this.registryServiceSubscribe = new RegistryServiceSubscribe();
-        registryServiceSubscribe.initialize(dubboConfig.getRegistryAddress());
+        registryServiceSubscribe.initialize();
     }
 
     @Override
