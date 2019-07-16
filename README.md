@@ -127,6 +127,22 @@ After successful execution, `lemon-1.0.0-SNAPSHOT-dist.tar.gz` will be generated
 # Usage: app { console | start | stop | restart | status | dump }
 ```
 
+## Use Arthas
+Alibaba [Arthas](https://github.com/alibaba/arthas)
+
+**arthas-boot**:
+```
+> wget https://alibaba.github.io/arthas/arthas-boot.jar
+> java -jar arthas-boot.jar
+```
+
+**as.sh**:
+```
+> curl -L https://alibaba.github.io/arthas/install.sh | sh
+> ./as.sh
+```
+可以直接访问：http://127.0.0.1:8563
+
 ## Start service provider
 The metadata report config must be used.
 
