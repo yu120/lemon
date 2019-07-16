@@ -7,6 +7,10 @@ Lemon is a high-performance, Java based open source gateway framework.
 
 同时支持Dubbo泛化调用和HTTP调用，并支持自定义实现微服务网关请求的代理转发功能。
 
+GitHub：https://github.com/yu120/lemon
+QQ交流群：微服务基础架构（191958521）
+微信交流：请加echo-lry
+
 ## Architecture
 ![lemon](doc/lemon.png)
 
