@@ -81,7 +81,7 @@ The support apache dubbo 2.7.2 generic service proxy.
 **Format:**
 ```
 URL:
-http://[host]:[port]/lemon/[application]/[service/serviceSimpleName]/[method]?group=[group]&version=[version]
+http://[host]:[port]/lemon/[application]/[service or serviceSimpleName]/[method]?group=[group]&version=[version]
 
 Body:
 List[Map{...}, Map{...}, ...]
