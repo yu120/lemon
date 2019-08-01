@@ -55,8 +55,6 @@ public class LemonJwtFilter extends AbstractFilter {
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
-        super.preFilter(chain, context);
-
         String token;
         if (JwtConfig.KeyAddr.QUERY == jwtConfig.getKeyAddr()) {
             token = context.getHeaders().get(jwtConfig.getKey());
@@ -84,6 +82,8 @@ public class LemonJwtFilter extends AbstractFilter {
         } catch (Exception e) {
             context.writeAndFlush(LemonStatusCode.BAD_REQUEST, "JWT Verify Unknown Exception");
         }
+
+        super.preFilter(chain, context);
     }
 
     @Override
