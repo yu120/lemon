@@ -1,6 +1,6 @@
-package cn.micro.lemon.dubbo.metadata;
+package cn.micro.lemon.proxy.dubbo.metadata;
 
-import cn.micro.lemon.dubbo.MetadataCollector;
+import cn.micro.lemon.proxy.dubbo.MetadataCollector;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;

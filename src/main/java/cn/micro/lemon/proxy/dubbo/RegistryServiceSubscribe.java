@@ -1,4 +1,4 @@
-package cn.micro.lemon.dubbo;
+package cn.micro.lemon.proxy.dubbo;
 
 import cn.micro.lemon.server.LemonServer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;

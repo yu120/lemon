@@ -1,4 +1,4 @@
-package cn.micro.lemon.dubbo;
+package cn.micro.lemon.proxy.dubbo;
 
 import lombok.Data;
 import lombok.ToString;

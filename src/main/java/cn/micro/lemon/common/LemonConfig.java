@@ -1,6 +1,6 @@
 package cn.micro.lemon.common;
 
-import cn.micro.lemon.dubbo.DubboConfig;
+import cn.micro.lemon.proxy.dubbo.DubboConfig;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;

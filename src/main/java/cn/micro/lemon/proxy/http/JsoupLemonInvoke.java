@@ -1,4 +1,4 @@
-package cn.micro.lemon.http;
+package cn.micro.lemon.proxy.http;
 
 import cn.micro.lemon.common.LemonConfig;
 import cn.micro.lemon.common.LemonInvoke;

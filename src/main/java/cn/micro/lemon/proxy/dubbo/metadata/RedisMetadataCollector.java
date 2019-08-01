@@ -1,6 +1,6 @@
-package cn.micro.lemon.dubbo.metadata;
+package cn.micro.lemon.proxy.dubbo.metadata;
 
-import cn.micro.lemon.dubbo.MetadataCollector;
+import cn.micro.lemon.proxy.dubbo.MetadataCollector;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.dubbo.common.constants.CommonConstants;

@@ -1,4 +1,4 @@
-package cn.micro.lemon.dubbo;
+package cn.micro.lemon.proxy.dubbo;
 
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 import org.micro.neural.common.URL;
