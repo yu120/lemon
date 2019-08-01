@@ -37,17 +37,17 @@ public class LemonJwtFilter extends AbstractFilter {
         try {
             switch (jwtConfig.getAlgorithm()) {
                 case HMAC256:
-                    algorithm = Algorithm.HMAC256(jwtConfig.getSecret());
+                    this.algorithm = Algorithm.HMAC256(jwtConfig.getSecret());
                     break;
                 case HMAC384:
-                    algorithm = Algorithm.HMAC384(jwtConfig.getSecret());
+                    this.algorithm = Algorithm.HMAC384(jwtConfig.getSecret());
                     break;
                 case HMAC512:
-                    algorithm = Algorithm.HMAC512(jwtConfig.getSecret());
+                    this.algorithm = Algorithm.HMAC512(jwtConfig.getSecret());
                     break;
                 default:
             }
-            verifier = JWT.require(algorithm).build();
+            this.verifier = JWT.require(algorithm).build();
         } catch (UnsupportedEncodingException e) {
             log.error(e.getMessage(), e);
         }
