@@ -144,6 +144,16 @@ public class LemonContext {
      * @param statusCode {@link LemonStatusCode}
      */
     public void writeAndFlush(LemonStatusCode statusCode) {
+        writeAndFlush(statusCode, null);
+    }
+
+    /**
+     * The write and flush
+     *
+     * @param statusCode {@link LemonStatusCode}
+     * @param message    custom message
+     */
+    public void writeAndFlush(LemonStatusCode statusCode, String message) {
         FullHttpResponse response;
         if (LemonStatusCode.SUCCESS != statusCode) {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
@@ -167,11 +177,16 @@ public class LemonContext {
             contentLength = content.readableBytes();
         }
 
+        String resultMessage = statusCode.getMessage();
+        if (message == null || message.trim().length() == 0) {
+            resultMessage += (":" + message);
+        }
+
         io.netty.handler.codec.http.HttpHeaders headers = response.headers();
         headers.set(LEMON_ID, id);
         headers.set(LEMON_TIME, System.currentTimeMillis());
         headers.set(LEMON_CODE_KEY, statusCode.getCode());
-        headers.set(LEMON_CODE_MESSAGE, statusCode.getMessage());
+        headers.set(LEMON_CODE_MESSAGE, resultMessage);
         headers.set(HttpHeaders.CONTENT_LENGTH, contentLength);
         headers.set(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON);
         headers.set(HttpHeaders.CONNECTION, HttpHeaderValues.KEEP_ALIVE);

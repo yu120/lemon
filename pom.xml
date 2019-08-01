@@ -21,6 +21,7 @@
         <dubbo.version>2.7.2</dubbo.version>
         <jedis.version>2.9.0</jedis.version>
         <jsoup.version>1.12.1</jsoup.version>
+        <java-jwt.version>3.3.0</java-jwt.version>
         <lombok.version>1.18.2</lombok.version>
     </properties>
 
@@ -100,6 +101,12 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>${jsoup.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${java-jwt.version}</version>
         </dependency>
 
         <dependency>

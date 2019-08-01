@@ -1,5 +1,6 @@
 package cn.micro.lemon.common;
 
+import cn.micro.lemon.common.support.JwtConfig;
 import cn.micro.lemon.proxy.dubbo.DubboConfig;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -105,6 +106,10 @@ public class LemonConfig implements Serializable {
      */
     private List<String> includeFilters = new ArrayList<>();
 
+    /**
+     * The jwt config
+     */
+    private JwtConfig jwt;
     /**
      * The dubbo config
      */
