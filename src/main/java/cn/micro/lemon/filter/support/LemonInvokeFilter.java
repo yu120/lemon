@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author lry
  */
 @Slf4j
-@Extension(order = 200, category = LemonFactory.ROUTER)
+@Extension(value = "invoke", order = 200, category = LemonFactory.ROUTER)
 public class LemonInvokeFilter extends AbstractFilter {
 
     private final ConcurrentMap<String, LemonInvoke> lemonInvokes = new ConcurrentHashMap<>();

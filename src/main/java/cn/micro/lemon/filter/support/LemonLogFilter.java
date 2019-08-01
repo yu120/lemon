@@ -12,7 +12,7 @@ import org.micro.neural.extension.Extension;
  * @author lry
  */
 @Slf4j
-@Extension(order = 20)
+@Extension(value = "log", order = 20)
 public class LemonLogFilter extends AbstractFilter {
 
     @Override

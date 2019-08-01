@@ -7,15 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.micro.neural.extension.Extension;
 
 /**
- * Degrade Filter
- * <p>
- * TODO
+ * Lemon Cache Filter
  *
  * @author lry
  */
 @Slf4j
-@Extension(order = 170)
-public class DegradeFilter extends AbstractFilter {
+@Extension(value = "cache", order = 150)
+public class LemonCacheFilter extends AbstractFilter {
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {

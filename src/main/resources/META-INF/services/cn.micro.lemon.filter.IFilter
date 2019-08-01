@@ -1,8 +1,4 @@
 cn.micro.lemon.filter.support.LemonExceptionFilter
 cn.micro.lemon.filter.support.LemonLogFilter
-cn.micro.lemon.filter.support.CircuitBreakerFilter
-cn.micro.lemon.filter.support.DegradeFilter
-cn.micro.lemon.filter.support.IdempotentFilter
-cn.micro.lemon.filter.support.LimiterFilter
-cn.micro.lemon.filter.support.RetryFilter
+cn.micro.lemon.filter.support.LemonCacheFilter
 cn.micro.lemon.filter.support.LemonInvokeFilter

@@ -97,6 +97,15 @@ public class LemonConfig implements Serializable {
     private Set<String> originalResHeaders = new LinkedHashSet<>();
 
     /**
+     * The exclude filter list
+     */
+    private List<String> excludeFilters = new ArrayList<>();
+    /**
+     * The include filter list
+     */
+    private List<String> includeFilters = new ArrayList<>();
+
+    /**
      * The dubbo config
      */
     private DubboConfig dubbo;

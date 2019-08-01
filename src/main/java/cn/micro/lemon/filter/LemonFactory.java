@@ -40,6 +40,26 @@ public enum LemonFactory {
                 IFilter filter = filterList.get(i);
                 Extension extension = filter.getClass().getAnnotation(Extension.class);
                 if (extension != null) {
+                    // calculation filter id
+                    String id = extension.value();
+                    if (id.trim().length() == 0) {
+                        id = filter.getClass().getSimpleName();
+                    }
+
+                    // exclude filter by id
+                    if (!lemonConfig.getExcludeFilters().isEmpty()) {
+                        if (lemonConfig.getExcludeFilters().contains(id)) {
+                            continue;
+                        }
+                    }
+
+                    // include filter by id
+                    if (!lemonConfig.getIncludeFilters().isEmpty()) {
+                        if (!lemonConfig.getIncludeFilters().contains(id)) {
+                            continue;
+                        }
+                    }
+
                     if (routerFilterIndex < 0 && Arrays.asList(extension.category()).contains(ROUTER)) {
                         routerFilterIndex = i;
                     }
