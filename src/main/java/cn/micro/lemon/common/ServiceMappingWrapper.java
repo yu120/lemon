@@ -13,7 +13,7 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ServiceDefinition extends ServiceMapping {
+public class ServiceMappingWrapper extends ServiceMapping {
 
     /**
      * The method name

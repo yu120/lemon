@@ -1,8 +1,8 @@
 package cn.micro.lemon.proxy.dubbo.metadata;
 
 import cn.micro.lemon.common.LemonConfig;
+import cn.micro.lemon.common.ServiceMappingWrapper;
 import cn.micro.lemon.proxy.dubbo.MetadataCollector;
-import cn.micro.lemon.common.ServiceDefinition;
 import cn.micro.lemon.server.LemonContext;
 import com.alibaba.fastjson.JSON;
 import com.google.common.cache.Cache;
@@ -63,21 +63,21 @@ public enum MetadataCollectorFactory {
     /**
      * The invalidate cache
      *
-     * @param serviceDefinitions service definition list
+     * @param serviceMappingWrappers service definition list
      */
-    public void invalidates(List<ServiceDefinition> serviceDefinitions) {
-        if (serviceDefinitions == null || serviceDefinitions.isEmpty()) {
+    public void invalidates(List<ServiceMappingWrapper> serviceMappingWrappers) {
+        if (serviceMappingWrappers == null || serviceMappingWrappers.isEmpty()) {
             cache.invalidateAll();
-        } else if (serviceDefinitions.size() == 1) {
-            ServiceDefinition serviceDefinition = serviceDefinitions.get(0);
+        } else if (serviceMappingWrappers.size() == 1) {
+            ServiceMappingWrapper serviceMappingWrapper = serviceMappingWrappers.get(0);
             MetadataIdentifier identifier = new MetadataIdentifier(
-                    serviceDefinition.getService(), serviceDefinition.getVersion(),
-                    serviceDefinition.getGroup(), CommonConstants.PROVIDER_SIDE, serviceDefinition.getApplication());
+                    serviceMappingWrapper.getService(), serviceMappingWrapper.getVersion(),
+                    serviceMappingWrapper.getGroup(), CommonConstants.PROVIDER_SIDE, serviceMappingWrapper.getApplication());
             cache.invalidate(identifier.getIdentifierKey());
         } else {
             Set<String> keys = new HashSet<>();
-            for (ServiceDefinition serviceDefinition : serviceDefinitions) {
-                MetadataIdentifier identifier = build(serviceDefinition);
+            for (ServiceMappingWrapper serviceMappingWrapper : serviceMappingWrappers) {
+                MetadataIdentifier identifier = build(serviceMappingWrapper);
                 keys.add(identifier.getIdentifierKey());
             }
 
@@ -89,10 +89,10 @@ public enum MetadataCollectorFactory {
      * The wrapper types from metadata
      *
      * @param context           {@link LemonContext}
-     * @param serviceDefinition {@link ServiceDefinition}
+     * @param serviceMappingWrapper {@link ServiceMappingWrapper}
      */
-    public void wrapperTypesFromMetadata(LemonContext context, ServiceDefinition serviceDefinition) {
-        MetadataIdentifier identifier = build(serviceDefinition);
+    public void wrapperTypesFromMetadata(LemonContext context, ServiceMappingWrapper serviceMappingWrapper) {
+        MetadataIdentifier identifier = build(serviceMappingWrapper);
 
         // whether to clear cached access
         String invalidateCache = context.getHeaders().get(LemonContext.INVALIDATE_CACHE);
@@ -124,8 +124,8 @@ public enum MetadataCollectorFactory {
             return;
         }
         for (MethodDefinition m : methods) {
-            if (!m.getName().equals(serviceDefinition.getMethod()) ||
-                    m.getParameterTypes().length != serviceDefinition.getParamValues().length) {
+            if (!m.getName().equals(serviceMappingWrapper.getMethod()) ||
+                    m.getParameterTypes().length != serviceMappingWrapper.getParamValues().length) {
                 continue;
             }
 
@@ -138,23 +138,23 @@ public enum MetadataCollectorFactory {
                 }
             }
 
-            serviceDefinition.setParamTypes(parameterTypes.toArray(new String[0]));
+            serviceMappingWrapper.setParamTypes(parameterTypes.toArray(new String[0]));
         }
     }
 
     /**
-     * The build {@link ServiceDefinition}
+     * The build {@link ServiceMappingWrapper}
      *
-     * @param serviceDefinition {@link ServiceDefinition}
+     * @param serviceMappingWrapper {@link ServiceMappingWrapper}
      * @return {@link MetadataIdentifier}
      */
-    private MetadataIdentifier build(ServiceDefinition serviceDefinition) {
+    private MetadataIdentifier build(ServiceMappingWrapper serviceMappingWrapper) {
         return new MetadataIdentifier(
-                serviceDefinition.getServiceName(),
-                serviceDefinition.getVersion(),
-                serviceDefinition.getGroup(),
+                serviceMappingWrapper.getServiceName(),
+                serviceMappingWrapper.getVersion(),
+                serviceMappingWrapper.getGroup(),
                 CommonConstants.PROVIDER_SIDE,
-                serviceDefinition.getApplication());
+                serviceMappingWrapper.getApplication());
     }
 
 }
