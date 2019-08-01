@@ -17,6 +17,7 @@
         <snakeyaml.version>1.20</snakeyaml.version>
         <netty.version>4.1.37.Final</netty.version>
         <log4j2.version>2.7</log4j2.version>
+        <fastjson.version>1.2.58</fastjson.version>
         <dubbo.version>2.7.2</dubbo.version>
         <jedis.version>2.9.0</jedis.version>
         <jsoup.version>1.12.1</jsoup.version>
@@ -51,6 +52,13 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>${log4j2.version}</version>
+        </dependency>
+
+        <!-- fastjson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
 
         <!-- dubbo -->
