@@ -27,7 +27,6 @@ public class LemonJwtFilter extends AbstractFilter {
 
     private Algorithm algorithm;
     private JWTVerifier verifier;
-
     private JwtConfig jwtConfig;
 
     @Override
@@ -70,6 +69,7 @@ public class LemonJwtFilter extends AbstractFilter {
 
         try {
             verifier.verify(token);
+            super.preFilter(chain, context);
         } catch (AlgorithmMismatchException e) {
             context.writeAndFlush(LemonStatusCode.BAD_REQUEST, "Algorithm Mismatch");
         } catch (InvalidClaimException e) {
@@ -83,8 +83,6 @@ public class LemonJwtFilter extends AbstractFilter {
         } catch (Exception e) {
             context.writeAndFlush(LemonStatusCode.BAD_REQUEST, "JWT Verify Unknown Exception");
         }
-
-        super.preFilter(chain, context);
     }
 
     @Override
