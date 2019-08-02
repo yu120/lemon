@@ -51,4 +51,17 @@ public class ServiceMapping implements Serializable {
      */
     private Long timeout;
 
+    /**
+     * The method name
+     */
+    private String method;
+    /**
+     * The parameter type list
+     */
+    private String[] paramTypes;
+    /**
+     * The parameter value list
+     */
+    private Object[] paramValues;
+
 }

@@ -1,7 +1,7 @@
 package cn.micro.lemon.common;
 
 import cn.micro.lemon.common.support.JwtConfig;
-import cn.micro.lemon.proxy.dubbo.DubboConfig;
+import cn.micro.lemon.common.support.DubboConfig;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;

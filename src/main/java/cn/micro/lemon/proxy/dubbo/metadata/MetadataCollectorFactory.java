@@ -1,7 +1,7 @@
 package cn.micro.lemon.proxy.dubbo.metadata;
 
 import cn.micro.lemon.common.LemonConfig;
-import cn.micro.lemon.common.ServiceMappingWrapper;
+import cn.micro.lemon.common.ServiceMapping;
 import cn.micro.lemon.proxy.dubbo.MetadataCollector;
 import cn.micro.lemon.server.LemonContext;
 import com.alibaba.fastjson.JSON;
@@ -63,21 +63,21 @@ public enum MetadataCollectorFactory {
     /**
      * The invalidate cache
      *
-     * @param serviceMappingWrappers service definition list
+     * @param serviceMappings service definition list
      */
-    public void invalidates(List<ServiceMappingWrapper> serviceMappingWrappers) {
-        if (serviceMappingWrappers == null || serviceMappingWrappers.isEmpty()) {
+    public void invalidates(List<ServiceMapping> serviceMappings) {
+        if (serviceMappings == null || serviceMappings.isEmpty()) {
             cache.invalidateAll();
-        } else if (serviceMappingWrappers.size() == 1) {
-            ServiceMappingWrapper serviceMappingWrapper = serviceMappingWrappers.get(0);
+        } else if (serviceMappings.size() == 1) {
+            ServiceMapping serviceMapping = serviceMappings.get(0);
             MetadataIdentifier identifier = new MetadataIdentifier(
-                    serviceMappingWrapper.getService(), serviceMappingWrapper.getVersion(),
-                    serviceMappingWrapper.getGroup(), CommonConstants.PROVIDER_SIDE, serviceMappingWrapper.getApplication());
+                    serviceMapping.getService(), serviceMapping.getVersion(),
+                    serviceMapping.getGroup(), CommonConstants.PROVIDER_SIDE, serviceMapping.getApplication());
             cache.invalidate(identifier.getIdentifierKey());
         } else {
             Set<String> keys = new HashSet<>();
-            for (ServiceMappingWrapper serviceMappingWrapper : serviceMappingWrappers) {
-                MetadataIdentifier identifier = build(serviceMappingWrapper);
+            for (ServiceMapping serviceMapping : serviceMappings) {
+                MetadataIdentifier identifier = build(serviceMapping);
                 keys.add(identifier.getIdentifierKey());
             }
 
@@ -89,10 +89,10 @@ public enum MetadataCollectorFactory {
      * The wrapper types from metadata
      *
      * @param context           {@link LemonContext}
-     * @param serviceMappingWrapper {@link ServiceMappingWrapper}
+     * @param serviceMapping {@link ServiceMapping}
      */
-    public void wrapperTypesFromMetadata(LemonContext context, ServiceMappingWrapper serviceMappingWrapper) {
-        MetadataIdentifier identifier = build(serviceMappingWrapper);
+    public void wrapperTypesFromMetadata(LemonContext context, ServiceMapping serviceMapping) {
+        MetadataIdentifier identifier = build(serviceMapping);
 
         // whether to clear cached access
         String invalidateCache = context.getHeaders().get(LemonContext.INVALIDATE_CACHE);
@@ -124,8 +124,8 @@ public enum MetadataCollectorFactory {
             return;
         }
         for (MethodDefinition m : methods) {
-            if (!m.getName().equals(serviceMappingWrapper.getMethod()) ||
-                    m.getParameterTypes().length != serviceMappingWrapper.getParamValues().length) {
+            if (!m.getName().equals(serviceMapping.getMethod()) ||
+                    m.getParameterTypes().length != serviceMapping.getParamValues().length) {
                 continue;
             }
 
@@ -138,23 +138,23 @@ public enum MetadataCollectorFactory {
                 }
             }
 
-            serviceMappingWrapper.setParamTypes(parameterTypes.toArray(new String[0]));
+            serviceMapping.setParamTypes(parameterTypes.toArray(new String[0]));
         }
     }
 
     /**
-     * The build {@link ServiceMappingWrapper}
+     * The build {@link ServiceMapping}
      *
-     * @param serviceMappingWrapper {@link ServiceMappingWrapper}
+     * @param serviceMapping {@link ServiceMapping}
      * @return {@link MetadataIdentifier}
      */
-    private MetadataIdentifier build(ServiceMappingWrapper serviceMappingWrapper) {
+    private MetadataIdentifier build(ServiceMapping serviceMapping) {
         return new MetadataIdentifier(
-                serviceMappingWrapper.getServiceName(),
-                serviceMappingWrapper.getVersion(),
-                serviceMappingWrapper.getGroup(),
+                serviceMapping.getServiceName(),
+                serviceMapping.getVersion(),
+                serviceMapping.getGroup(),
                 CommonConstants.PROVIDER_SIDE,
-                serviceMappingWrapper.getApplication());
+                serviceMapping.getApplication());
     }
 
 }

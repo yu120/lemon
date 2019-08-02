@@ -1,7 +1,7 @@
 package cn.micro.lemon.filter.support;
 
 import cn.micro.lemon.common.LemonConfig;
-import cn.micro.lemon.common.ServiceMappingWrapper;
+import cn.micro.lemon.common.ServiceMapping;
 import cn.micro.lemon.filter.AbstractFilter;
 import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.proxy.dubbo.RegistryServiceSubscribe;
@@ -54,7 +54,7 @@ public class LemonAuthorizeFilter extends AbstractFilter {
     }
 
     /**
-     * The build {@link ServiceMappingWrapper} by {@link LemonContext}
+     * The wrapper {@link ServiceMapping} by {@link LemonContext}
      *
      * @param context {@link LemonContext}
      */
@@ -64,46 +64,46 @@ public class LemonAuthorizeFilter extends AbstractFilter {
             throw new IllegalArgumentException("Illegal Request");
         }
 
-        ServiceMappingWrapper serviceMappingWrapper = new ServiceMappingWrapper();
-        serviceMappingWrapper.setApplication(paths.get(1));
-        serviceMappingWrapper.setService(paths.get(2));
-        serviceMappingWrapper.setMethod(paths.get(3));
+        ServiceMapping serviceMapping = new ServiceMapping();
+        serviceMapping.setApplication(paths.get(1));
+        serviceMapping.setService(paths.get(2));
+        serviceMapping.setMethod(paths.get(3));
 
         // wrapper service name
-        wrapperServiceName(serviceMappingWrapper);
+        wrapperServiceName(serviceMapping);
 
         Map<String, String> parameters = context.getParameters();
         if (parameters.containsKey(CommonConstants.GROUP_KEY)) {
             String group = parameters.get(CommonConstants.GROUP_KEY);
             if (group != null && group.length() > 0) {
-                serviceMappingWrapper.setGroup(group);
+                serviceMapping.setGroup(group);
             }
         }
         if (parameters.containsKey(CommonConstants.VERSION_KEY)) {
             String version = parameters.get(CommonConstants.VERSION_KEY);
             if (version != null && version.length() > 0) {
-                serviceMappingWrapper.setVersion(version);
+                serviceMapping.setVersion(version);
             }
         }
 
-        context.setServiceMappingWrapper(serviceMappingWrapper);
+        context.setServiceMapping(serviceMapping);
     }
 
-    private void wrapperServiceName(ServiceMappingWrapper serviceMappingWrapper) {
+    private void wrapperServiceName(ServiceMapping serviceMapping) {
         ConcurrentMap<String, String> serviceNames =
-                registryServiceSubscribe.getServiceNames().get(serviceMappingWrapper.getApplication());
+                registryServiceSubscribe.getServiceNames().get(serviceMapping.getApplication());
         if (serviceNames == null || serviceNames.isEmpty()) {
-            serviceMappingWrapper.setServiceName(serviceMappingWrapper.getService());
+            serviceMapping.setServiceName(serviceMapping.getService());
             return;
         }
 
-        String serviceName = serviceNames.get(serviceMappingWrapper.getService());
+        String serviceName = serviceNames.get(serviceMapping.getService());
         if (StringUtils.isBlank(serviceName)) {
-            serviceMappingWrapper.setServiceName(serviceMappingWrapper.getService());
+            serviceMapping.setServiceName(serviceMapping.getService());
             return;
         }
 
-        serviceMappingWrapper.setServiceName(serviceName);
+        serviceMapping.setServiceName(serviceName);
     }
 
 }
