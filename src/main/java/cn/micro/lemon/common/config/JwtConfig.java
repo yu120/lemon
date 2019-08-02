@@ -1,5 +1,7 @@
-package cn.micro.lemon.common.support;
+package cn.micro.lemon.common.config;
 
+import cn.micro.lemon.common.support.JwtAlgorithm;
+import cn.micro.lemon.common.support.KeyAddr;
 import lombok.Data;
 import lombok.ToString;
 
@@ -30,20 +32,5 @@ public class JwtConfig implements Serializable {
      * The jwt algorithm
      */
     private JwtAlgorithm algorithm = JwtAlgorithm.HMAC256;
-
-    /**
-     * Jwt Key Addr
-     *
-     * @author lry
-     */
-    public enum KeyAddr {
-        // ===
-        HEADER, QUERY;
-    }
-
-    public enum JwtAlgorithm {
-        // ===
-        HMAC256, HMAC384, HMAC512;
-    }
 
 }

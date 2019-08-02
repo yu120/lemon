@@ -1,7 +1,7 @@
 package cn.micro.lemon.proxy.dubbo;
 
 import cn.micro.lemon.common.*;
-import cn.micro.lemon.common.support.DubboConfig;
+import cn.micro.lemon.common.config.DubboConfig;
 import cn.micro.lemon.proxy.dubbo.metadata.MetadataCollectorFactory;
 import cn.micro.lemon.server.LemonContext;
 import com.alibaba.fastjson.JSON;

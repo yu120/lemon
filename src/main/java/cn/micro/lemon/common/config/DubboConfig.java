@@ -1,4 +1,4 @@
-package cn.micro.lemon.common.support;
+package cn.micro.lemon.common.config;
 
 import lombok.Data;
 import lombok.ToString;

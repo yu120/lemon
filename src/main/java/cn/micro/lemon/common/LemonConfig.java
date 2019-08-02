@@ -1,16 +1,13 @@
 package cn.micro.lemon.common;
 
-import cn.micro.lemon.common.support.JwtConfig;
-import cn.micro.lemon.common.support.DubboConfig;
-import lombok.AllArgsConstructor;
+import cn.micro.lemon.common.config.BizTaskConfig;
+import cn.micro.lemon.common.config.JwtConfig;
+import cn.micro.lemon.common.config.DubboConfig;
 import lombok.Data;
-import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Lemon Config
@@ -58,26 +55,8 @@ public class LemonConfig implements Serializable {
      * The server model: true
      */
     private boolean server = true;
-    /**
-     * The biz core thread number
-     */
-    private int bizCoreThread = 20;
-    /**
-     * The biz max thread number
-     */
-    private int bizMaxThread = 200;
-    /**
-     * The biz queue capacity
-     */
-    private int bizQueueCapacity = 800;
-    /**
-     * The biz keep alive time(ms)
-     */
-    private long bizKeepAliveTime = 60000L;
-    /**
-     * The biz thread rejected strategy
-     */
-    private RejectedStrategy rejectedStrategy = RejectedStrategy.ABORT_POLICY;
+
+    private BizTaskConfig biz;
 
     /**
      * The configure fixed response header list
@@ -118,25 +97,5 @@ public class LemonConfig implements Serializable {
      * The direct connection service mapping list
      */
     private List<ServiceMapping> services = new ArrayList<>();
-
-    /**
-     * Rejected Strategy
-     *
-     * @author lry
-     */
-    @Getter
-    @AllArgsConstructor
-    public enum RejectedStrategy {
-
-        // ===
-
-        ABORT_POLICY(new ThreadPoolExecutor.AbortPolicy()),
-        CALLER_RUNS_POLICY(new ThreadPoolExecutor.CallerRunsPolicy()),
-        DISCARD_OLDEST_POLICY(new ThreadPoolExecutor.DiscardOldestPolicy()),
-        DISCARD_POLICY(new ThreadPoolExecutor.DiscardPolicy());
-
-        private RejectedExecutionHandler handler;
-
-    }
 
 }
