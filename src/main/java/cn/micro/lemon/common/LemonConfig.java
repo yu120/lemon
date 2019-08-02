@@ -35,6 +35,11 @@ public class LemonConfig implements Serializable {
      */
     private String lemonRegistry;
 
+
+    /**
+     * The server model: true
+     */
+    private boolean server = true;
     /**
      * The IO thread number
      */
@@ -51,12 +56,10 @@ public class LemonConfig implements Serializable {
      * The max server conn (all clients conn)
      **/
     private int maxChannel = 100000;
-    /**
-     * The server model: true
-     */
-    private boolean server = true;
+
 
     private BizTaskConfig biz;
+
 
     /**
      * The configure fixed response header list

@@ -1,6 +1,7 @@
 package cn.micro.lemon.server;
 
 import cn.micro.lemon.common.LemonConfig;
+import cn.micro.lemon.common.config.BizTaskConfig;
 import cn.micro.lemon.filter.LemonFactory;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -61,18 +62,19 @@ public class LemonServer {
         workBuilder.setDaemon(true);
         workBuilder.setNameFormat("lemon-work");
 
-        if (lemonConfig.getBizCoreThread() > 0) {
+        BizTaskConfig bizTaskConfig = lemonConfig.getBiz();
+        if (bizTaskConfig.getBizCoreThread() > 0) {
             ThreadFactoryBuilder bizBuilder = new ThreadFactoryBuilder();
             bizBuilder.setDaemon(true);
             bizBuilder.setNameFormat("lemon-biz");
             this.standardThreadExecutor = new StandardThreadExecutor(
-                    lemonConfig.getBizCoreThread(),
-                    lemonConfig.getBizMaxThread(),
-                    lemonConfig.getBizKeepAliveTime(),
+                    bizTaskConfig.getBizCoreThread(),
+                    bizTaskConfig.getBizMaxThread(),
+                    bizTaskConfig.getBizKeepAliveTime(),
                     TimeUnit.MILLISECONDS,
-                    lemonConfig.getBizQueueCapacity(),
+                    bizTaskConfig.getBizQueueCapacity(),
                     bizBuilder.build(),
-                    lemonConfig.getRejectedStrategy().getHandler());
+                    bizTaskConfig.getRejectedStrategy().getHandler());
             standardThreadExecutor.prestartAllCoreThreads();
         }
 
