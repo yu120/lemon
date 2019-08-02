@@ -147,8 +147,8 @@ Alibaba [Arthas](https://github.com/alibaba/arthas)
 The metadata report config must be used.
 
 ```
-import cn.micro.lemon.provider.DemoService;
-import cn.micro.lemon.provider.DemoServiceImpl;
+import DemoService;
+import DemoServiceImpl;
 import org.apache.dubbo.config.*;
 
 public class ProviderDemo {

@@ -239,7 +239,7 @@
                         <daemon>
                             <id>app</id>
                             <!-- Main Class -->
-                            <mainClass>cn.micro.lemon.Main</mainClass>
+                            <mainClass>org.micro.lemon.Main</mainClass>
                             <platforms>
                                 <!-- Java Service Wrapper -->
                                 <platform>jsw</platform>

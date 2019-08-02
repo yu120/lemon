@@ -1,0 +1,2 @@
+org.micro.lemon.proxy.dubbo.metadata.ZookeeperMetadataCollector
+org.micro.lemon.proxy.dubbo.metadata.RedisMetadataCollector

@@ -1,0 +1,2 @@
+org.micro.lemon.proxy.dubbo.DubboLemonInvoke
+org.micro.lemon.proxy.http.JsoupLemonInvoke
