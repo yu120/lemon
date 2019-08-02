@@ -3,7 +3,7 @@ package cn.micro.lemon.filter.support;
 import cn.micro.lemon.common.LemonConfig;
 import cn.micro.lemon.common.LemonStatusCode;
 import cn.micro.lemon.common.config.JwtConfig;
-import cn.micro.lemon.common.support.KeyAddr;
+import cn.micro.lemon.common.support.JwtKeyAddr;
 import cn.micro.lemon.filter.AbstractFilter;
 import cn.micro.lemon.filter.LemonChain;
 import cn.micro.lemon.server.LemonContext;
@@ -66,7 +66,7 @@ public class LemonJwtFilter extends AbstractFilter {
         }
 
         String token;
-        if (KeyAddr.QUERY == jwtConfig.getKeyAddr()) {
+        if (JwtKeyAddr.QUERY == jwtConfig.getJwtKeyAddr()) {
             token = context.getHeaders().get(jwtConfig.getKey());
         } else {
             token = context.getParameters().get(jwtConfig.getKey());

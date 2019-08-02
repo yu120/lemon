@@ -5,7 +5,7 @@ package cn.micro.lemon.common.support;
  *
  * @author lry
  */
-public enum KeyAddr {
+public enum JwtKeyAddr {
 
     // ===
 

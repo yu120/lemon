@@ -1,7 +1,7 @@
 package cn.micro.lemon.common.config;
 
 import cn.micro.lemon.common.support.JwtAlgorithm;
-import cn.micro.lemon.common.support.KeyAddr;
+import cn.micro.lemon.common.support.JwtKeyAddr;
 import lombok.Data;
 import lombok.ToString;
 
@@ -31,7 +31,7 @@ public class JwtConfig implements Serializable {
     /**
      * The jwt key address
      */
-    private KeyAddr keyAddr = KeyAddr.HEADER;
+    private JwtKeyAddr jwtKeyAddr = JwtKeyAddr.HEADER;
     /**
      * The jwt algorithm
      */
