@@ -31,8 +31,13 @@ public class LemonJwtFilter extends AbstractFilter {
 
     @Override
     public void initialize(LemonConfig lemonConfig) {
-        super.initialize(lemonConfig);
         this.jwtConfig = lemonConfig.getJwt();
+        if (!jwtConfig.isEnable()) {
+            return;
+        }
+
+        super.initialize(lemonConfig);
+
 
         try {
             switch (jwtConfig.getAlgorithm()) {
@@ -55,6 +60,11 @@ public class LemonJwtFilter extends AbstractFilter {
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
+        if (!jwtConfig.isEnable()) {
+            super.preFilter(chain, context);
+            return;
+        }
+
         String token;
         if (KeyAddr.QUERY == jwtConfig.getKeyAddr()) {
             token = context.getHeaders().get(jwtConfig.getKey());
@@ -87,6 +97,11 @@ public class LemonJwtFilter extends AbstractFilter {
 
     @Override
     public void postFilter(LemonChain chain, LemonContext context) throws Throwable {
+        if (!jwtConfig.isEnable()) {
+            super.postFilter(chain, context);
+            return;
+        }
+
         super.postFilter(chain, context);
     }
 

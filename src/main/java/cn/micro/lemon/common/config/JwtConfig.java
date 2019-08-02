@@ -17,6 +17,10 @@ import java.io.Serializable;
 public class JwtConfig implements Serializable {
 
     /**
+     * The jwt enable
+     */
+    private boolean enable = true;
+    /**
      * The jwt key
      */
     private String key = "Token";
