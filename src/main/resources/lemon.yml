@@ -25,6 +25,7 @@ original:
 
 # JWT config
 jwt:
+  enable: true
   key: Token
   secret: lemon
   keyAddr: HEADER
