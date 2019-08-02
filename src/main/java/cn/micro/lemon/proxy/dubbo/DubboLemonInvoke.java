@@ -8,8 +8,6 @@ import cn.micro.lemon.proxy.dubbo.metadata.MetadataCollectorFactory;
 import cn.micro.lemon.server.LemonContext;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.common.constants.CommonConstants;
-import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
@@ -23,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Dubbo Lemon Invoke
@@ -37,7 +34,6 @@ public class DubboLemonInvoke implements LemonInvoke {
     private LemonConfig lemonConfig;
     private RegistryConfig registry;
     private MetadataCollectorFactory metadataCollectorFactory;
-    private RegistryServiceSubscribe registryServiceSubscribe;
 
     @Override
     public void initialize(LemonConfig lemonConfig) {
@@ -49,8 +45,6 @@ public class DubboLemonInvoke implements LemonInvoke {
 
         this.metadataCollectorFactory = MetadataCollectorFactory.INSTANCE;
         metadataCollectorFactory.initialize(lemonConfig);
-        this.registryServiceSubscribe = new RegistryServiceSubscribe();
-        registryServiceSubscribe.initialize();
     }
 
     @Override
@@ -66,7 +60,8 @@ public class DubboLemonInvoke implements LemonInvoke {
         }
 
         // call original remote
-        ServiceMappingWrapper serviceMappingWrapper = buildServiceDefinition(context);
+        ServiceMappingWrapper serviceMappingWrapper = context.getServiceMappingWrapper();
+        wrapperServiceDefinition(context);
         GenericService genericService = buildGenericService(context, serviceMappingWrapper);
         Object result = genericService.$invoke(serviceMappingWrapper.getMethod(),
                 serviceMappingWrapper.getParamTypes(), serviceMappingWrapper.getParamValues());
@@ -114,45 +109,14 @@ public class DubboLemonInvoke implements LemonInvoke {
 
     @Override
     public void destroy() {
-        if (registryServiceSubscribe != null) {
-            registryServiceSubscribe.destroy();
-        }
     }
 
     /**
      * The build {@link ServiceMappingWrapper} by {@link LemonContext}
      *
      * @param context {@link LemonContext}
-     * @return {@link ServiceMappingWrapper}
      */
-    private ServiceMappingWrapper buildServiceDefinition(LemonContext context) {
-        List<String> paths = context.getPaths();
-        if (paths.size() != 4) {
-            throw new IllegalArgumentException("Illegal Request");
-        }
-
-        ServiceMappingWrapper serviceMappingWrapper = new ServiceMappingWrapper();
-        serviceMappingWrapper.setApplication(paths.get(1));
-        serviceMappingWrapper.setService(paths.get(2));
-        serviceMappingWrapper.setMethod(paths.get(3));
-
-        // wrapper service name
-        wrapperServiceName(serviceMappingWrapper);
-
-        Map<String, String> parameters = context.getParameters();
-        if (parameters.containsKey(CommonConstants.GROUP_KEY)) {
-            String group = parameters.get(CommonConstants.GROUP_KEY);
-            if (group != null && group.length() > 0) {
-                serviceMappingWrapper.setGroup(group);
-            }
-        }
-        if (parameters.containsKey(CommonConstants.VERSION_KEY)) {
-            String version = parameters.get(CommonConstants.VERSION_KEY);
-            if (version != null && version.length() > 0) {
-                serviceMappingWrapper.setVersion(version);
-            }
-        }
-
+    private void wrapperServiceDefinition(LemonContext context) {
         List<Object> paramValues = new ArrayList<>();
         if (JSON.isValid(context.getContent())) {
             paramValues.add(JSON.parse(context.getContent()));
@@ -160,31 +124,13 @@ public class DubboLemonInvoke implements LemonInvoke {
             paramValues.add(context.getContent());
         }
 
-        serviceMappingWrapper.setParamValues(paramValues.toArray(new Object[0]));
-        return serviceMappingWrapper;
-    }
-
-    private void wrapperServiceName(ServiceMappingWrapper serviceMappingWrapper) {
-        ConcurrentMap<String, String> serviceNames =
-                registryServiceSubscribe.getServiceNames().get(serviceMappingWrapper.getApplication());
-        if (serviceNames == null || serviceNames.isEmpty()) {
-            serviceMappingWrapper.setServiceName(serviceMappingWrapper.getService());
-            return;
-        }
-
-        String serviceName = serviceNames.get(serviceMappingWrapper.getService());
-        if (StringUtils.isBlank(serviceName)) {
-            serviceMappingWrapper.setServiceName(serviceMappingWrapper.getService());
-            return;
-        }
-
-        serviceMappingWrapper.setServiceName(serviceName);
+        context.getServiceMappingWrapper().setParamValues(paramValues.toArray(new Object[0]));
     }
 
     /**
      * The build {@link GenericService} by {@link ServiceMappingWrapper}
      *
-     * @param context           {@link LemonContext}
+     * @param context               {@link LemonContext}
      * @param serviceMappingWrapper {@link ServiceMappingWrapper}
      * @return {@link GenericService}
      */

@@ -2,6 +2,7 @@ package cn.micro.lemon.server;
 
 import cn.micro.lemon.common.LemonConfig;
 import cn.micro.lemon.common.LemonStatusCode;
+import cn.micro.lemon.common.ServiceMappingWrapper;
 import com.alibaba.fastjson.JSON;
 import com.google.common.net.HttpHeaders;
 import io.netty.buffer.ByteBuf;
@@ -69,6 +70,8 @@ public class LemonContext {
 
     private Object result;
     private final Map<String, Object> resHeaders = new HashMap<>();
+
+    private ServiceMappingWrapper serviceMappingWrapper;
 
     public LemonContext(LemonConfig lemonConfig, ChannelHandlerContext ctx) {
         this.id = UUID.randomUUID().toString().replace("-", "");
