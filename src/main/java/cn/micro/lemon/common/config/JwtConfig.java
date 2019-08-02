@@ -17,6 +17,10 @@ import java.io.Serializable;
 public class JwtConfig implements Serializable {
 
     /**
+     * The jwt key
+     */
+    private String key = "Token";
+    /**
      * The jwt secret
      */
     private String secret = "lemon";
@@ -24,10 +28,6 @@ public class JwtConfig implements Serializable {
      * The jwt key address
      */
     private KeyAddr keyAddr = KeyAddr.HEADER;
-    /**
-     * The jwt key
-     */
-    private String key = "Token";
     /**
      * The jwt algorithm
      */

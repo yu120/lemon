@@ -207,7 +207,7 @@ public class LemonContext {
         Map<String, Object> resHeaders = getResHeaders();
         if (resHeaders != null && resHeaders.size() > 0) {
             for (Map.Entry<String, Object> entry : resHeaders.entrySet()) {
-                if (lemonConfig.getOriginalResHeaders().contains(entry.getKey())) {
+                if (lemonConfig.getOriginal().getResHeaders().contains(entry.getKey())) {
                     headers.set(entry.getKey(), entry.getValue());
                 }
             }

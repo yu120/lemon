@@ -18,19 +18,19 @@ public class BizTaskConfig implements Serializable {
     /**
      * The biz core thread number
      */
-    private int bizCoreThread = 20;
+    private int coreThread = 20;
     /**
      * The biz max thread number
      */
-    private int bizMaxThread = 200;
+    private int maxThread = 200;
     /**
      * The biz queue capacity
      */
-    private int bizQueueCapacity = 800;
+    private int queueCapacity = 800;
     /**
      * The biz keep alive time(ms)
      */
-    private long bizKeepAliveTime = 60000L;
+    private long keepAliveTime = 60000L;
     /**
      * The biz thread rejected strategy
      */

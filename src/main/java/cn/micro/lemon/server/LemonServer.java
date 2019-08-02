@@ -51,7 +51,7 @@ public class LemonServer {
         LemonFactory.INSTANCE.initialize(lemonConfig);
         log.info("The starting open server by config:{}", lemonConfig);
 
-        URL url = URL.valueOf(lemonConfig.getLemonRegistry());
+        URL url = URL.valueOf(lemonConfig.getRegistryAddress());
         RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getExtension(url.getProtocol());
         registryService = registryFactory.getRegistry(url);
 
@@ -63,16 +63,16 @@ public class LemonServer {
         workBuilder.setNameFormat("lemon-work");
 
         BizTaskConfig bizTaskConfig = lemonConfig.getBiz();
-        if (bizTaskConfig.getBizCoreThread() > 0) {
+        if (bizTaskConfig.getCoreThread() > 0) {
             ThreadFactoryBuilder bizBuilder = new ThreadFactoryBuilder();
             bizBuilder.setDaemon(true);
             bizBuilder.setNameFormat("lemon-biz");
             this.standardThreadExecutor = new StandardThreadExecutor(
-                    bizTaskConfig.getBizCoreThread(),
-                    bizTaskConfig.getBizMaxThread(),
-                    bizTaskConfig.getBizKeepAliveTime(),
+                    bizTaskConfig.getCoreThread(),
+                    bizTaskConfig.getMaxThread(),
+                    bizTaskConfig.getKeepAliveTime(),
                     TimeUnit.MILLISECONDS,
-                    bizTaskConfig.getBizQueueCapacity(),
+                    bizTaskConfig.getQueueCapacity(),
                     bizBuilder.build(),
                     bizTaskConfig.getRejectedStrategy().getHandler());
             standardThreadExecutor.prestartAllCoreThreads();

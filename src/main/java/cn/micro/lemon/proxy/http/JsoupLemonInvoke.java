@@ -72,7 +72,7 @@ public class JsoupLemonInvoke implements LemonInvoke {
         // setter timeout(ms)
         Long timeout = mapping.getTimeout();
         if (timeout == null) {
-            timeout = lemonConfig.getOriginalTimeout();
+            timeout = lemonConfig.getOriginal().getTimeout();
         }
         if (timeout > 0) {
             request.timeout(timeout.intValue());

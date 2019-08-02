@@ -1,25 +1,49 @@
-port: 8080
+# Base config
+token: lemon
 application: lemon
-lemonRegistry: zookeeper://127.0.0.1:2181
+port: 8080
+server: true
 ioThread: 0
 workThread: 0
 # 64 * 1024 * 1024 = 64 MB
 maxContentLength: 67108864
 maxChannel: 100000
-bizCoreThread: 20
-bizMaxThread: 200
-bizQueueCapacity: 800
-bizKeepAliveTime: 60000
-resHeaders:
-  Connection: keep-alive
-  Accept-Encoding: gzip,deflate
-  Content-Type: application/json;charset=UTF-8
-originalReqHeaders: [Connection, Content-Type, Set-Cookie, Call-Code, Call-Message]
-originalResHeaders: [Connection, Content-Type, Set-Cookie, Call-Code, Call-Message]
+
+# BIZ I/O Task config
+biz:
+  coreThread: 20
+  maxThread: 200
+  queueCapacity: 800
+  keepAliveTime: 60000
+  rejectedStrategy: ABORT_POLICY
+
+# Original invoke config
+original:
+  timeout: 30000
+  reqHeaders: [Connection, Content-Type, Set-Cookie, Call-Code, Call-Message]
+  resHeaders: [Connection, Content-Type, Set-Cookie, Call-Code, Call-Message]
+
+# JWT config
+jwt:
+  key: Token
+  secret: lemon
+  keyAddr: HEADER
+  algorithm: HMAC256
+
+# Dubbo config
 dubbo:
   serviceSimpleName: true
   registryAddress: zookeeper://127.0.0.1:2181
   metadataAddress: zookeeper://127.0.0.1:2181
+
+# Lemon config
+registryAddress: zookeeper://127.0.0.1:2181
+excludeFilters: []
+includeFilters: []
+resHeaders:
+  Connection: keep-alive
+  Accept-Encoding: gzip,deflate
+  Content-Type: application/json;charset=UTF-8
 services:
   - category: jsoup
     service: /baidu/**

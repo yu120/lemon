@@ -2,6 +2,7 @@ package cn.micro.lemon.proxy.dubbo;
 
 import cn.micro.lemon.common.*;
 import cn.micro.lemon.common.config.DubboConfig;
+import cn.micro.lemon.common.config.OriginalConfig;
 import cn.micro.lemon.proxy.dubbo.metadata.MetadataCollectorFactory;
 import cn.micro.lemon.server.LemonContext;
 import com.alibaba.fastjson.JSON;
@@ -47,11 +48,13 @@ public class DubboLemonInvoke implements LemonInvoke {
 
     @Override
     public Object invoke(LemonContext context) {
+        OriginalConfig originalConfig = lemonConfig.getOriginal();
+
         context.setSendTime(System.currentTimeMillis());
         // setter request header list
         for (Map.Entry<String, String> entry : context.getHeaders().entrySet()) {
             // originalReqHeaders contains or starts with 'X-'
-            if (lemonConfig.getOriginalReqHeaders().contains(entry.getKey())
+            if (originalConfig.getReqHeaders().contains(entry.getKey())
                     || entry.getKey().startsWith(LemonContext.HEADER_PREFIX)) {
                 RpcContext.getContext().setAttachment(entry.getKey(), entry.getValue());
             }
@@ -67,7 +70,7 @@ public class DubboLemonInvoke implements LemonInvoke {
         // setter response header list
         for (Map.Entry<String, String> entry : RpcContext.getContext().getAttachments().entrySet()) {
             // originalResHeaders contains or starts with 'X-'
-            if (lemonConfig.getOriginalResHeaders().contains(entry.getKey())
+            if (originalConfig.getResHeaders().contains(entry.getKey())
                     || entry.getKey().startsWith(LemonContext.HEADER_PREFIX)) {
                 context.getResHeaders().put(entry.getKey(), entry.getValue());
             }
@@ -128,7 +131,7 @@ public class DubboLemonInvoke implements LemonInvoke {
     /**
      * The build {@link GenericService} by {@link ServiceMapping}
      *
-     * @param context               {@link LemonContext}
+     * @param context        {@link LemonContext}
      * @param serviceMapping {@link ServiceMapping}
      * @return {@link GenericService}
      */
