@@ -1,6 +1,5 @@
 package cn.micro.lemon.common.support;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr;
 import lombok.Data;
 import lombok.ToString;
 
@@ -38,20 +37,13 @@ public class JwtConfig implements Serializable {
      * @author lry
      */
     public enum KeyAddr {
-        /**
-         * Http header parameter
-         */
-        HEADER,
-        /**
-         * Http query parameter
-         */
-        QUERY;
+        // ===
+        HEADER, QUERY;
     }
 
     public enum JwtAlgorithm {
-        HMAC256,
-        HMAC384,
-        HMAC512;
+        // ===
+        HMAC256, HMAC384, HMAC512;
     }
 
 }
