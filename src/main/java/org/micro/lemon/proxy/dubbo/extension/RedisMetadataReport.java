@@ -23,7 +23,7 @@ import static org.apache.dubbo.metadata.identifier.MetadataIdentifier.META_DATA_
  * @author lry
  */
 @ToString
-public class RedisMetadataReport extends AbstractMetadataReport {
+public class RedisMetadataReport extends AbstractExtensionMetadataReport {
 
     private final static Logger logger = LoggerFactory.getLogger(RedisMetadataReport.class);
 

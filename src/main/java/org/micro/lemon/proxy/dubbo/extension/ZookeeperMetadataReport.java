@@ -3,7 +3,6 @@ package org.micro.lemon.proxy.dubbo.extension;
 import lombok.ToString;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
-import org.apache.dubbo.metadata.support.AbstractMetadataReport;
 import org.apache.dubbo.remoting.zookeeper.ZookeeperClient;
 import org.apache.dubbo.remoting.zookeeper.ZookeeperTransporter;
 
@@ -16,7 +15,7 @@ import static org.apache.dubbo.common.constants.CommonConstants.PATH_SEPARATOR;
  * @author lry
  */
 @ToString
-public class ZookeeperMetadataReport extends AbstractMetadataReport {
+public class ZookeeperMetadataReport extends AbstractExtensionMetadataReport {
 
     private final String root;
     private final ZookeeperClient zkClient;
