@@ -42,12 +42,12 @@ public class ZookeeperMetadataReport extends AbstractExtensionMetadataReport {
 
     @Override
     protected void doStoreProviderMetadata(MetadataIdentifier providerMetadataIdentifier, String serviceDefinitions) {
-        storeMetadata(providerMetadataIdentifier, serviceDefinitions);
+        storeMetadata(providerMetadataIdentifier, super.wrapperStoreProviderMetadata(providerMetadataIdentifier, serviceDefinitions));
     }
 
     @Override
     protected void doStoreConsumerMetadata(MetadataIdentifier consumerMetadataIdentifier, String value) {
-        storeMetadata(consumerMetadataIdentifier, value);
+        storeMetadata(consumerMetadataIdentifier, super.wrapperStoreConsumerMetadata(consumerMetadataIdentifier, value));
     }
 
     private void storeMetadata(MetadataIdentifier metadataIdentifier, String v) {
