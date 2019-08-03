@@ -4,6 +4,7 @@ import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.utils.ClassUtils;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 import org.apache.dubbo.metadata.support.AbstractMetadataReport;
+import org.micro.lemon.proxy.dubbo.metadata.annotation.LemonService;
 
 /**
  * Abstract Extension Metadata Report
@@ -19,7 +20,7 @@ public abstract class AbstractExtensionMetadataReport extends AbstractMetadataRe
     protected String wrapperStoreProviderMetadata(MetadataIdentifier providerMetadataIdentifier, String serviceDefinitions) {
         try {
             Class<?> clazz = ClassUtils.forName(providerMetadataIdentifier.getServiceInterface());
-            System.out.println(clazz);
+            LemonService lemonService = clazz.getDeclaredAnnotation(LemonService.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
