@@ -1,6 +1,5 @@
 package org.micro.lemon.proxy.dubbo;
 
-import cn.micro.lemon.common.*;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.LemonInvoke;
 import org.micro.lemon.common.LemonStatusCode;

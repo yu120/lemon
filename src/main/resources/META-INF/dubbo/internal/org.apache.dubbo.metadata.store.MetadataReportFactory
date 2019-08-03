@@ -1,0 +1,2 @@
+zookeeper=org.micro.lemon.proxy.dubbo.extension.ZookeeperMetadataReportFactory
+redis=org.micro.lemon.proxy.dubbo.extension.RedisMetadataReportFactory
