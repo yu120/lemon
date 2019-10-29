@@ -15,7 +15,7 @@
 
         <neural-core.version>1.0.0-SNAPSHOT</neural-core.version>
         <snakeyaml.version>1.20</snakeyaml.version>
-        <netty.version>4.1.37.Final</netty.version>
+        <netty.version>4.1.42.Final</netty.version>
         <log4j2.version>2.7</log4j2.version>
         <fastjson.version>1.2.58</fastjson.version>
         <dubbo.version>2.7.2</dubbo.version>
