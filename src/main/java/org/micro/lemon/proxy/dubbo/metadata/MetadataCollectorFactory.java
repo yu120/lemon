@@ -2,6 +2,7 @@ package org.micro.lemon.proxy.dubbo.metadata;
 
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.ServiceMapping;
+import org.micro.lemon.common.utils.URL;
 import org.micro.lemon.proxy.dubbo.MetadataCollector;
 import org.micro.lemon.server.LemonContext;
 import com.alibaba.fastjson.JSON;
@@ -12,7 +13,6 @@ import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.metadata.definition.model.FullServiceDefinition;
 import org.apache.dubbo.metadata.definition.model.MethodDefinition;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
-import org.micro.neural.common.URL;
 import org.micro.lemon.extension.ExtensionLoader;
 
 import java.util.ArrayList;
@@ -88,7 +88,7 @@ public enum MetadataCollectorFactory {
     /**
      * The wrapper types from metadata
      *
-     * @param context           {@link LemonContext}
+     * @param context        {@link LemonContext}
      * @param serviceMapping {@link ServiceMapping}
      */
     public void wrapperTypesFromMetadata(LemonContext context, ServiceMapping serviceMapping) {
@@ -97,7 +97,7 @@ public enum MetadataCollectorFactory {
         // whether to clear cached access
         String invalidateCache = context.getHeaders().get(LemonContext.INVALIDATE_CACHE);
         if (!StringUtils.isBlank(invalidateCache)) {
-            if (Boolean.valueOf(invalidateCache)) {
+            if (Boolean.parseBoolean(invalidateCache)) {
                 String lemonToken = context.getHeaders().get(LemonContext.LEMON_TOKEN);
                 if (lemonConfig.getToken().equals(lemonToken)) {
                     cache.invalidate(identifier.getIdentifierKey());

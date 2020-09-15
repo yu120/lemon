@@ -2,8 +2,9 @@ package org.micro.lemon.filter;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.common.extension.ExtensionLoader;
 import org.micro.lemon.common.LemonConfig;
+import org.micro.lemon.extension.Extension;
+import org.micro.lemon.extension.ExtensionLoader;
 
 import java.util.ArrayList;
 import java.util.Arrays;

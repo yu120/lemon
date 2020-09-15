@@ -1,5 +1,6 @@
 package org.micro.lemon.proxy.dubbo.metadata;
 
+import org.micro.lemon.common.utils.URL;
 import org.micro.lemon.proxy.dubbo.MetadataCollector;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
@@ -7,7 +8,6 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
-import org.micro.neural.common.URL;
 import org.micro.lemon.extension.Extension;
 
 /**

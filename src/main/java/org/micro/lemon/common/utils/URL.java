@@ -994,38 +994,6 @@ public final class URL implements Serializable {
         return map;
     }
 
-    public <T> T getObj(Class<T> clz) {
-        T obj;
-        try {
-            obj = clz.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return getObj(obj);
-    }
-
-    public <T> T getObj(T obj) {
-        BeanUtils.copyMapToObj(toMap(), obj);
-        return obj;
-    }
-
-    public <T> T getObj(String method, Class<T> clz) {
-        T obj;
-        try {
-            obj = clz.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return getObj(method, obj);
-    }
-
-    public <T> T getObj(String method, T obj) {
-        BeanUtils.copyMapToObj(getMethodParameters(method), obj);
-        return obj;
-    }
-
     @Override
     public String toString() {
         if (string != null) {

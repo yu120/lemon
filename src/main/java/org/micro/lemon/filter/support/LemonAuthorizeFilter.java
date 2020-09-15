@@ -1,11 +1,11 @@
 package org.micro.lemon.filter.support;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.common.Extension;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.common.utils.StringUtils;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.ServiceMapping;
+import org.micro.lemon.extension.Extension;
 import org.micro.lemon.filter.AbstractFilter;
 import org.micro.lemon.filter.LemonChain;
 import org.micro.lemon.proxy.dubbo.RegistryServiceSubscribe;
