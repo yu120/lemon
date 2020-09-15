@@ -3,13 +3,13 @@ package org.micro.lemon.server;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.LemonStatusCode;
 import org.micro.lemon.common.utils.StandardThreadExecutor;
-import org.micro.lemon.filter.LemonChain;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
+import org.micro.lemon.filter.LemonFactory;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -66,10 +66,10 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
 
-            LemonChain lemonChain = new LemonChain();
+            LemonFactory lemonFactory = LemonFactory.INSTANCE;
             if (standardThreadExecutor == null) {
                 try {
-                    lemonChain.doFilter(lemonContext);
+                    lemonFactory.doFilter(lemonContext);
                 } catch (Throwable t) {
                     log.error(t.getMessage(), t);
                     lemonContext.writeAndFlush(LemonStatusCode.INTERNAL_SERVER_ERROR);
@@ -78,7 +78,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                 try {
                     standardThreadExecutor.execute(() -> {
                         try {
-                            lemonChain.doFilter(lemonContext);
+                            lemonFactory.doFilter(lemonContext);
                         } catch (Throwable t) {
                             log.error(t.getMessage(), t);
                             lemonContext.writeAndFlush(LemonStatusCode.INTERNAL_SERVER_ERROR);

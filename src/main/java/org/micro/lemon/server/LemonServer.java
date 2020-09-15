@@ -1,8 +1,12 @@
 package org.micro.lemon.server;
 
-import org.apache.dubbo.common.utils.NetUtils;
+import org.apache.dubbo.common.URL;
+import org.apache.dubbo.common.extension.ExtensionLoader;
+import org.apache.dubbo.registry.RegistryFactory;
+import org.apache.dubbo.registry.RegistryService;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.config.BizTaskConfig;
+import org.micro.lemon.common.utils.NetUtils;
 import org.micro.lemon.common.utils.StandardThreadExecutor;
 import org.micro.lemon.filter.LemonFactory;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -18,10 +22,6 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.common.URL;
-import org.apache.dubbo.common.extension.ExtensionLoader;
-import org.apache.dubbo.registry.RegistryFactory;
-import org.apache.dubbo.registry.RegistryService;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;

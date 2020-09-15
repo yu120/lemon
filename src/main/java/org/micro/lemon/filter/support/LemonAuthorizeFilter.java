@@ -1,8 +1,6 @@
 package org.micro.lemon.filter.support;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.common.constants.CommonConstants;
-import org.apache.dubbo.common.utils.StringUtils;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.ServiceMapping;
 import org.micro.lemon.extension.Extension;
@@ -23,6 +21,9 @@ import java.util.concurrent.ConcurrentMap;
 @Slf4j
 @Extension(value = "authorize", order = 30)
 public class LemonAuthorizeFilter extends AbstractFilter {
+
+    private static final String GROUP_KEY = "group";
+    private static final String VERSION_KEY = "version";
 
     private RegistryServiceSubscribe registryServiceSubscribe;
 
@@ -50,6 +51,7 @@ public class LemonAuthorizeFilter extends AbstractFilter {
         }
     }
 
+
     /**
      * The wrapper {@link ServiceMapping} by {@link LemonContext}
      *
@@ -70,14 +72,14 @@ public class LemonAuthorizeFilter extends AbstractFilter {
         wrapperServiceName(serviceMapping);
 
         Map<String, String> parameters = context.getParameters();
-        if (parameters.containsKey(CommonConstants.GROUP_KEY)) {
-            String group = parameters.get(CommonConstants.GROUP_KEY);
+        if (parameters.containsKey(GROUP_KEY)) {
+            String group = parameters.get(GROUP_KEY);
             if (group != null && group.length() > 0) {
                 serviceMapping.setGroup(group);
             }
         }
-        if (parameters.containsKey(CommonConstants.VERSION_KEY)) {
-            String version = parameters.get(CommonConstants.VERSION_KEY);
+        if (parameters.containsKey(VERSION_KEY)) {
+            String version = parameters.get(VERSION_KEY);
             if (version != null && version.length() > 0) {
                 serviceMapping.setVersion(version);
             }
@@ -95,7 +97,7 @@ public class LemonAuthorizeFilter extends AbstractFilter {
         }
 
         String serviceName = serviceNames.get(serviceMapping.getService());
-        if (StringUtils.isBlank(serviceName)) {
+        if (serviceName == null || serviceName.length() == 0) {
             serviceMapping.setServiceName(serviceMapping.getService());
             return;
         }

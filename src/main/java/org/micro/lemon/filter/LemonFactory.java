@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.extension.Extension;
 import org.micro.lemon.extension.ExtensionLoader;
+import org.micro.lemon.server.LemonContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +73,10 @@ public enum LemonFactory {
             filter.initialize(lemonConfig);
             log.info("The filter[{}] initialize is success.", filter);
         }
+    }
+
+    public void doFilter(LemonContext context) throws Throwable {
+        new LemonChain().doFilter(context);
     }
 
     /**
