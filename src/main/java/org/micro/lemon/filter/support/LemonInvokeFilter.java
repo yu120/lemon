@@ -8,8 +8,8 @@ import org.micro.lemon.filter.LemonChain;
 import org.micro.lemon.filter.LemonFactory;
 import org.micro.lemon.server.LemonContext;
 import lombok.extern.slf4j.Slf4j;
-import org.micro.neural.extension.Extension;
-import org.micro.neural.extension.ExtensionLoader;
+import org.micro.lemon.extension.Extension;
+import org.micro.lemon.extension.ExtensionLoader;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

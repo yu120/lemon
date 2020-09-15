@@ -2,7 +2,7 @@ package org.micro.lemon.filter;
 
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.server.LemonContext;
-import org.micro.neural.extension.SPI;
+import org.micro.lemon.extension.SPI;
 
 /**
  * Filter

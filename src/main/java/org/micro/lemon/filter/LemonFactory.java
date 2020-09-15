@@ -1,10 +1,9 @@
 package org.micro.lemon.filter;
 
-import org.micro.lemon.common.LemonConfig;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.micro.neural.extension.Extension;
-import org.micro.neural.extension.ExtensionLoader;
+import org.apache.dubbo.common.extension.ExtensionLoader;
+import org.micro.lemon.common.LemonConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;

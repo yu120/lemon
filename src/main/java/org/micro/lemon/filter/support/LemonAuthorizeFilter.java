@@ -1,21 +1,18 @@
 package org.micro.lemon.filter.support;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.common.Extension;
+import org.apache.dubbo.common.constants.CommonConstants;
+import org.apache.dubbo.common.utils.StringUtils;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.ServiceMapping;
 import org.micro.lemon.filter.AbstractFilter;
 import org.micro.lemon.filter.LemonChain;
 import org.micro.lemon.proxy.dubbo.RegistryServiceSubscribe;
 import org.micro.lemon.server.LemonContext;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.common.constants.CommonConstants;
-import org.apache.dubbo.common.utils.StringUtils;
-import org.micro.neural.common.URL;
-import org.micro.neural.config.store.RedisStore;
-import org.micro.neural.extension.Extension;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -28,8 +25,6 @@ import java.util.concurrent.ConcurrentMap;
 public class LemonAuthorizeFilter extends AbstractFilter {
 
     private RegistryServiceSubscribe registryServiceSubscribe;
-    private Map<String, URL> services = new ConcurrentHashMap<>();
-    private RedisStore redisStore = RedisStore.INSTANCE;
 
     @Override
     public void initialize(LemonConfig lemonConfig) {

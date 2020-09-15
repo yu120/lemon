@@ -1,8 +1,8 @@
 package org.micro.lemon.proxy.dubbo;
 
+import org.apache.dubbo.common.extension.SPI;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
-import org.micro.neural.common.URL;
-import org.micro.neural.extension.SPI;
+import org.micro.lemon.common.utils.URL;
 
 /**
  * Metadata Collector

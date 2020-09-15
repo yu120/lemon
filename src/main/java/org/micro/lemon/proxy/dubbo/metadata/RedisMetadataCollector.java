@@ -7,7 +7,7 @@ import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 import org.apache.dubbo.rpc.RpcException;
 import org.micro.neural.common.URL;
-import org.micro.neural.extension.Extension;
+import org.micro.lemon.extension.Extension;
 import redis.clients.jedis.*;
 
 import java.util.HashSet;

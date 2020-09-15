@@ -28,11 +28,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.micro</groupId>
-            <artifactId>neural-core</artifactId>
-            <version>${neural-core.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>${snakeyaml.version}</version>

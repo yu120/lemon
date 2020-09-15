@@ -2,6 +2,7 @@ package org.micro.lemon.server;
 
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.LemonStatusCode;
+import org.micro.lemon.common.utils.StandardThreadExecutor;
 import org.micro.lemon.filter.LemonChain;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -9,8 +10,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
-import org.micro.neural.common.collection.MapEntry;
-import org.micro.neural.common.thread.StandardThreadExecutor;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -123,16 +122,11 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         String uri = request.uri();
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
         HttpHeaders httpHeaders = request.headers();
-
-        // use header Lemon-Id as lemon id
-        String lemonId = httpHeaders.get(LemonContext.LEMON_ID);
-        if (lemonId != null && lemonId.length() > 0) {
-            lemonContext.setId(lemonId);
-        } else {
-            lemonContext.getHeaders().put(LemonContext.LEMON_ID, lemonContext.getId());
-            lemonContext.getHeaderAll().add(new MapEntry<>(LemonContext.LEMON_ID, lemonContext.getId()));
+        if (!httpHeaders.contains(LemonContext.LEMON_ID)) {
+            request.headers().add(LemonContext.LEMON_ID, lemonContext.getId());
         }
 
+        lemonContext.setId(httpHeaders.get(LemonContext.LEMON_ID));
         lemonContext.setUri(request.uri());
         lemonContext.setPath(decoder.path());
         lemonContext.setMethod(request.method().name());

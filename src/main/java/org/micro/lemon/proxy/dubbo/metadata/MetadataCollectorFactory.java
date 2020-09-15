@@ -13,7 +13,7 @@ import org.apache.dubbo.metadata.definition.model.FullServiceDefinition;
 import org.apache.dubbo.metadata.definition.model.MethodDefinition;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 import org.micro.neural.common.URL;
-import org.micro.neural.extension.ExtensionLoader;
+import org.micro.lemon.extension.ExtensionLoader;
 
 import java.util.ArrayList;
 import java.util.HashSet;

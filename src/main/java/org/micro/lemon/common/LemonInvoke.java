@@ -1,7 +1,7 @@
 package org.micro.lemon.common;
 
 import org.micro.lemon.server.LemonContext;
-import org.micro.neural.extension.SPI;
+import org.micro.lemon.extension.SPI;
 
 import java.util.concurrent.CompletableFuture;
 

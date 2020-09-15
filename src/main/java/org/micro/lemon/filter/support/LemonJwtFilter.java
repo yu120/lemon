@@ -12,7 +12,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
-import org.micro.neural.extension.Extension;
+import org.micro.lemon.extension.Extension;
 
 import java.io.UnsupportedEncodingException;
 

@@ -8,7 +8,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 import org.micro.neural.common.URL;
-import org.micro.neural.extension.Extension;
+import org.micro.lemon.extension.Extension;
 
 /**
  * Zookeeper Metadata Collector

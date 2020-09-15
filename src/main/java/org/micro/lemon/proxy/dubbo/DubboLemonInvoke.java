@@ -17,7 +17,7 @@ import org.apache.dubbo.config.utils.ReferenceConfigCache;
 import org.apache.dubbo.rpc.RpcContext;
 import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.service.GenericService;
-import org.micro.neural.extension.Extension;
+import org.micro.lemon.extension.Extension;
 
 import java.util.ArrayList;
 import java.util.List;
