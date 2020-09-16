@@ -35,7 +35,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Slf4j
 @Extension("dubbo")
-public class DubboLemonInvoke implements LemonInvoke {
+public class DubboInvoke implements LemonInvoke {
 
     private LemonConfig lemonConfig;
 
@@ -43,6 +43,7 @@ public class DubboLemonInvoke implements LemonInvoke {
     private RegistryConfig registryConfig;
     private RegistryService registryService;
     private MetadataCollectorFactory metadataCollectorFactory;
+
 
     @Override
     public void initialize(LemonConfig lemonConfig) {

@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 @Slf4j
 @Extension("jsoup")
-public class JsoupLemonInvoke implements LemonInvoke {
+public class JsoupInvoke implements LemonInvoke {
 
     private LemonConfig lemonConfig;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();

@@ -1,2 +1,3 @@
-org.micro.lemon.proxy.dubbo.DubboLemonInvoke
-org.micro.lemon.proxy.http.JsoupLemonInvoke
+org.micro.lemon.proxy.http.JsoupInvoke
+org.micro.lemon.proxy.dubbo.DubboInvoke
+org.micro.lemon.proxy.eurake.EurakeInvoke
