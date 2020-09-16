@@ -15,9 +15,9 @@ import java.io.Serializable;
 public class ServiceMapping implements Serializable {
 
     /**
-     * The category
+     * The protocol
      */
-    private String category;
+    private String protocol;
     /**
      * The application of service
      */

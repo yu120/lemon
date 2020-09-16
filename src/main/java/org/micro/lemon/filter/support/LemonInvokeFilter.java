@@ -3,6 +3,7 @@ package org.micro.lemon.filter.support;
 import org.micro.lemon.common.LemonInvoke;
 import org.micro.lemon.common.LemonStatusCode;
 import org.micro.lemon.common.LemonConfig;
+import org.micro.lemon.common.ServiceMapping;
 import org.micro.lemon.filter.AbstractFilter;
 import org.micro.lemon.filter.LemonChain;
 import org.micro.lemon.filter.LemonFactory;
@@ -11,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.micro.lemon.extension.Extension;
 import org.micro.lemon.extension.ExtensionLoader;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -29,12 +32,21 @@ public class LemonInvokeFilter extends AbstractFilter {
 
     @Override
     public void initialize(LemonConfig lemonConfig) {
+        // 计算配置文件中的协议
+        Set<String> serviceProtocol = new HashSet<>();
+        for (ServiceMapping serviceMapping : lemonConfig.getServices()) {
+            serviceProtocol.add(serviceMapping.getProtocol());
+        }
+
         List<LemonInvoke> lemonInvokeList = ExtensionLoader.getLoader(LemonInvoke.class).getExtensions();
         for (LemonInvoke lemonInvoke : lemonInvokeList) {
             Extension extension = lemonInvoke.getClass().getAnnotation(Extension.class);
             if (extension != null) {
-                lemonInvokes.put(extension.value(), lemonInvoke);
-                lemonInvoke.initialize(lemonConfig);
+                // 只启动配置文件中的配置
+                if (serviceProtocol.contains(extension.value())) {
+                    lemonInvokes.put(extension.value(), lemonInvoke);
+                    lemonInvoke.initialize(lemonConfig);
+                }
             }
         }
     }

@@ -1,11 +1,15 @@
 package org.micro.lemon.proxy.dubbo;
 
+import org.apache.dubbo.common.URL;
+import org.apache.dubbo.common.extension.ExtensionLoader;
+import org.apache.dubbo.registry.RegistryFactory;
+import org.apache.dubbo.registry.RegistryService;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.LemonInvoke;
 import org.micro.lemon.common.LemonStatusCode;
 import org.micro.lemon.common.ServiceMapping;
-import org.micro.lemon.common.config.DubboConfig;
 import org.micro.lemon.common.config.OriginalConfig;
+import org.micro.lemon.common.utils.NetUtils;
 import org.micro.lemon.proxy.dubbo.metadata.MetadataCollectorFactory;
 import org.micro.lemon.server.LemonContext;
 import com.alibaba.fastjson.JSON;
@@ -34,17 +38,29 @@ import java.util.concurrent.CompletableFuture;
 public class DubboLemonInvoke implements LemonInvoke {
 
     private LemonConfig lemonConfig;
-    private RegistryConfig registry;
+
+    private URL serverUrl;
+    private RegistryConfig registryConfig;
+    private RegistryService registryService;
     private MetadataCollectorFactory metadataCollectorFactory;
 
     @Override
     public void initialize(LemonConfig lemonConfig) {
         this.lemonConfig = lemonConfig;
-        DubboConfig dubboConfig = lemonConfig.getDubbo();
-        RegistryConfig registryConfig = new RegistryConfig();
-        registryConfig.setAddress(dubboConfig.getRegistryAddress());
-        this.registry = registryConfig;
 
+        // 创建注册中心配置
+        RegistryConfig registryConfig = new RegistryConfig();
+        registryConfig.setAddress(lemonConfig.getDubbo().getRegistryAddress());
+        this.registryConfig = registryConfig;
+
+        // 启动注册中心，并注册服务本身至注册中心
+        URL url = URL.valueOf(lemonConfig.getRegistryAddress());
+        RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getExtension(url.getProtocol());
+        this.registryService = registryFactory.getRegistry(url);
+        this.serverUrl = new URL("http", NetUtils.getLocalHost(), lemonConfig.getPort(), lemonConfig.getApplication());
+        registryService.register(serverUrl);
+
+        // 启动Metadata数据收集器
         this.metadataCollectorFactory = MetadataCollectorFactory.INSTANCE;
         metadataCollectorFactory.initialize(lemonConfig);
     }
@@ -113,6 +129,9 @@ public class DubboLemonInvoke implements LemonInvoke {
 
     @Override
     public void destroy() {
+        if (registryService != null) {
+            registryService.unregister(serverUrl);
+        }
     }
 
     /**
@@ -143,7 +162,7 @@ public class DubboLemonInvoke implements LemonInvoke {
         referenceConfig.setApplication(new ApplicationConfig(serviceMapping.getApplication()));
         referenceConfig.setGroup(serviceMapping.getGroup());
         referenceConfig.setVersion(serviceMapping.getVersion());
-        referenceConfig.setRegistry(registry);
+        referenceConfig.setRegistry(registryConfig);
         referenceConfig.setInterface(serviceMapping.getServiceName());
         referenceConfig.setGeneric(true);
 

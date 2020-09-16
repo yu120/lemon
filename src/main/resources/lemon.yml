@@ -46,9 +46,9 @@ resHeaders:
   -DAccept-Encoding: gzip,deflate
   -DContent-Type: application/json;charset=UTF-8
 services:
-  - category: jsoup
+  - protocol: jsoup
     service: /baidu/**
     url: https://www.baidu.com
-  - category: jsoup
+  - protocol: jsoup
     service: /oschina/**
     url: https://www.oschina.net
