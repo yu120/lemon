@@ -1,8 +1,5 @@
 package org.micro.lemon.server;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.ExtensionLoader;
 import org.apache.dubbo.registry.RegistryFactory;
@@ -25,16 +22,8 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileInputStream;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Lemon Server by Netty
@@ -56,7 +45,7 @@ public class LemonServer {
      * The initialize
      */
     public void initialize() {
-        LemonConfig lemonConfig = loadConfig();
+        LemonConfig lemonConfig = LemonConfig.loadConfig();
         LemonFactory.INSTANCE.initialize(lemonConfig);
         log.info("The starting open server by config:{}", lemonConfig);
 
@@ -122,79 +111,6 @@ public class LemonServer {
             }
         } catch (Exception e) {
             log.error("The start server is fail", e);
-        }
-    }
-
-    /**
-     * The load config
-     *
-     * @return {@link LemonConfig}
-     */
-    private LemonConfig loadConfig() {
-        java.net.URL url = this.getClass().getClassLoader().getResource("lemon.yml");
-        if (url != null) {
-            try {
-                Iterable<Object> iterable = new Yaml().loadAll(new FileInputStream(url.getFile()));
-                for (Object object : iterable) {
-                    JSON json = recursion(object);
-                    return json.toJavaObject(LemonConfig.class);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("The load as yaml is exception", e);
-            }
-        }
-
-        throw new RuntimeException("Not found lemon.yml");
-    }
-
-    private static Pattern linePattern = Pattern.compile("-(\\w)");
-
-    /**
-     * 下划线转驼峰
-     */
-    public static String lineToHump(String str) {
-        str = str.toLowerCase();
-        Matcher matcher = linePattern.matcher(str);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            matcher.appendReplacement(sb, matcher.group(1).toUpperCase());
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
-    }
-
-    @SuppressWarnings("unchecked")
-    private JSON recursion(Object object) {
-        if (object instanceof Map) {
-            JSONObject jsonObject = new JSONObject();
-            for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) object).entrySet()) {
-                String key = String.valueOf(entry.getKey());
-                if (key.startsWith("-D") || key.startsWith("-d")) {
-                    key = key.substring(2);
-                } else if (key.contains("-")) {
-                    key = lineToHump(key);
-                }
-                if (entry.getValue() instanceof Map || entry.getValue() instanceof Collection) {
-                    jsonObject.put(key, recursion(entry.getValue()));
-                } else {
-                    jsonObject.put(key, entry.getValue());
-                }
-            }
-
-            return jsonObject;
-        } else if (object instanceof Collection) {
-            JSONArray jsonArray = new JSONArray();
-            for (Object tempObject : (List<Object>) object) {
-                if (tempObject instanceof Map || tempObject instanceof Collection) {
-                    jsonArray.add(recursion(tempObject));
-                } else {
-                    jsonArray.add(tempObject);
-                }
-            }
-
-            return jsonArray;
-        } else {
-            throw new RuntimeException("未知数据类型" + object);
         }
     }
 
