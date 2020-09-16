@@ -181,7 +181,7 @@ public class LemonContext {
         }
 
         String resultMessage = statusCode.getMessage();
-        if (message == null || message.trim().length() == 0) {
+        if (message != null && message.trim().length() > 0) {
             resultMessage += (":" + message);
         }
 

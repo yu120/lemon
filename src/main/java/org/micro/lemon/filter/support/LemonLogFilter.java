@@ -12,7 +12,7 @@ import org.micro.lemon.extension.Extension;
  * @author lry
  */
 @Slf4j
-@Extension(value = "log", order = 20)
+@Extension(value = "log", order = 10)
 public class LemonLogFilter extends AbstractFilter {
 
     @Override

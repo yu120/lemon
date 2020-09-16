@@ -12,7 +12,7 @@ import org.micro.lemon.extension.Extension;
  * @author lry
  */
 @Slf4j
-@Extension(value = "cache", order = 150)
+@Extension(value = "cache", order = 100)
 public class LemonCacheFilter extends AbstractFilter {
 
     @Override

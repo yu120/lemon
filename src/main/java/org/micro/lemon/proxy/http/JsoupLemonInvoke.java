@@ -3,7 +3,6 @@ package org.micro.lemon.proxy.http;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.common.Extension;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.micro.lemon.common.LemonConfig;
@@ -11,6 +10,7 @@ import org.micro.lemon.common.LemonInvoke;
 import org.micro.lemon.common.LemonStatusCode;
 import org.micro.lemon.common.ServiceMapping;
 import org.micro.lemon.common.utils.AntPathMatcher;
+import org.micro.lemon.extension.Extension;
 import org.micro.lemon.server.LemonContext;
 
 import java.io.IOException;
@@ -44,7 +44,12 @@ public class JsoupLemonInvoke implements LemonInvoke {
 
     @Override
     public Object invoke(LemonContext context) {
-        ServiceMapping mapping = matchMapping(context.getContextPath());
+        ServiceMapping mapping = null;
+        for (ConcurrentMap.Entry<String, ServiceMapping> entry : mappings.entrySet()) {
+            if (antPathMatcher.match(entry.getKey(), context.getContextPath())) {
+                mapping = entry.getValue();
+            }
+        }
         if (mapping == null) {
             context.writeAndFlush(LemonStatusCode.NOT_FOUND);
             return null;
@@ -90,8 +95,8 @@ public class JsoupLemonInvoke implements LemonInvoke {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public CompletableFuture<Object> invokeAsync(LemonContext context) {
         Object object = invoke(context);
         if (object instanceof CompletableFuture) {
@@ -109,16 +114,6 @@ public class JsoupLemonInvoke implements LemonInvoke {
     @Override
     public void destroy() {
 
-    }
-
-    private ServiceMapping matchMapping(String uri) {
-        for (ConcurrentMap.Entry<String, ServiceMapping> entry : mappings.entrySet()) {
-            if (antPathMatcher.match(entry.getKey(), uri)) {
-                return entry.getValue();
-            }
-        }
-
-        return null;
     }
 
     @Getter

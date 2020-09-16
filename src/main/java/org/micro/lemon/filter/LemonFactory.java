@@ -8,7 +8,6 @@ import org.micro.lemon.extension.ExtensionLoader;
 import org.micro.lemon.server.LemonContext;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,7 +25,6 @@ public enum LemonFactory {
 
     public final static String ROUTER = "ROUTER";
 
-    private int routerFilterIndex = -1;
     private List<IFilter> filters = new ArrayList<>();
 
     /**
@@ -37,8 +35,7 @@ public enum LemonFactory {
     public void initialize(LemonConfig lemonConfig) {
         List<IFilter> filterList = ExtensionLoader.getLoader(IFilter.class).getExtensions();
         if (filterList.size() > 0) {
-            for (int i = 0; i < filterList.size(); i++) {
-                IFilter filter = filterList.get(i);
+            for (IFilter filter : filterList) {
                 Extension extension = filter.getClass().getAnnotation(Extension.class);
                 if (extension != null) {
                     // calculation filter id
@@ -60,10 +57,6 @@ public enum LemonFactory {
                             continue;
                         }
                     }
-
-                    if (routerFilterIndex < 0 && Arrays.asList(extension.category()).contains(ROUTER)) {
-                        routerFilterIndex = i;
-                    }
                     filters.add(filter);
                 }
             }
@@ -76,7 +69,7 @@ public enum LemonFactory {
     }
 
     public void doFilter(LemonContext context) throws Throwable {
-        new LemonChain().doFilter(context);
+        new LemonChain().start(context, filters);
     }
 
     /**

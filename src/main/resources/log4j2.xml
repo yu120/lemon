@@ -67,6 +67,7 @@
         <logger name="org.springframework.web" level="info"/>
         <logger name="org.jboss.netty" level="warn"/>
         <logger name="org.apache.http" level="warn"/>
+        <logger name="org.apache.zookeeper" level="warn"/>
 
         <!-- 日志实例(info),其中'service-log'继承root,但是root将日志输出控制台,而'service-log'将日志输出到文件,通过属性'additivity="false"'将'service-log'的
              的日志不再输出到控制台 -->

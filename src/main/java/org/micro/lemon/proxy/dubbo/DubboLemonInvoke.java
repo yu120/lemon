@@ -82,8 +82,8 @@ public class DubboLemonInvoke implements LemonInvoke {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public CompletableFuture<Object> invokeAsync(LemonContext context) {
         Object object = invoke(context);
         if (object instanceof CompletableFuture) {

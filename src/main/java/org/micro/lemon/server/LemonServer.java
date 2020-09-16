@@ -105,7 +105,7 @@ public class LemonServer {
             this.channel = channelFuture.channel();
 
             this.serverUrl = new URL("http", NetUtils.getLocalHost(), lemonConfig.getPort(), lemonConfig.getApplication());
-            registryService.register(serverUrl);
+            //registryService.register(serverUrl);
 
             Runtime.getRuntime().addShutdownHook(new Thread(LemonServer.this::destroy));
             if (lemonConfig.isServer()) {

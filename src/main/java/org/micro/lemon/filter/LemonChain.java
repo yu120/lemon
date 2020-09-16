@@ -3,6 +3,7 @@ package org.micro.lemon.filter;
 import org.micro.lemon.server.LemonContext;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,6 +19,23 @@ public class LemonChain {
     private AtomicBoolean flag = new AtomicBoolean(true);
     private AtomicInteger index = new AtomicInteger(0);
 
+    private int filterMaxIndex = 0;
+    private List<IFilter> filters = new ArrayList<>();
+
+    /**
+     * The do filter
+     *
+     * @param context {@link LemonContext}
+     * @throws Throwable throw exception
+     */
+    public final void start(LemonContext context, List<IFilter> filters) throws Throwable {
+        if (!filters.isEmpty()) {
+            this.filterMaxIndex = filters.size() - 1;
+            this.filters.addAll(filters);
+        }
+        doFilter(context);
+    }
+
     /**
      * The do filter
      *
@@ -25,12 +43,9 @@ public class LemonChain {
      * @throws Throwable throw exception
      */
     public void doFilter(LemonContext context) throws Throwable {
-        LemonFactory factory = LemonFactory.INSTANCE;
-        List<IFilter> filters = factory.getFilters();
-
         if (flag.get()) {
             int tempIndex = index.getAndIncrement();
-            if (tempIndex >= factory.getRouterFilterIndex()) {
+            if (tempIndex >= filterMaxIndex) {
                 flag.set(false);
             }
 

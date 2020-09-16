@@ -51,7 +51,6 @@ public class LemonAuthorizeFilter extends AbstractFilter {
         }
     }
 
-
     /**
      * The wrapper {@link ServiceMapping} by {@link LemonContext}
      *

@@ -22,7 +22,7 @@ import java.io.UnsupportedEncodingException;
  * @author lry
  */
 @Slf4j
-@Extension(value = "jwt", order = 30)
+@Extension(value = "jwt", order = 20)
 public class LemonJwtFilter extends AbstractFilter {
 
     private Algorithm algorithm;
@@ -37,7 +37,6 @@ public class LemonJwtFilter extends AbstractFilter {
         }
 
         super.initialize(lemonConfig);
-
 
         try {
             switch (jwtConfig.getAlgorithm()) {
@@ -66,14 +65,14 @@ public class LemonJwtFilter extends AbstractFilter {
         }
 
         String token;
-        if (JwtKeyAddr.QUERY == jwtConfig.getJwtKeyAddr()) {
+        if (JwtKeyAddr.QUERY == jwtConfig.getKeyAddr()) {
             token = context.getHeaders().get(jwtConfig.getKey());
         } else {
             token = context.getParameters().get(jwtConfig.getKey());
         }
 
         if (token == null || token.length() == 0) {
-            context.writeAndFlush(LemonStatusCode.NOT_FOUND, "'" + jwtConfig.getKey() + "' is Null or Empty");
+            context.writeAndFlush(LemonStatusCode.BAD_REQUEST, "'" + jwtConfig.getKey() + "' is Null or Empty");
             return;
         }
 
@@ -98,7 +97,6 @@ public class LemonJwtFilter extends AbstractFilter {
     @Override
     public void postFilter(LemonChain chain, LemonContext context) throws Throwable {
         if (!jwtConfig.isEnable()) {
-            super.postFilter(chain, context);
             return;
         }
 

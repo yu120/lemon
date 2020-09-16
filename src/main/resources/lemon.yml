@@ -39,7 +39,7 @@ dubbo:
 
 # Lemon config
 registryAddress: zookeeper://127.0.0.1:2181
-excludeFilters: []
+excludeFilters: ["jwt"]
 includeFilters: []
 resHeaders:
   Connection: keep-alive

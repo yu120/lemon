@@ -31,7 +31,7 @@ public class JwtConfig implements Serializable {
     /**
      * The jwt key address
      */
-    private JwtKeyAddr jwtKeyAddr = JwtKeyAddr.HEADER;
+    private JwtKeyAddr keyAddr = JwtKeyAddr.HEADER;
     /**
      * The jwt algorithm
      */
