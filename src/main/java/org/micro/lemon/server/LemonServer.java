@@ -18,6 +18,7 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,32 +42,22 @@ public class LemonServer {
         LemonFactory.INSTANCE.initialize(lemonConfig);
         log.info("The starting open server by config:{}", lemonConfig);
 
-        ThreadFactoryBuilder ioBuilder = new ThreadFactoryBuilder();
-        ioBuilder.setDaemon(true);
-        ioBuilder.setNameFormat("lemon-io");
-        ThreadFactoryBuilder workBuilder = new ThreadFactoryBuilder();
-        workBuilder.setDaemon(true);
-        workBuilder.setNameFormat("lemon-work");
+        ThreadFactory ioThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-io").build();
+        ThreadFactory workThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-work").build();
 
         BizTaskConfig bizTaskConfig = lemonConfig.getBiz();
         if (bizTaskConfig.getCoreThread() > 0) {
-            ThreadFactoryBuilder bizBuilder = new ThreadFactoryBuilder();
-            bizBuilder.setDaemon(true);
-            bizBuilder.setNameFormat("lemon-biz");
+            ThreadFactory bizThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-biz").build();
             this.standardThreadExecutor = new StandardThreadExecutor(
-                    bizTaskConfig.getCoreThread(),
-                    bizTaskConfig.getMaxThread(),
-                    bizTaskConfig.getKeepAliveTime(),
-                    TimeUnit.MILLISECONDS,
-                    bizTaskConfig.getQueueCapacity(),
-                    bizBuilder.build(),
-                    bizTaskConfig.getRejectedStrategy().getHandler());
+                    bizTaskConfig.getCoreThread(), bizTaskConfig.getMaxThread(),
+                    bizTaskConfig.getKeepAliveTime(), TimeUnit.MILLISECONDS, bizTaskConfig.getQueueCapacity(),
+                    bizThreadFactory, bizTaskConfig.getRejectedStrategy().getHandler());
             standardThreadExecutor.prestartAllCoreThreads();
         }
 
         try {
-            this.bossGroup = new NioEventLoopGroup(lemonConfig.getIoThread(), ioBuilder.build());
-            this.workerGroup = new NioEventLoopGroup(lemonConfig.getWorkThread(), workBuilder.build());
+            this.bossGroup = new NioEventLoopGroup(lemonConfig.getIoThread(), ioThreadFactory);
+            this.workerGroup = new NioEventLoopGroup(lemonConfig.getWorkThread(), workThreadFactory);
             ServerBootstrap serverBootstrap = new ServerBootstrap()
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
