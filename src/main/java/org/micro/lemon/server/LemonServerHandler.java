@@ -1,20 +1,22 @@
 package org.micro.lemon.server;
 
-import org.micro.lemon.common.LemonConfig;
-import org.micro.lemon.common.LemonStatusCode;
-import org.micro.lemon.common.utils.StandardThreadExecutor;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
+import org.micro.lemon.common.LemonConfig;
+import org.micro.lemon.common.LemonStatusCode;
+import org.micro.lemon.common.utils.StandardThreadExecutor;
 import org.micro.lemon.filter.LemonFactory;
+import org.slf4j.MDC;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.RejectedExecutionException;
@@ -58,34 +60,32 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
-            LemonContext lemonContext = new LemonContext(lemonConfig, ctx);
-            wrapperChainContext(lemonContext, (FullHttpRequest) msg);
-            if (!lemonContext.getUri().startsWith(LemonContext.URL_DELIMITER +
+            LemonContext lemonContext = this.buildContext(ctx, (FullHttpRequest) msg);
+            if (!lemonContext.getApplicationPath().equals(LemonContext.URL_DELIMITER +
                     lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
-                lemonContext.writeAndFlush(LemonStatusCode.NOT_FOUND);
+                lemonContext.onCallback(LemonStatusCode.NOT_FOUND);
                 return;
             }
 
-            LemonFactory lemonFactory = LemonFactory.INSTANCE;
             if (standardThreadExecutor == null) {
                 try {
-                    lemonFactory.doFilter(lemonContext);
+                    LemonFactory.INSTANCE.doFilter(lemonContext);
                 } catch (Throwable t) {
                     log.error(t.getMessage(), t);
-                    lemonContext.writeAndFlush(LemonStatusCode.INTERNAL_SERVER_ERROR);
+                    lemonContext.onCallback(LemonStatusCode.INTERNAL_SERVER_ERROR);
                 }
             } else {
                 try {
                     standardThreadExecutor.execute(() -> {
                         try {
-                            lemonFactory.doFilter(lemonContext);
+                            LemonFactory.INSTANCE.doFilter(lemonContext);
                         } catch (Throwable t) {
                             log.error(t.getMessage(), t);
-                            lemonContext.writeAndFlush(LemonStatusCode.INTERNAL_SERVER_ERROR);
+                            lemonContext.onCallback(LemonStatusCode.INTERNAL_SERVER_ERROR);
                         }
                     });
                 } catch (RejectedExecutionException e) {
-                    lemonContext.writeAndFlush(LemonStatusCode.TOO_MANY_REQUESTS);
+                    lemonContext.onCallback(LemonStatusCode.TOO_MANY_REQUESTS);
                 }
             }
         }
@@ -115,52 +115,84 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     /**
      * The wrapper chain context
      *
-     * @param lemonContext {@link LemonContext}
-     * @param request      {@link FullHttpRequest}
+     * @param ctx     {@link ChannelHandlerContext}
+     * @param request {@link FullHttpRequest}
      */
-    private void wrapperChainContext(LemonContext lemonContext, FullHttpRequest request) {
-        String uri = request.uri();
-        QueryStringDecoder decoder = new QueryStringDecoder(uri);
+    private LemonContext buildContext(ChannelHandlerContext ctx, FullHttpRequest request) {
+        // read headers
         HttpHeaders httpHeaders = request.headers();
-        if (!httpHeaders.contains(LemonContext.LEMON_ID)) {
-            request.headers().add(LemonContext.LEMON_ID, lemonContext.getId());
+        String requestId = httpHeaders.get(LemonContext.LEMON_ID_KEY,
+                UUID.randomUUID().toString().replace("-", ""));
+        MDC.put(LemonContext.LEMON_ID_KEY, requestId);
+        Map<String, List<String>> originHeaders = new HashMap<>();
+        for (Map.Entry<String, String> entry : httpHeaders.entries()) {
+            originHeaders.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
         }
 
-        lemonContext.setId(httpHeaders.get(LemonContext.LEMON_ID));
-        lemonContext.setUri(request.uri());
-        lemonContext.setPath(decoder.path());
-        lemonContext.setMethod(request.method().name());
-        lemonContext.setKeepAlive(HttpUtil.isKeepAlive(request));
+        // read uri
+        QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
+        String path = decoder.path();
 
-        String applicationPath = LemonContext.URL_DELIMITER + lemonConfig.getApplication();
-        if (uri.startsWith(applicationPath)) {
-            lemonContext.setContextPath(request.uri().substring(applicationPath.length()));
-        }
-
+        // read content
         int contentLength;
-        byte[] contentByte;
+        byte[] content;
         ByteBuf byteBuf = null;
         try {
             byteBuf = request.content();
             contentLength = byteBuf.readableBytes();
-            contentByte = new byte[contentLength];
-            byteBuf.readBytes(contentByte);
+            content = new byte[contentLength];
+            byteBuf.readBytes(content);
         } finally {
             if (byteBuf != null) {
                 byteBuf.release();
             }
         }
 
-        lemonContext.setContentLength(contentLength);
-        lemonContext.setContentByte(contentByte);
-        lemonContext.setContent(new String(contentByte, StandardCharsets.UTF_8));
+        final Map<String, Object> headers = new HashMap<>(originHeaders);
+        headers.putAll(decoder.parameters());
+        headers.put(LemonContext.LEMON_ID_KEY, requestId);
+        headers.put(LemonContext.URI_KEY, request.uri());
+        headers.put(LemonContext.APP_PATH_KEY, path.substring(0, path.indexOf(LemonContext.URL_DELIMITER, 1) - 1));
+        headers.put(LemonContext.CONTEXT_PATH_KEY, path.substring(path.indexOf(LemonContext.URL_DELIMITER, 1)));
+        headers.put(LemonContext.PATH_KEY, path);
+        headers.put(LemonContext.METHOD_KEY, request.method().name());
+        headers.put(LemonContext.KEEP_ALIVE_KEY, HttpUtil.isKeepAlive(request));
+        headers.put(LemonContext.CONTENT_LENGTH_KEY, contentLength);
+        return new LemonContext(headers, content, (statusCode, message, body) -> {
+            FullHttpResponse response = buildRespone(statusCode, message, body);
+            ctx.writeAndFlush(response).addListener(future -> MDC.remove(LemonContext.LEMON_ID_KEY));
+        });
+    }
 
-        // wrapper complex value
-        lemonContext.addPaths(decoder.path());
-        lemonContext.getHeaderAll().addAll(httpHeaders.entries());
-        lemonContext.getParameterAll().putAll(decoder.parameters());
-        lemonContext.addHeaders(httpHeaders.entries());
-        lemonContext.addParameters(decoder.parameters());
+    /**
+     * The write and flush
+     *
+     * @param statusCode {@link LemonStatusCode}
+     * @param message    custom message
+     * @param body       response body content
+     */
+    private FullHttpResponse buildRespone(LemonStatusCode statusCode, String message, Object body) {
+        ByteBuf byteBuf;
+        if (body == null) {
+            byteBuf = Unpooled.buffer(0);
+        } else if (body instanceof ByteBuf) {
+            byteBuf = (ByteBuf) body;
+        } else if (body instanceof byte[]) {
+            byteBuf = Unpooled.wrappedBuffer((byte[]) body);
+        } else {
+            byteBuf = Unpooled.wrappedBuffer(String.valueOf(body).getBytes(StandardCharsets.UTF_8));
+        }
+
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
+        response.headers().set(LemonContext.LEMON_CODE_KEY, statusCode.getCode());
+        response.headers().set(LemonContext.LEMON_CODE_MESSAGE,
+                (message != null && message.trim().length() > 0) ? message : statusCode.getMessage());
+        response.headers().set(com.google.common.net.HttpHeaders.CONTENT_LENGTH,
+                (response.content() == null ? 0 : response.content().readableBytes()));
+        response.headers().set(com.google.common.net.HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
+        response.headers().set(com.google.common.net.HttpHeaders.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        response.headers().set(com.google.common.net.HttpHeaders.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
+        return response;
     }
 
     /**

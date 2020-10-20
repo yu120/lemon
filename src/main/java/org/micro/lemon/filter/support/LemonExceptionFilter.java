@@ -22,7 +22,7 @@ public class LemonExceptionFilter extends AbstractFilter {
             super.preFilter(chain, context);
         } catch (Throwable t) {
             log.error(t.getMessage(), t);
-            context.writeAndFlush(LemonStatusCode.INTERNAL_SERVER_ERROR);
+            context.onCallback(LemonStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 

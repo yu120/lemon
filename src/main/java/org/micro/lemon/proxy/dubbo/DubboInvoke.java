@@ -1,5 +1,6 @@
 package org.micro.lemon.proxy.dubbo;
 
+import lombok.Getter;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.ExtensionLoader;
 import org.apache.dubbo.registry.RegistryFactory;
@@ -23,6 +24,7 @@ import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.service.GenericService;
 import org.micro.lemon.extension.Extension;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,7 @@ import java.util.concurrent.CompletableFuture;
  * @author lry
  */
 @Slf4j
+@Getter
 @Extension("dubbo")
 public class DubboInvoke implements LemonInvoke {
 
@@ -70,13 +73,12 @@ public class DubboInvoke implements LemonInvoke {
     public Object invoke(LemonContext context) {
         OriginalConfig originalConfig = lemonConfig.getOriginal();
 
-        context.setSendTime(System.currentTimeMillis());
         // setter request header list
-        for (Map.Entry<String, String> entry : context.getHeaders().entrySet()) {
+        for (Map.Entry<String, Object> entry : context.getHeaders().entrySet()) {
             // originalReqHeaders contains or starts with 'X-'
             if (originalConfig.getReqHeaders().contains(entry.getKey())
                     || entry.getKey().startsWith(LemonContext.HEADER_PREFIX)) {
-                RpcContext.getContext().setAttachment(entry.getKey(), entry.getValue());
+                RpcContext.getContext().setAttachment(entry.getKey(), String.valueOf(entry.getValue()));
             }
         }
 
@@ -142,7 +144,8 @@ public class DubboInvoke implements LemonInvoke {
      */
     private void wrapperServiceDefinition(LemonContext context) {
         List<Object> paramValues = new ArrayList<>();
-        if (JSON.isValid(context.getContent())) {
+        String body = new String(context.getContent(), StandardCharsets.UTF_8);
+        if (JSON.isValid(body)) {
             paramValues.add(JSON.parse(context.getContent()));
         } else {
             paramValues.add(context.getContent());

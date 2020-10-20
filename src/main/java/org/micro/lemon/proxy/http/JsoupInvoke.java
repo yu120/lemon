@@ -14,6 +14,7 @@ import org.micro.lemon.extension.Extension;
 import org.micro.lemon.server.LemonContext;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -51,7 +52,7 @@ public class JsoupInvoke implements LemonInvoke {
             }
         }
         if (mapping == null) {
-            context.writeAndFlush(LemonStatusCode.NOT_FOUND);
+            context.onCallback(LemonStatusCode.NOT_FOUND);
             return null;
         }
 
@@ -66,12 +67,12 @@ public class JsoupInvoke implements LemonInvoke {
 
         Connection connection = Jsoup.connect(originalUrl);
         Connection.Request request = connection.request();
-        request.method(ConnectionMethod.valueOf(context.getMethod()).getMethod());
-        for (Map.Entry<String, String> entry : context.getHeaderAll()) {
-            request.header(entry.getKey(), entry.getValue());
+        request.method(ConnectionMethod.valueOf(context.getHttpMethod()).getMethod());
+        for (Map.Entry<String, Object> entry : context.getHeaders().entrySet()) {
+            request.header(entry.getKey(), String.valueOf(entry.getValue()));
         }
-        if (!(context.getContent() == null || context.getContent().length() == 0)) {
-            request.requestBody(context.getContent());
+        if (context.getContent() != null && context.getContent().length > 0) {
+            request.requestBody(new String(context.getContent(), StandardCharsets.UTF_8));
         }
 
         // setter timeout(ms)

@@ -9,6 +9,8 @@ import org.micro.lemon.server.LemonContext;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Lemon Chain Factory
@@ -26,6 +28,7 @@ public enum LemonFactory {
     public final static String ROUTER = "ROUTER";
 
     private List<IFilter> filters = new ArrayList<>();
+    private Map<Class<?>, IFilter> filterMap = new ConcurrentHashMap<>();
 
     /**
      * The initialize filter chain
@@ -58,6 +61,7 @@ public enum LemonFactory {
                         }
                     }
                     filters.add(filter);
+                    filterMap.put(filter.getClass(), filter);
                 }
             }
         }
@@ -70,6 +74,10 @@ public enum LemonFactory {
 
     public void doFilter(LemonContext context) throws Throwable {
         new LemonChain().start(context, filters);
+    }
+
+    public IFilter getFilter(Class<?> filterClass) {
+        return filterMap.get(filterClass);
     }
 
     /**

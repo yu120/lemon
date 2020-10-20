@@ -13,8 +13,8 @@ import org.micro.lemon.proxy.dubbo.metadata.annotation.LemonService;
  */
 public abstract class AbstractExtensionMetadataReport extends AbstractMetadataReport {
 
-    public AbstractExtensionMetadataReport(URL reportServerURL) {
-        super(reportServerURL);
+    public AbstractExtensionMetadataReport(URL reportServerUrl) {
+        super(reportServerUrl);
     }
 
     protected String wrapperStoreProviderMetadata(MetadataIdentifier providerMetadataIdentifier, String serviceDefinitions) {

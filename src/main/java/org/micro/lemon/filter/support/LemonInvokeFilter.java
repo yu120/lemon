@@ -53,9 +53,9 @@ public class LemonInvokeFilter extends AbstractFilter {
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
-        LemonInvoke lemonInvoke = lemonInvokes.get(context.getProtocol());
+        LemonInvoke lemonInvoke = lemonInvokes.get("jsoup");
         if (lemonInvoke == null) {
-            context.writeAndFlush(LemonStatusCode.NOT_FOUND);
+            context.onCallback(LemonStatusCode.NOT_FOUND);
             return;
         }
 
@@ -66,11 +66,10 @@ public class LemonInvokeFilter extends AbstractFilter {
         }
 
         future.whenComplete((result, throwable) -> {
-            context.setReceiveTime(System.currentTimeMillis());
             if (throwable != null) {
                 log.error(throwable.getMessage(), throwable);
                 LemonStatusCode statusCode = lemonInvoke.failure(context, throwable);
-                context.writeAndFlush(statusCode);
+                context.onCallback(statusCode);
                 return;
             } else {
                 context.setResult(result);
@@ -81,7 +80,7 @@ public class LemonInvokeFilter extends AbstractFilter {
             } catch (Throwable t) {
                 log.error(t.getMessage(), t);
             } finally {
-                context.writeAndFlush(LemonStatusCode.SUCCESS);
+                context.onCallback(LemonStatusCode.SUCCESS);
             }
         });
     }

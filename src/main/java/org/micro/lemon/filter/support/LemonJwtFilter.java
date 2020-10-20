@@ -3,7 +3,6 @@ package org.micro.lemon.filter.support;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.LemonStatusCode;
 import org.micro.lemon.common.config.JwtConfig;
-import org.micro.lemon.common.support.JwtKeyAddr;
 import org.micro.lemon.filter.AbstractFilter;
 import org.micro.lemon.filter.LemonChain;
 import org.micro.lemon.server.LemonContext;
@@ -64,33 +63,27 @@ public class LemonJwtFilter extends AbstractFilter {
             return;
         }
 
-        String token;
-        if (JwtKeyAddr.QUERY == jwtConfig.getKeyAddr()) {
-            token = context.getHeaders().get(jwtConfig.getKey());
-        } else {
-            token = context.getParameters().get(jwtConfig.getKey());
-        }
-
-        if (token == null || token.length() == 0) {
-            context.writeAndFlush(LemonStatusCode.BAD_REQUEST, "'" + jwtConfig.getKey() + "' is Null or Empty");
+        Object token = context.getHeaders().get(jwtConfig.getKey());
+        if (token == null) {
+            context.onCallback(LemonStatusCode.BAD_REQUEST, "'" + jwtConfig.getKey() + "' is Null or Empty");
             return;
         }
 
         try {
-            verifier.verify(token);
+            verifier.verify(String.valueOf(token));
             super.preFilter(chain, context);
         } catch (AlgorithmMismatchException e) {
-            context.writeAndFlush(LemonStatusCode.BAD_REQUEST, "Algorithm Mismatch");
+            context.onCallback(LemonStatusCode.BAD_REQUEST, "Algorithm Mismatch");
         } catch (InvalidClaimException e) {
-            context.writeAndFlush(LemonStatusCode.BAD_REQUEST, "Invalid Claim");
+            context.onCallback(LemonStatusCode.BAD_REQUEST, "Invalid Claim");
         } catch (JWTDecodeException e) {
-            context.writeAndFlush(LemonStatusCode.BAD_REQUEST, "JWT Decode");
+            context.onCallback(LemonStatusCode.BAD_REQUEST, "JWT Decode");
         } catch (SignatureVerificationException e) {
-            context.writeAndFlush(LemonStatusCode.BAD_REQUEST, "Signature Verification");
+            context.onCallback(LemonStatusCode.BAD_REQUEST, "Signature Verification");
         } catch (TokenExpiredException e) {
-            context.writeAndFlush(LemonStatusCode.PAYMENT_REQUIRED, "Token Expired");
+            context.onCallback(LemonStatusCode.PAYMENT_REQUIRED, "Token Expired");
         } catch (Exception e) {
-            context.writeAndFlush(LemonStatusCode.BAD_REQUEST, "JWT Verify Unknown Exception");
+            context.onCallback(LemonStatusCode.BAD_REQUEST, "JWT Verify Unknown Exception");
         }
     }
 

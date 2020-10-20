@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
  *
  * @author lry
  */
-@SPI("dubbo")
+@SPI(value = "dubbo", single = true)
 public interface LemonInvoke {
 
     /**

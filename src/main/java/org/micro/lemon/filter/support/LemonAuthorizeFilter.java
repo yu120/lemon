@@ -70,18 +70,12 @@ public class LemonAuthorizeFilter extends AbstractFilter {
         // wrapper service name
         wrapperServiceName(serviceMapping);
 
-        Map<String, String> parameters = context.getParameters();
+        Map<String, Object> parameters = context.getHeaders();
         if (parameters.containsKey(GROUP_KEY)) {
-            String group = parameters.get(GROUP_KEY);
-            if (group != null && group.length() > 0) {
-                serviceMapping.setGroup(group);
-            }
+            serviceMapping.setGroup(String.valueOf(parameters.get(GROUP_KEY)));
         }
         if (parameters.containsKey(VERSION_KEY)) {
-            String version = parameters.get(VERSION_KEY);
-            if (version != null && version.length() > 0) {
-                serviceMapping.setVersion(version);
-            }
+            serviceMapping.setVersion(String.valueOf(parameters.get(VERSION_KEY)));
         }
 
         context.setServiceMapping(serviceMapping);
