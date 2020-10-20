@@ -36,7 +36,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     public LemonServerHandler(LemonConfig lemonConfig, StandardThreadExecutor standardThreadExecutor) {
         this.lemonConfig = lemonConfig;
         this.standardThreadExecutor = standardThreadExecutor;
-        this.channels = new ConcurrentHashMap<>(lemonConfig.getMaxChannel());
+        this.channels = new ConcurrentHashMap<>(lemonConfig.getMaxConnection());
     }
 
     public Map<String, Channel> getChannels() {
@@ -46,9 +46,9 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
-        if (channels.size() >= lemonConfig.getMaxChannel()) {
+        if (channels.size() >= lemonConfig.getMaxConnection()) {
             // Direct close connection beyond maximum connection limit
-            log.warn("The connected channel size out of limit: limit={} current={}", lemonConfig.getMaxChannel(), channels.size());
+            log.warn("The connected channel size out of limit: limit={} current={}", lemonConfig.getMaxConnection(), channels.size());
             channel.close();
         } else {
             String channelKey = getChannelKey(channel.localAddress(), channel.remoteAddress());

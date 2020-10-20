@@ -59,7 +59,7 @@ public class LemonConfig implements Serializable {
     /**
      * The max server conn (all clients conn)
      **/
-    private int maxChannel = 100000;
+    private int maxConnection = 100000;
 
 
     /**
@@ -128,9 +128,6 @@ public class LemonConfig implements Serializable {
 
     /**
      * 递归解析
-     *
-     * @param object
-     * @return
      */
     @SuppressWarnings("unchecked")
     private static JSON recursion(Object object) {
