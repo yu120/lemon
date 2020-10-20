@@ -3,6 +3,7 @@ package org.micro.lemon.server;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
@@ -17,9 +18,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.*;
 
 /**
  * Lemon Server Handler
@@ -27,6 +26,7 @@ import java.util.concurrent.RejectedExecutionException;
  * @author lry
  */
 @Slf4j
+@ChannelHandler.Sharable
 public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
     private LemonConfig lemonConfig;
@@ -37,10 +37,6 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         this.lemonConfig = lemonConfig;
         this.standardThreadExecutor = standardThreadExecutor;
         this.channels = new ConcurrentHashMap<>(lemonConfig.getMaxConnection());
-    }
-
-    public Map<String, Channel> getChannels() {
-        return channels;
     }
 
     @Override

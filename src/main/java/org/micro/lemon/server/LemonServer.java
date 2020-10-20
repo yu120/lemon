@@ -1,25 +1,17 @@
 package org.micro.lemon.server;
 
 import org.micro.lemon.common.LemonConfig;
-import org.micro.lemon.common.config.BizTaskConfig;
-import org.micro.lemon.common.utils.StandardThreadExecutor;
 import org.micro.lemon.filter.LemonFactory;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Lemon Server by Netty
@@ -32,7 +24,7 @@ public class LemonServer {
     private Channel channel;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private StandardThreadExecutor standardThreadExecutor;
+    private LemonChannelInitializer lemonChannelInitializer;
 
     /**
      * The initialize
@@ -44,16 +36,7 @@ public class LemonServer {
 
         ThreadFactory ioThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-io").build();
         ThreadFactory workThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-work").build();
-
-        BizTaskConfig bizTaskConfig = lemonConfig.getBiz();
-        if (bizTaskConfig.getCoreThread() > 0) {
-            ThreadFactory bizThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-biz").build();
-            this.standardThreadExecutor = new StandardThreadExecutor(
-                    bizTaskConfig.getCoreThread(), bizTaskConfig.getMaxThread(),
-                    bizTaskConfig.getKeepAliveTime(), TimeUnit.MILLISECONDS, bizTaskConfig.getQueueCapacity(),
-                    bizThreadFactory, bizTaskConfig.getRejectedStrategy().getHandler());
-            standardThreadExecutor.prestartAllCoreThreads();
-        }
+        this.lemonChannelInitializer = new LemonChannelInitializer(lemonConfig);
 
         try {
             this.bossGroup = new NioEventLoopGroup(lemonConfig.getIoThread(), ioThreadFactory);
@@ -64,18 +47,7 @@ public class LemonServer {
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ChannelPipeline pipeline = ch.pipeline();
-                            pipeline.addLast("http-decoder", new HttpRequestDecoder());
-                            // Convert multiple requests from HTTP to FullHttpRequest/FullHttpResponse
-                            pipeline.addLast("http-aggregator", new HttpObjectAggregator(lemonConfig.getMaxContentLength()));
-                            pipeline.addLast("http-encoder", new HttpResponseEncoder());
-                            pipeline.addLast("http-chunked", new ChunkedWriteHandler());
-                            pipeline.addLast("serverHandler", new LemonServerHandler(lemonConfig, standardThreadExecutor));
-                        }
-                    });
+                    .childHandler(lemonChannelInitializer);
 
             ChannelFuture channelFuture = serverBootstrap.bind(lemonConfig.getPort()).sync();
             channelFuture.addListener((future) -> log.info("The start server is success"));
@@ -106,10 +78,9 @@ public class LemonServer {
             if (workerGroup != null) {
                 workerGroup.shutdownGracefully();
             }
-            if (standardThreadExecutor != null) {
-                standardThreadExecutor.shutdown();
+            if (lemonChannelInitializer != null) {
+                lemonChannelInitializer.destroy();
             }
-
             LemonFactory.INSTANCE.destroy();
         } catch (Exception e) {
             log.error("The destroy server is fail", e);
