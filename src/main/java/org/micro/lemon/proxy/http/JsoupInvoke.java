@@ -46,18 +46,17 @@ public class JsoupInvoke implements LemonInvoke {
     }
 
     @Override
-    public LemonContext invoke(LemonContext context) {
-        LemonRequest request = context.getRequest();
+    public LemonResponse invoke(LemonRequest request) {
         ServiceMapping mapping = null;
         for (ConcurrentMap.Entry<String, ServiceMapping> entry : mappings.entrySet()) {
             if (antPathMatcher.match(entry.getKey(), request.getContextPath())) {
                 mapping = entry.getValue();
             }
         }
-        if (mapping == null) {
-            context.callback(LemonStatusCode.NOT_FOUND);
-            return null;
-        }
+//        if (mapping == null) {
+//            context.callback(LemonStatusCode.NOT_FOUND);
+//            return null;
+//        }
 
         String originalUrl = mapping.getUrl();
         if (mapping.isFullUrl()) {
@@ -91,8 +90,7 @@ public class JsoupInvoke implements LemonInvoke {
         try {
             Connection.Response response = connection.execute();
             Map<String, Object> headers = new HashMap<>(response.headers());
-            context.setResponse(new LemonResponse(headers, response.bodyAsBytes()));
-            return context;
+            return new LemonResponse(headers, response.bodyAsBytes());
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

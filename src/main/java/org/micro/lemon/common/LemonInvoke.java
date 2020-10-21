@@ -2,6 +2,8 @@ package org.micro.lemon.common;
 
 import org.micro.lemon.server.LemonContext;
 import org.micro.lemon.extension.SPI;
+import org.micro.lemon.server.LemonRequest;
+import org.micro.lemon.server.LemonResponse;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -23,19 +25,19 @@ public interface LemonInvoke {
     /**
      * The sync invoke
      *
-     * @param context {@link LemonContext}
+     * @param request {@link LemonRequest}
      * @return result object
      */
-    LemonContext invoke(LemonContext context);
+    LemonResponse invoke(LemonRequest request);
 
     /**
      * The async invoke
      *
-     * @param context {@link LemonContext}
+     * @param request {@link LemonRequest}
      * @return result object {@link CompletableFuture}
      */
-   default CompletableFuture<LemonContext> invokeAsync(LemonContext context){
-       return CompletableFuture.completedFuture(invoke(context));
+   default CompletableFuture<LemonResponse> invokeAsync(LemonRequest request){
+       return CompletableFuture.completedFuture(invoke(request));
    }
 
     /**

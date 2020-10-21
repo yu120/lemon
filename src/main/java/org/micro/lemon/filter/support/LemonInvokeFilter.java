@@ -11,6 +11,7 @@ import org.micro.lemon.server.LemonContext;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.lemon.extension.Extension;
 import org.micro.lemon.extension.ExtensionLoader;
+import org.micro.lemon.server.LemonResponse;
 
 import java.util.HashSet;
 import java.util.List;
@@ -59,7 +60,7 @@ public class LemonInvokeFilter extends AbstractFilter {
             return;
         }
 
-        CompletableFuture<LemonContext> future = lemonInvoke.invokeAsync(context);
+        CompletableFuture<LemonResponse> future = lemonInvoke.invokeAsync(context.getRequest());
         if (future == null) {
             log.error("The completable future is null by context:{}", context);
             return;

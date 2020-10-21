@@ -77,8 +77,7 @@ public class DubboInvoke implements LemonInvoke {
     }
 
     @Override
-    public LemonContext invoke(LemonContext context) {
-        LemonRequest request = context.getRequest();
+    public LemonResponse invoke(LemonRequest request) {
         OriginalConfig originalConfig = lemonConfig.getOriginal();
 
         // setter request header list
@@ -99,7 +98,7 @@ public class DubboInvoke implements LemonInvoke {
         paramValues.add(JSON.isValid(body) ? JSON.parse(bytes) : body);
         serviceMapping.setParamValues(paramValues.toArray(new Object[0]));
 
-        GenericService genericService = buildGenericService(context, serviceMapping);
+        GenericService genericService = buildGenericService(request, serviceMapping);
         Object result = genericService.$invoke(serviceMapping.getMethod(),
                 serviceMapping.getParamTypes(), serviceMapping.getParamValues());
 
@@ -109,8 +108,7 @@ public class DubboInvoke implements LemonInvoke {
             headers.put(entry.getKey(), entry.getValue());
         }
 
-        context.setResponse(new LemonResponse(headers, result));
-        return context;
+        return new LemonResponse(headers, result);
     }
 
     @Override
@@ -141,11 +139,11 @@ public class DubboInvoke implements LemonInvoke {
     /**
      * The build {@link GenericService} by {@link ServiceMapping}
      *
-     * @param context        {@link LemonContext}
+     * @param request        {@link LemonRequest}
      * @param serviceMapping {@link ServiceMapping}
      * @return {@link GenericService}
      */
-    private GenericService buildGenericService(LemonContext context, ServiceMapping serviceMapping) {
+    private GenericService buildGenericService(LemonRequest request, ServiceMapping serviceMapping) {
         ReferenceConfig<GenericService> referenceConfig = new ReferenceConfig<>();
         referenceConfig.setApplication(new ApplicationConfig(serviceMapping.getApplication()));
         referenceConfig.setGroup(serviceMapping.getGroup());
@@ -155,7 +153,7 @@ public class DubboInvoke implements LemonInvoke {
         referenceConfig.setGeneric(true);
 
         if (serviceMapping.getParamTypes() == null) {
-            metadataCollectorFactory.wrapperTypesFromMetadata(context, serviceMapping);
+            metadataCollectorFactory.wrapperTypesFromMetadata(request, serviceMapping);
         }
 
         return ReferenceConfigCache.getCache().get(referenceConfig);

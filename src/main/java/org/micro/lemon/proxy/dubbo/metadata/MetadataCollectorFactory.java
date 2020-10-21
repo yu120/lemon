@@ -14,6 +14,7 @@ import org.apache.dubbo.metadata.definition.model.FullServiceDefinition;
 import org.apache.dubbo.metadata.definition.model.MethodDefinition;
 import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 import org.micro.lemon.extension.ExtensionLoader;
+import org.micro.lemon.server.LemonRequest;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -88,17 +89,17 @@ public enum MetadataCollectorFactory {
     /**
      * The wrapper types from metadata
      *
-     * @param context        {@link LemonContext}
+     * @param request        {@link LemonRequest}
      * @param serviceMapping {@link ServiceMapping}
      */
-    public void wrapperTypesFromMetadata(LemonContext context, ServiceMapping serviceMapping) {
+    public void wrapperTypesFromMetadata(LemonRequest request, ServiceMapping serviceMapping) {
         MetadataIdentifier identifier = build(serviceMapping);
 
         // whether to clear cached access
-        String invalidateCache = context.getRequest().getHeaderValue(LemonContext.INVALIDATE_CACHE);
+        String invalidateCache = request.getHeaderValue(LemonContext.INVALIDATE_CACHE);
         if (!StringUtils.isBlank(invalidateCache)) {
             if (Boolean.parseBoolean(invalidateCache)) {
-                String lemonToken = context.getRequest().getHeaderValue(LemonContext.LEMON_TOKEN);
+                String lemonToken = request.getHeaderValue(LemonContext.LEMON_TOKEN);
                 if (lemonConfig.getToken().equals(lemonToken)) {
                     cache.invalidate(identifier.getIdentifierKey());
                 }
