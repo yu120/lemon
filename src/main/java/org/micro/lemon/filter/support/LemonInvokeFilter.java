@@ -11,16 +11,12 @@ import org.micro.lemon.server.LemonContext;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.lemon.extension.Extension;
 import org.micro.lemon.extension.ExtensionLoader;
-import org.micro.lemon.server.LemonResponse;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 /**
  * LemonInvokeFilter
@@ -80,8 +76,6 @@ public class LemonInvokeFilter extends AbstractFilter {
                 super.preFilter(chain, context);
             } catch (Throwable t) {
                 log.error(t.getMessage(), t);
-            } finally {
-                context.callback(LemonStatusCode.SUCCESS);
             }
         });
     }
