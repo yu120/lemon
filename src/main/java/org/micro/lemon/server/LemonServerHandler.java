@@ -65,7 +65,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
             if (standardThreadExecutor == null) {
                 try {
-                    dispatcher(lemonContext);
+                    new LemonChain(lemonContext);
                 } catch (Throwable t) {
                     log.error(t.getMessage(), t);
                     lemonContext.callback(LemonStatusCode.INTERNAL_SERVER_ERROR);
@@ -74,7 +74,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                 try {
                     standardThreadExecutor.execute(() -> {
                         try {
-                            dispatcher(lemonContext);
+                            new LemonChain(lemonContext);
                         } catch (Throwable t) {
                             log.error(t.getMessage(), t);
                             lemonContext.callback(LemonStatusCode.INTERNAL_SERVER_ERROR);
@@ -86,11 +86,6 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                 }
             }
         }
-    }
-
-    private void dispatcher(LemonContext lemonContext) throws Throwable {
-        LemonChain lemonChain = new LemonChain();
-        lemonChain.start(lemonContext);
     }
 
     @Override

@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class LemonChain {
 
-    private AtomicBoolean flag = new AtomicBoolean(true);
     private AtomicInteger index = new AtomicInteger(0);
+    private AtomicBoolean flag = new AtomicBoolean(true);
 
     private int filterMaxIndex = 0;
     private List<IFilter> filters = new ArrayList<>();
@@ -28,7 +28,7 @@ public class LemonChain {
      * @param context {@link LemonContext}
      * @throws Throwable throw exception
      */
-    public final void start(LemonContext context) throws Throwable {
+    public LemonChain(LemonContext context) throws Throwable {
         List<IFilter> filters = LemonFactory.INSTANCE.getFilters();
         if (!filters.isEmpty()) {
             this.filterMaxIndex = filters.size() - 1;
