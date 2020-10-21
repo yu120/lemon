@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * The Extension Loader
+ * ExtensionLoader
  *
  * @param <T>
  * @author lry

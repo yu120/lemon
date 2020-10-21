@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * Lemon Server Handler
+ * LemonServerHandler
  *
  * @author lry
  */

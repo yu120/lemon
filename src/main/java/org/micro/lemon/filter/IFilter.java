@@ -5,7 +5,7 @@ import org.micro.lemon.server.LemonContext;
 import org.micro.lemon.extension.SPI;
 
 /**
- * Filter
+ * IFilter
  *
  * @author lry
  */
