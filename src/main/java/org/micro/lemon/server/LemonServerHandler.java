@@ -81,6 +81,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                         }
                     });
                 } catch (RejectedExecutionException e) {
+                    log.error(e.getMessage(), e);
                     lemonContext.callback(LemonStatusCode.TOO_MANY_REQUESTS);
                 }
             }
