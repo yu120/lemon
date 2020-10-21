@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -16,7 +15,6 @@ import java.util.Map;
  * @author lry
  */
 @Data
-@Slf4j
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
