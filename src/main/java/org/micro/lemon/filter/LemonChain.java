@@ -1,12 +1,15 @@
 package org.micro.lemon.filter;
 
+import org.micro.lemon.common.LemonStatusCode;
 import org.micro.lemon.server.LemonContext;
 import lombok.extern.slf4j.Slf4j;
+import org.micro.lemon.server.LemonResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 /**
  * LemonChain
@@ -35,6 +38,10 @@ public class LemonChain {
             this.filters.addAll(filters);
         }
         doFilter(context);
+        context.getFuture().thenRunAsync(() -> {
+            LemonResponse response = context.getResponse();
+            context.callback(LemonStatusCode.SUCCESS, response.getContent());
+        });
     }
 
     /**

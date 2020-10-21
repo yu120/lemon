@@ -32,6 +32,16 @@ public interface LemonCallback {
      * The callback
      *
      * @param statusCode {@link LemonStatusCode}
+     * @param body       body
+     */
+    default void callback(LemonStatusCode statusCode, Object body) {
+        callback(statusCode, statusCode.getMessage(), body);
+    }
+
+    /**
+     * The callback
+     *
+     * @param statusCode {@link LemonStatusCode}
      * @param message    message
      * @param body       body
      */

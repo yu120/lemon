@@ -56,13 +56,21 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
-            LemonContext lemonContext = this.buildContext(ctx, (FullHttpRequest) msg);
-            if (!lemonContext.getRequest().getApplicationPath().equals(LemonContext.URL_DELIMITER +
-                    lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
+            LemonContext lemonContext = new LemonContext(new LemonRequest()) {
+                @Override
+                public void callback(LemonStatusCode statusCode, String message, Object body) {
+                    FullHttpResponse response = buildResponse(statusCode, message, body);
+                    ctx.writeAndFlush(response).addListener(future -> MDC.remove(LemonContext.LEMON_ID_KEY));
+                }
+            };
+
+            FullHttpRequest request = (FullHttpRequest) msg;
+            if (!request.uri().startsWith(LemonContext.URL_DELIMITER + lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
                 lemonContext.callback(LemonStatusCode.NOT_FOUND);
                 return;
             }
 
+            this.wrapperRequest(lemonContext, request);
             if (standardThreadExecutor == null) {
                 try {
                     new LemonChain(lemonContext);
@@ -112,10 +120,10 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     /**
      * The wrapper chain context
      *
-     * @param ctx     {@link ChannelHandlerContext}
-     * @param request {@link FullHttpRequest}
+     * @param lemonContext {@link LemonContext}
+     * @param request      {@link FullHttpRequest}
      */
-    private LemonContext buildContext(ChannelHandlerContext ctx, FullHttpRequest request) {
+    private void wrapperRequest(LemonContext lemonContext, FullHttpRequest request) {
         // read headers
         HttpHeaders httpHeaders = request.headers();
         String requestId = httpHeaders.get(LemonContext.LEMON_ID_KEY,
@@ -149,19 +157,13 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         headers.putAll(decoder.parameters());
         headers.put(LemonContext.LEMON_ID_KEY, requestId);
         headers.put(LemonContext.URI_KEY, request.uri());
-        headers.put(LemonContext.APP_PATH_KEY, path.substring(0, path.indexOf(LemonContext.URL_DELIMITER, 1) - 1));
+        headers.put(LemonContext.APP_PATH_KEY, path.substring(0, path.indexOf(LemonContext.URL_DELIMITER, 1)));
         headers.put(LemonContext.CONTEXT_PATH_KEY, path.substring(path.indexOf(LemonContext.URL_DELIMITER, 1)));
         headers.put(LemonContext.PATH_KEY, path);
         headers.put(LemonContext.METHOD_KEY, request.method().name());
         headers.put(LemonContext.KEEP_ALIVE_KEY, HttpUtil.isKeepAlive(request));
         headers.put(LemonContext.CONTENT_LENGTH_KEY, contentLength);
-        return new LemonContext(new LemonRequest(headers, content)) {
-            @Override
-            public void callback(LemonStatusCode statusCode, String message, Object body) {
-                FullHttpResponse response = buildRespone(statusCode, message, body);
-                ctx.writeAndFlush(response).addListener(future -> MDC.remove(LemonContext.LEMON_ID_KEY));
-            }
-        };
+        lemonContext.setRequest(new LemonRequest(headers, content));
     }
 
     /**
@@ -171,7 +173,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
      * @param message    custom message
      * @param body       response body content
      */
-    private FullHttpResponse buildRespone(LemonStatusCode statusCode, String message, Object body) {
+    private FullHttpResponse buildResponse(LemonStatusCode statusCode, String message, Object body) {
         ByteBuf byteBuf;
         if (body == null) {
             byteBuf = Unpooled.buffer(0);

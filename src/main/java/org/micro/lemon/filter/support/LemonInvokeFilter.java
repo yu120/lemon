@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 /**
  * LemonInvokeFilter
@@ -60,13 +62,14 @@ public class LemonInvokeFilter extends AbstractFilter {
             return;
         }
 
-        CompletableFuture<LemonResponse> future = lemonInvoke.invokeAsync(context.getRequest());
-        if (future == null) {
+        context.setFuture(lemonInvoke.invokeAsync(context.getRequest()));
+        if (context.getFuture() == null) {
             log.error("The completable future is null by context:{}", context);
             return;
         }
 
-        future.whenComplete((result, throwable) -> {
+        context.getFuture().whenComplete((result, throwable) -> {
+            context.setResponse(result);
             if (throwable != null) {
                 log.error("Invoke exception", throwable);
                 context.callback(lemonInvoke.failure(context, throwable));
