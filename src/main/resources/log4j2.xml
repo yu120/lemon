@@ -13,7 +13,7 @@
             <!-- 控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) -->
             <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
             <!-- 输出日志的格式 -->
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%class{36}] [%L] [%M]: %msg%xEx%n"/>
         </Console>
 
         <!-- 设置日志格式并配置日志压缩格式(service.log.年份.gz) -->
@@ -33,10 +33,10 @@
                 hostAddress : 本地ip地址
              -->
             <PatternLayout>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M -- %msg%xEx%n</pattern>
+                <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%class{36}] [%L] [%M]: %msg%xEx%n</pattern>
             </PatternLayout>
             <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingRandomAccessFile>
 
@@ -46,10 +46,10 @@
                                  immediateFlush="false" fileName="${LOG_HOME}/service.log"
                                  filePattern="${LOG_HOME}/service.log.%d{yyyy-MM-dd}.debug.gz">
             <PatternLayout>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M -- %msg%xEx%n</pattern>
+                <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%class{36}] [%L] [%M]: %msg%xEx%n</pattern>
             </PatternLayout>
             <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingRandomAccessFile>
     </Appenders>
