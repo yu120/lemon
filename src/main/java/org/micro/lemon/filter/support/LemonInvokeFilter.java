@@ -74,8 +74,9 @@ public class LemonInvokeFilter extends AbstractFilter {
 
             try {
                 super.preFilter(chain, context);
+                context.callback(LemonStatusCode.SUCCESS);
             } catch (Throwable t) {
-                log.error(t.getMessage(), t);
+                throw new RuntimeException(t);
             }
         });
     }

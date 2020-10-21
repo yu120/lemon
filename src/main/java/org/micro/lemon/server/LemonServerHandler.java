@@ -58,8 +58,8 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof FullHttpRequest) {
             LemonContext lemonContext = new LemonContext(new LemonRequest()) {
                 @Override
-                public void callback(LemonStatusCode statusCode, String message, Object body) {
-                    FullHttpResponse response = buildResponse(statusCode, message, body);
+                public void callback(LemonStatusCode statusCode, String message) {
+                    FullHttpResponse response = buildResponse(statusCode, message, getResponse());
                     ctx.writeAndFlush(response).addListener(future -> MDC.remove(LemonContext.LEMON_ID_KEY));
                 }
             };
@@ -171,30 +171,34 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
      *
      * @param statusCode {@link LemonStatusCode}
      * @param message    custom message
-     * @param body       response body content
+     * @param response   {@link LemonResponse}
      */
-    private FullHttpResponse buildResponse(LemonStatusCode statusCode, String message, Object body) {
+    private FullHttpResponse buildResponse(LemonStatusCode statusCode, String message, LemonResponse response) {
         ByteBuf byteBuf;
-        if (body == null) {
+        if (response.getContent() == null) {
             byteBuf = Unpooled.buffer(0);
-        } else if (body instanceof ByteBuf) {
-            byteBuf = (ByteBuf) body;
-        } else if (body instanceof byte[]) {
-            byteBuf = Unpooled.wrappedBuffer((byte[]) body);
+        } else if (response.getContent() instanceof ByteBuf) {
+            byteBuf = (ByteBuf) response.getContent();
+        } else if (response.getContent() instanceof byte[]) {
+            byteBuf = Unpooled.wrappedBuffer((byte[]) response.getContent());
         } else {
-            byteBuf = Unpooled.wrappedBuffer(String.valueOf(body).getBytes(StandardCharsets.UTF_8));
+            byteBuf = Unpooled.wrappedBuffer(String.valueOf(response.getContent()).getBytes(StandardCharsets.UTF_8));
         }
 
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
-        response.headers().set(LemonContext.LEMON_CODE_KEY, statusCode.getCode());
-        response.headers().set(LemonContext.LEMON_CODE_MESSAGE,
-                (message != null && message.trim().length() > 0) ? message : statusCode.getMessage());
-        response.headers().set(com.google.common.net.HttpHeaders.CONTENT_LENGTH,
-                (response.content() == null ? 0 : response.content().readableBytes()));
-        response.headers().set(com.google.common.net.HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
-        response.headers().set(com.google.common.net.HttpHeaders.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-        response.headers().set(com.google.common.net.HttpHeaders.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
-        return response;
+        FullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
+        for (Map.Entry<String, Object> entry : response.getHeaders().entrySet()) {
+            httpResponse.headers().set(entry.getKey(), entry.getValue());
+        }
+
+        httpResponse.headers().set(LemonContext.LEMON_CODE_KEY, statusCode.getCode());
+        if (!response.getHeaders().containsKey(com.google.common.net.HttpHeaders.CONTENT_TYPE)) {
+            httpResponse.headers().set(com.google.common.net.HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
+        }
+        httpResponse.headers().set(com.google.common.net.HttpHeaders.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        httpResponse.headers().set(com.google.common.net.HttpHeaders.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
+        httpResponse.headers().set(LemonContext.LEMON_CODE_MESSAGE, (message != null && message.trim().length() > 0) ? message : statusCode.getMessage());
+        httpResponse.headers().set(com.google.common.net.HttpHeaders.CONTENT_LENGTH, (httpResponse.content() == null ? 0 : httpResponse.content().readableBytes()));
+        return httpResponse;
     }
 
     /**

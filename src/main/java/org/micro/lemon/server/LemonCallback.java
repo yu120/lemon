@@ -15,7 +15,7 @@ public interface LemonCallback {
      * @param statusCode {@link LemonStatusCode}
      */
     default void callback(LemonStatusCode statusCode) {
-        callback(statusCode, statusCode.getMessage(), null);
+        callback(statusCode, statusCode.getMessage());
     }
 
     /**
@@ -25,27 +25,6 @@ public interface LemonCallback {
      * @param message    message
      */
     default void callback(LemonStatusCode statusCode, String message) {
-        callback(statusCode, message, null);
-    }
-
-    /**
-     * The callback
-     *
-     * @param statusCode {@link LemonStatusCode}
-     * @param body       body
-     */
-    default void callback(LemonStatusCode statusCode, Object body) {
-        callback(statusCode, statusCode.getMessage(), body);
-    }
-
-    /**
-     * The callback
-     *
-     * @param statusCode {@link LemonStatusCode}
-     * @param message    message
-     * @param body       body
-     */
-    default void callback(LemonStatusCode statusCode, String message, Object body) {
 
     }
 
