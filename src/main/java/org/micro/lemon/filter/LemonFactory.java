@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.extension.Extension;
 import org.micro.lemon.extension.ExtensionLoader;
-import org.micro.lemon.server.LemonContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Lemon Chain Factory
+ * LemonFactory
  *
  * @author lry
  */
@@ -40,29 +39,31 @@ public enum LemonFactory {
         if (filterList.size() > 0) {
             for (IFilter filter : filterList) {
                 Extension extension = filter.getClass().getAnnotation(Extension.class);
-                if (extension != null) {
-                    // calculation filter id
-                    String id = extension.value();
-                    if (id.trim().length() == 0) {
-                        id = filter.getClass().getSimpleName();
-                    }
-
-                    // exclude filter by id
-                    if (!lemonConfig.getExcludeFilters().isEmpty()) {
-                        if (lemonConfig.getExcludeFilters().contains(id)) {
-                            continue;
-                        }
-                    }
-
-                    // include filter by id
-                    if (!lemonConfig.getIncludeFilters().isEmpty()) {
-                        if (!lemonConfig.getIncludeFilters().contains(id)) {
-                            continue;
-                        }
-                    }
-                    filters.add(filter);
-                    filterMap.put(filter.getClass(), filter);
+                if (extension == null) {
+                    continue;
                 }
+
+                // calculation filter id
+                String id = extension.value();
+                if (id.trim().length() == 0) {
+                    id = filter.getClass().getSimpleName();
+                }
+
+                // exclude filter by id
+                if (!lemonConfig.getExcludeFilters().isEmpty()) {
+                    if (lemonConfig.getExcludeFilters().contains(id)) {
+                        continue;
+                    }
+                }
+
+                // include filter by id
+                if (!lemonConfig.getIncludeFilters().isEmpty()) {
+                    if (!lemonConfig.getIncludeFilters().contains(id)) {
+                        continue;
+                    }
+                }
+                filters.add(filter);
+                filterMap.put(filter.getClass(), filter);
             }
         }
 
@@ -70,14 +71,6 @@ public enum LemonFactory {
             filter.initialize(lemonConfig);
             log.info("The filter[{}] initialize is success.", filter);
         }
-    }
-
-    public void doFilter(LemonContext context) throws Throwable {
-        new LemonChain().start(context, filters);
-    }
-
-    public IFilter getFilter(Class<?> filterClass) {
-        return filterMap.get(filterClass);
     }
 
     /**

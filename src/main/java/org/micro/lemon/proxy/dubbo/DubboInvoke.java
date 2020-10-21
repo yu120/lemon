@@ -23,6 +23,8 @@ import org.apache.dubbo.rpc.RpcContext;
 import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.service.GenericService;
 import org.micro.lemon.extension.Extension;
+import org.micro.lemon.server.LemonRequest;
+import org.micro.lemon.server.LemonResponse;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -76,10 +78,11 @@ public class DubboInvoke implements LemonInvoke {
 
     @Override
     public LemonContext invoke(LemonContext context) {
+        LemonRequest request = context.getRequest();
         OriginalConfig originalConfig = lemonConfig.getOriginal();
 
         // setter request header list
-        for (Map.Entry<String, Object> entry : context.getHeaders().entrySet()) {
+        for (Map.Entry<String, Object> entry : request.getHeaders().entrySet()) {
             // originalReqHeaders contains or starts with 'X-'
             if (originalConfig.getReqHeaders().contains(entry.getKey())
                     || entry.getKey().startsWith(LemonContext.HEADER_PREFIX)) {
@@ -88,8 +91,8 @@ public class DubboInvoke implements LemonInvoke {
         }
 
         // call original remote
-        ServiceMapping serviceMapping = parseServiceMapping(context);
-        byte[] bytes = (byte[]) context.getContent();
+        ServiceMapping serviceMapping = parseServiceMapping(request);
+        byte[] bytes = (byte[]) request.getContent();
         String body = new String(bytes, StandardCharsets.UTF_8);
 
         List<Object> paramValues = new ArrayList<>();
@@ -106,7 +109,8 @@ public class DubboInvoke implements LemonInvoke {
             headers.put(entry.getKey(), entry.getValue());
         }
 
-        return new LemonContext(headers, result);
+        context.setResponse(new LemonResponse(headers, result));
+        return context;
     }
 
     @Override
@@ -160,10 +164,10 @@ public class DubboInvoke implements LemonInvoke {
     /**
      * The wrapper {@link ServiceMapping} by {@link LemonContext}
      *
-     * @param context {@link LemonContext}
+     * @param request {@link LemonRequest}
      */
-    private ServiceMapping parseServiceMapping(LemonContext context) {
-        List<String> paths = Arrays.asList(context.getPath().split(LemonContext.URL_DELIMITER));
+    private ServiceMapping parseServiceMapping(LemonRequest request) {
+        List<String> paths = Arrays.asList(request.getPath().split(LemonContext.URL_DELIMITER));
         if (paths.size() != 4) {
             throw new IllegalArgumentException("Illegal Request");
         }
@@ -174,9 +178,9 @@ public class DubboInvoke implements LemonInvoke {
         serviceMapping.setMethod(paths.get(3));
 
         // wrapper service name
-        wrapperServiceName(serviceMapping);
+        serviceMapping.setServiceName(this.getServiceName(serviceMapping));
 
-        Map<String, Object> parameters = context.getHeaders();
+        Map<String, Object> parameters = request.getHeaders();
         if (parameters.containsKey(GROUP_KEY)) {
             serviceMapping.setGroup(String.valueOf(parameters.get(GROUP_KEY)));
         }
@@ -187,21 +191,19 @@ public class DubboInvoke implements LemonInvoke {
         return serviceMapping;
     }
 
-    private void wrapperServiceName(ServiceMapping serviceMapping) {
+    private String getServiceName(ServiceMapping serviceMapping) {
         ConcurrentMap<String, String> serviceNames =
                 registryServiceSubscribe.getServiceNames().get(serviceMapping.getApplication());
         if (serviceNames == null || serviceNames.isEmpty()) {
-            serviceMapping.setServiceName(serviceMapping.getService());
-            return;
+            return serviceMapping.getService();
         }
 
         String serviceName = serviceNames.get(serviceMapping.getService());
         if (serviceName == null || serviceName.length() == 0) {
-            serviceMapping.setServiceName(serviceMapping.getService());
-            return;
+            return serviceMapping.getService();
         }
 
-        serviceMapping.setServiceName(serviceName);
+        return serviceName;
     }
 
 }

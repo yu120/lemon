@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
-
 /**
  * Lemon Context
  *
@@ -34,36 +32,12 @@ public class LemonContext implements MessageCallback {
     public final static String INVALIDATE_CACHE = "X-Invalidate-Cache";
     public final static String LEMON_TOKEN = "X-Lemon-Token";
 
-    private Object content;
-    private final Map<String, Object> headers = new HashMap<>();
+    private LemonRequest request;
+    private LemonResponse response;
 
-    public LemonContext(Map<String, Object> headers, Object content) {
-        this.headers.putAll(headers);
-        this.content = content;
-    }
-
-    public String getHeaderValue(String headerKey) {
-        return headers.containsKey(headerKey) ? String.valueOf(headers.get(headerKey)) : null;
-    }
-
-    public String getUri() {
-        return this.getHeaderValue(URI_KEY);
-    }
-
-    public String getApplicationPath() {
-        return this.getHeaderValue(APP_PATH_KEY);
-    }
-
-    public String getContextPath() {
-        return this.getHeaderValue(CONTEXT_PATH_KEY);
-    }
-
-    public String getHttpMethod() {
-        return this.getHeaderValue(METHOD_KEY);
-    }
-
-    public String getPath() {
-        return this.getHeaderValue(PATH_KEY);
+    public LemonContext(LemonRequest request) {
+        this.request = request;
+        this.response = new LemonResponse();
     }
 
     public void onCallback(LemonStatusCode statusCode) {

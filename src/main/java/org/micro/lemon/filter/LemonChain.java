@@ -28,7 +28,8 @@ public class LemonChain {
      * @param context {@link LemonContext}
      * @throws Throwable throw exception
      */
-    public final void start(LemonContext context, List<IFilter> filters) throws Throwable {
+    public final void start(LemonContext context) throws Throwable {
+        List<IFilter> filters = LemonFactory.INSTANCE.getFilters();
         if (!filters.isEmpty()) {
             this.filterMaxIndex = filters.size() - 1;
             this.filters.addAll(filters);

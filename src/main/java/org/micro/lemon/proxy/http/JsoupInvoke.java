@@ -12,6 +12,8 @@ import org.micro.lemon.common.ServiceMapping;
 import org.micro.lemon.common.utils.AntPathMatcher;
 import org.micro.lemon.extension.Extension;
 import org.micro.lemon.server.LemonContext;
+import org.micro.lemon.server.LemonRequest;
+import org.micro.lemon.server.LemonResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -45,9 +47,10 @@ public class JsoupInvoke implements LemonInvoke {
 
     @Override
     public LemonContext invoke(LemonContext context) {
+        LemonRequest request = context.getRequest();
         ServiceMapping mapping = null;
         for (ConcurrentMap.Entry<String, ServiceMapping> entry : mappings.entrySet()) {
-            if (antPathMatcher.match(entry.getKey(), context.getContextPath())) {
+            if (antPathMatcher.match(entry.getKey(), request.getContextPath())) {
                 mapping = entry.getValue();
             }
         }
@@ -58,22 +61,22 @@ public class JsoupInvoke implements LemonInvoke {
 
         String originalUrl = mapping.getUrl();
         if (mapping.isFullUrl()) {
-            originalUrl += context.getContextPath();
+            originalUrl += request.getContextPath();
         } else {
             String servicePrefix = mapping.getService();
             servicePrefix = servicePrefix.substring(0, servicePrefix.lastIndexOf("/"));
-            originalUrl += context.getContextPath().substring(servicePrefix.length());
+            originalUrl += request.getContextPath().substring(servicePrefix.length());
         }
 
         Connection connection = Jsoup.connect(originalUrl);
-        Connection.Request request = connection.request();
-        request.method(ConnectionMethod.valueOf(context.getHttpMethod()).getMethod());
-        for (Map.Entry<String, Object> entry : context.getHeaders().entrySet()) {
-            request.header(entry.getKey(), String.valueOf(entry.getValue()));
+        Connection.Request sendRequest = connection.request();
+        sendRequest.method(ConnectionMethod.valueOf(request.getHttpMethod()).getMethod());
+        for (Map.Entry<String, Object> entry : request.getHeaders().entrySet()) {
+            sendRequest.header(entry.getKey(), String.valueOf(entry.getValue()));
         }
-        byte[] bytes = (byte[]) context.getContent();
-        if (context.getContent() != null && bytes.length > 0) {
-            request.requestBody(new String(bytes, StandardCharsets.UTF_8));
+        byte[] bytes = (byte[]) request.getContent();
+        if (request.getContent() != null && bytes.length > 0) {
+            sendRequest.requestBody(new String(bytes, StandardCharsets.UTF_8));
         }
 
         // setter timeout(ms)
@@ -82,13 +85,14 @@ public class JsoupInvoke implements LemonInvoke {
             timeout = lemonConfig.getOriginal().getTimeout();
         }
         if (timeout > 0) {
-            request.timeout(timeout.intValue());
+            sendRequest.timeout(timeout.intValue());
         }
 
         try {
             Connection.Response response = connection.execute();
             Map<String, Object> headers = new HashMap<>(response.headers());
-            return new LemonContext(headers, response.bodyAsBytes());
+            context.setResponse(new LemonResponse(headers, response.bodyAsBytes()));
+            return context;
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

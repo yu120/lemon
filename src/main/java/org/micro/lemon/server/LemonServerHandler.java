@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.LemonStatusCode;
 import org.micro.lemon.common.utils.StandardThreadExecutor;
-import org.micro.lemon.filter.LemonFactory;
+import org.micro.lemon.filter.LemonChain;
 import org.slf4j.MDC;
 
 import java.net.InetSocketAddress;
@@ -57,7 +57,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
             LemonContext lemonContext = this.buildContext(ctx, (FullHttpRequest) msg);
-            if (!lemonContext.getApplicationPath().equals(LemonContext.URL_DELIMITER +
+            if (!lemonContext.getRequest().getApplicationPath().equals(LemonContext.URL_DELIMITER +
                     lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
                 lemonContext.onCallback(LemonStatusCode.NOT_FOUND);
                 return;
@@ -65,7 +65,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
             if (standardThreadExecutor == null) {
                 try {
-                    LemonFactory.INSTANCE.doFilter(lemonContext);
+                    dispatcher(lemonContext);
                 } catch (Throwable t) {
                     log.error(t.getMessage(), t);
                     lemonContext.onCallback(LemonStatusCode.INTERNAL_SERVER_ERROR);
@@ -74,7 +74,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                 try {
                     standardThreadExecutor.execute(() -> {
                         try {
-                            LemonFactory.INSTANCE.doFilter(lemonContext);
+                            dispatcher(lemonContext);
                         } catch (Throwable t) {
                             log.error(t.getMessage(), t);
                             lemonContext.onCallback(LemonStatusCode.INTERNAL_SERVER_ERROR);
@@ -85,6 +85,11 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                 }
             }
         }
+    }
+
+    private void dispatcher(LemonContext lemonContext) throws Throwable {
+        LemonChain lemonChain = new LemonChain();
+        lemonChain.start(lemonContext);
     }
 
     @Override
@@ -154,7 +159,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         headers.put(LemonContext.METHOD_KEY, request.method().name());
         headers.put(LemonContext.KEEP_ALIVE_KEY, HttpUtil.isKeepAlive(request));
         headers.put(LemonContext.CONTENT_LENGTH_KEY, contentLength);
-        return new LemonContext(headers, content) {
+        return new LemonContext(new LemonRequest(headers, content)) {
             @Override
             public void callback(LemonStatusCode statusCode, String message, Object body) {
                 FullHttpResponse response = buildRespone(statusCode, message, body);
