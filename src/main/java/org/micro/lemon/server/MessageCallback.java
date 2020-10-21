@@ -4,6 +4,8 @@ import org.micro.lemon.common.LemonStatusCode;
 
 public interface MessageCallback {
 
-    void callback(LemonStatusCode statusCode, String message, Object body);
+    default void callback(LemonStatusCode statusCode, String message, Object body){
+
+    }
 
 }

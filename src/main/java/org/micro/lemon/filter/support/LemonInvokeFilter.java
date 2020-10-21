@@ -67,9 +67,8 @@ public class LemonInvokeFilter extends AbstractFilter {
 
         future.whenComplete((result, throwable) -> {
             if (throwable != null) {
-                log.error(throwable.getMessage(), throwable);
-                LemonStatusCode statusCode = lemonInvoke.failure(context, throwable);
-                context.onCallback(statusCode);
+                log.error("Invoke exception", throwable);
+                context.onCallback(lemonInvoke.failure(context, throwable));
                 return;
             }
 

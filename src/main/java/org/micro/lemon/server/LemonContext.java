@@ -47,11 +47,6 @@ public class LemonContext implements MessageCallback {
         this.content = content;
     }
 
-    @Override
-    public void callback(LemonStatusCode statusCode, String message, Object body) {
-
-    }
-
     public String getHeaderValue(String headerKey) {
         return headers.containsKey(headerKey) ? String.valueOf(headers.get(headerKey)) : null;
     }
