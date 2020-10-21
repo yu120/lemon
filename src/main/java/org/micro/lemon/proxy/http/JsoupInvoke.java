@@ -15,9 +15,9 @@ import org.micro.lemon.server.LemonContext;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -44,7 +44,7 @@ public class JsoupInvoke implements LemonInvoke {
     }
 
     @Override
-    public Object invoke(LemonContext context) {
+    public LemonContext invoke(LemonContext context) {
         ServiceMapping mapping = null;
         for (ConcurrentMap.Entry<String, ServiceMapping> entry : mappings.entrySet()) {
             if (antPathMatcher.match(entry.getKey(), context.getContextPath())) {
@@ -71,8 +71,9 @@ public class JsoupInvoke implements LemonInvoke {
         for (Map.Entry<String, Object> entry : context.getHeaders().entrySet()) {
             request.header(entry.getKey(), String.valueOf(entry.getValue()));
         }
-        if (context.getContent() != null && context.getContent().length > 0) {
-            request.requestBody(new String(context.getContent(), StandardCharsets.UTF_8));
+        byte[] bytes = (byte[]) context.getContent();
+        if (context.getContent() != null && bytes.length > 0) {
+            request.requestBody(new String(bytes, StandardCharsets.UTF_8));
         }
 
         // setter timeout(ms)
@@ -86,25 +87,11 @@ public class JsoupInvoke implements LemonInvoke {
 
         try {
             Connection.Response response = connection.execute();
-            context.getResHeaders().putAll(response.headers());
-            context.getResHeaders().put(LemonContext.CALL_CODE, response.statusCode());
-            context.getResHeaders().put(LemonContext.CALL_MESSAGE, response.statusMessage());
-            return response.bodyAsBytes();
+            Map<String, Object> headers = new HashMap<>(response.headers());
+            return new LemonContext(headers, response.bodyAsBytes());
         } catch (IOException e) {
-            context.getResHeaders().put(LemonContext.CALL_MESSAGE, e.getMessage());
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public CompletableFuture<Object> invokeAsync(LemonContext context) {
-        Object object = invoke(context);
-        if (object instanceof CompletableFuture) {
-            return (CompletableFuture<Object>) object;
-        }
-
-        return CompletableFuture.completedFuture(object);
     }
 
     @Override

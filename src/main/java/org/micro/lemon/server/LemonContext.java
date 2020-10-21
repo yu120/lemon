@@ -28,14 +28,9 @@ public class LemonContext implements MessageCallback {
 
     public final static String LEMON_CODE_KEY = "X-Lemon-Code";
     public final static String LEMON_CODE_MESSAGE = "X-Lemon-Message";
-    private final static String APPLICATION_JSON = "application/json;charset=UTF-8";
 
     public final static String URL_DELIMITER = "/";
     public final static String HEADER_PREFIX = "X-";
-    private final static String LEMON_TIME = "X-Lemon-Time";
-    private final static String LEMON_PROTOCOL = "X-Lemon-Protocol";
-    public final static String CALL_CODE = "X-Call-Code";
-    public final static String CALL_MESSAGE = "X-Call-Message";
     public final static String INVALIDATE_CACHE = "X-Invalidate-Cache";
     public final static String LEMON_TOKEN = "X-Lemon-Token";
 

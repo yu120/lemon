@@ -26,7 +26,6 @@ import org.micro.lemon.extension.Extension;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -108,11 +107,6 @@ public class DubboInvoke implements LemonInvoke {
         }
 
         return new LemonContext(headers, result);
-    }
-
-    @Override
-    public CompletableFuture<LemonContext> invokeAsync(LemonContext context) {
-        return CompletableFuture.completedFuture(invoke(context));
     }
 
     @Override
