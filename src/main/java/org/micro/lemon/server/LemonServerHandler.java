@@ -59,7 +59,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
             LemonContext lemonContext = this.buildContext(ctx, (FullHttpRequest) msg);
             if (!lemonContext.getRequest().getApplicationPath().equals(LemonContext.URL_DELIMITER +
                     lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
-                lemonContext.onCallback(LemonStatusCode.NOT_FOUND);
+                lemonContext.callback(LemonStatusCode.NOT_FOUND);
                 return;
             }
 
@@ -68,7 +68,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                     dispatcher(lemonContext);
                 } catch (Throwable t) {
                     log.error(t.getMessage(), t);
-                    lemonContext.onCallback(LemonStatusCode.INTERNAL_SERVER_ERROR);
+                    lemonContext.callback(LemonStatusCode.INTERNAL_SERVER_ERROR);
                 }
             } else {
                 try {
@@ -77,11 +77,11 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
                             dispatcher(lemonContext);
                         } catch (Throwable t) {
                             log.error(t.getMessage(), t);
-                            lemonContext.onCallback(LemonStatusCode.INTERNAL_SERVER_ERROR);
+                            lemonContext.callback(LemonStatusCode.INTERNAL_SERVER_ERROR);
                         }
                     });
                 } catch (RejectedExecutionException e) {
-                    lemonContext.onCallback(LemonStatusCode.TOO_MANY_REQUESTS);
+                    lemonContext.callback(LemonStatusCode.TOO_MANY_REQUESTS);
                 }
             }
         }

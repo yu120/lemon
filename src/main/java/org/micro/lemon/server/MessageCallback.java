@@ -13,6 +13,25 @@ public interface MessageCallback {
      * The callback
      *
      * @param statusCode {@link LemonStatusCode}
+     */
+    default void callback(LemonStatusCode statusCode) {
+        callback(statusCode, statusCode.getMessage(), null);
+    }
+
+    /**
+     * The callback
+     *
+     * @param statusCode {@link LemonStatusCode}
+     * @param message    message
+     */
+    default void callback(LemonStatusCode statusCode, String message) {
+        callback(statusCode, message, null);
+    }
+
+    /**
+     * The callback
+     *
+     * @param statusCode {@link LemonStatusCode}
      * @param message    message
      * @param body       body
      */

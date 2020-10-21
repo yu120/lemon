@@ -1,6 +1,5 @@
 package org.micro.lemon.server;
 
-import org.micro.lemon.common.LemonStatusCode;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -38,18 +37,6 @@ public class LemonContext implements MessageCallback {
     public LemonContext(LemonRequest request) {
         this.request = request;
         this.response = new LemonResponse();
-    }
-
-    public void onCallback(LemonStatusCode statusCode) {
-        callback(statusCode, statusCode.getMessage(), null);
-    }
-
-    public void onCallback(LemonStatusCode statusCode, String message) {
-        callback(statusCode, message, null);
-    }
-
-    public void onCallback(LemonStatusCode statusCode, String message, Object body) {
-        callback(statusCode, message, body);
     }
 
 }

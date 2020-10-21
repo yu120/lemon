@@ -57,19 +57,19 @@ public class LemonJwtFilter extends AbstractFilter {
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
         if (jwtConfig.isEnable()) {
-            Object token = context.getHeaderValue(jwtConfig.getKey());
+            Object token = context.getRequest().getHeaderValue(jwtConfig.getKey());
             if (token == null) {
-                context.onCallback(LemonStatusCode.BAD_REQUEST, "'" + jwtConfig.getKey() + "' is null or empty");
+                context.callback(LemonStatusCode.BAD_REQUEST, "'" + jwtConfig.getKey() + "' is null or empty");
                 return;
             }
 
             try {
                 verifier.verify(String.valueOf(token));
             } catch (TokenExpiredException e) {
-                context.onCallback(LemonStatusCode.PAYMENT_REQUIRED, "Token expired");
+                context.callback(LemonStatusCode.PAYMENT_REQUIRED, "Token expired");
                 return;
             } catch (JWTVerificationException e) {
-                context.onCallback(LemonStatusCode.UNAUTHORIZED, "Verify that the token is illegal");
+                context.callback(LemonStatusCode.UNAUTHORIZED, "Verify that the token is illegal");
                 return;
             }
         }

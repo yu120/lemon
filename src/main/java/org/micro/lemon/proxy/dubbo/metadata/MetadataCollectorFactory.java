@@ -95,10 +95,10 @@ public enum MetadataCollectorFactory {
         MetadataIdentifier identifier = build(serviceMapping);
 
         // whether to clear cached access
-        String invalidateCache = context.getHeaderValue(LemonContext.INVALIDATE_CACHE);
+        String invalidateCache = context.getRequest().getHeaderValue(LemonContext.INVALIDATE_CACHE);
         if (!StringUtils.isBlank(invalidateCache)) {
             if (Boolean.parseBoolean(invalidateCache)) {
-                String lemonToken = context.getHeaderValue(LemonContext.LEMON_TOKEN);
+                String lemonToken = context.getRequest().getHeaderValue(LemonContext.LEMON_TOKEN);
                 if (lemonConfig.getToken().equals(lemonToken)) {
                     cache.invalidate(identifier.getIdentifierKey());
                 }

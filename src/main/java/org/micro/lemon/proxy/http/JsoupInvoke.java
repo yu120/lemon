@@ -55,7 +55,7 @@ public class JsoupInvoke implements LemonInvoke {
             }
         }
         if (mapping == null) {
-            context.onCallback(LemonStatusCode.NOT_FOUND);
+            context.callback(LemonStatusCode.NOT_FOUND);
             return null;
         }
 
