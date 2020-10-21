@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 @ToString
-public class LemonContext implements MessageCallback {
+public class LemonContext implements LemonCallback {
 
     public final static String LEMON_ID_KEY = "X-Lemon-Id";
     public final static String URI_KEY = "X-Lemon-Uri";

@@ -3,11 +3,11 @@ package org.micro.lemon.server;
 import org.micro.lemon.common.LemonStatusCode;
 
 /**
- * MessageCallback
+ * LemonCallback
  *
  * @author lry
  */
-public interface MessageCallback {
+public interface LemonCallback {
 
     /**
      * The callback
