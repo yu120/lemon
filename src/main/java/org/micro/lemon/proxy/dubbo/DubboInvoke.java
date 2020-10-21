@@ -25,11 +25,9 @@ import org.apache.dubbo.rpc.service.GenericService;
 import org.micro.lemon.extension.Extension;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Dubbo Lemon Invoke
@@ -40,6 +38,9 @@ import java.util.concurrent.CompletableFuture;
 @Getter
 @Extension("dubbo")
 public class DubboInvoke implements LemonInvoke {
+
+    private static final String GROUP_KEY = "group";
+    private static final String VERSION_KEY = "version";
 
     private LemonConfig lemonConfig;
 
@@ -88,8 +89,14 @@ public class DubboInvoke implements LemonInvoke {
         }
 
         // call original remote
-        ServiceMapping serviceMapping = context.getServiceMapping();
-        wrapperServiceDefinition(context);
+        ServiceMapping serviceMapping = parseServiceMapping(context);
+        byte[] bytes = (byte[]) context.getContent();
+        String body = new String(bytes, StandardCharsets.UTF_8);
+
+        List<Object> paramValues = new ArrayList<>();
+        paramValues.add(JSON.isValid(body) ? JSON.parse(bytes) : body);
+        serviceMapping.setParamValues(paramValues.toArray(new Object[0]));
+
         GenericService genericService = buildGenericService(context, serviceMapping);
         Object result = genericService.$invoke(serviceMapping.getMethod(),
                 serviceMapping.getParamTypes(), serviceMapping.getParamValues());
@@ -134,20 +141,6 @@ public class DubboInvoke implements LemonInvoke {
     }
 
     /**
-     * The wrapper ServiceDefinition by {@link LemonContext}
-     *
-     * @param context {@link LemonContext}
-     */
-    private void wrapperServiceDefinition(LemonContext context) {
-        byte[] bytes = (byte[]) context.getContent();
-        String body = new String(bytes, StandardCharsets.UTF_8);
-
-        List<Object> paramValues = new ArrayList<>();
-        paramValues.add(JSON.isValid(body) ? JSON.parse(bytes) : body);
-        context.getServiceMapping().setParamValues(paramValues.toArray(new Object[0]));
-    }
-
-    /**
      * The build {@link GenericService} by {@link ServiceMapping}
      *
      * @param context        {@link LemonContext}
@@ -168,6 +161,53 @@ public class DubboInvoke implements LemonInvoke {
         }
 
         return ReferenceConfigCache.getCache().get(referenceConfig);
+    }
+
+    /**
+     * The wrapper {@link ServiceMapping} by {@link LemonContext}
+     *
+     * @param context {@link LemonContext}
+     */
+    private ServiceMapping parseServiceMapping(LemonContext context) {
+        List<String> paths = Arrays.asList(context.getPath().split(LemonContext.URL_DELIMITER));
+        if (paths.size() != 4) {
+            throw new IllegalArgumentException("Illegal Request");
+        }
+
+        ServiceMapping serviceMapping = new ServiceMapping();
+        serviceMapping.setApplication(paths.get(1));
+        serviceMapping.setService(paths.get(2));
+        serviceMapping.setMethod(paths.get(3));
+
+        // wrapper service name
+        wrapperServiceName(serviceMapping);
+
+        Map<String, Object> parameters = context.getHeaders();
+        if (parameters.containsKey(GROUP_KEY)) {
+            serviceMapping.setGroup(String.valueOf(parameters.get(GROUP_KEY)));
+        }
+        if (parameters.containsKey(VERSION_KEY)) {
+            serviceMapping.setVersion(String.valueOf(parameters.get(VERSION_KEY)));
+        }
+
+        return serviceMapping;
+    }
+
+    private void wrapperServiceName(ServiceMapping serviceMapping) {
+        ConcurrentMap<String, String> serviceNames =
+                registryServiceSubscribe.getServiceNames().get(serviceMapping.getApplication());
+        if (serviceNames == null || serviceNames.isEmpty()) {
+            serviceMapping.setServiceName(serviceMapping.getService());
+            return;
+        }
+
+        String serviceName = serviceNames.get(serviceMapping.getService());
+        if (serviceName == null || serviceName.length() == 0) {
+            serviceMapping.setServiceName(serviceMapping.getService());
+            return;
+        }
+
+        serviceMapping.setServiceName(serviceName);
     }
 
 }

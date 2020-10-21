@@ -1,7 +1,6 @@
 package org.micro.lemon.server;
 
 import org.micro.lemon.common.LemonStatusCode;
-import org.micro.lemon.common.ServiceMapping;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,7 @@ import java.util.*;
 @Data
 @Slf4j
 @ToString
-public class LemonContext {
+public class LemonContext implements MessageCallback {
 
     public final static String LEMON_ID_KEY = "X-Lemon-Id";
     public final static String URI_KEY = "X-Lemon-Uri";
@@ -43,17 +42,14 @@ public class LemonContext {
     private Object content;
     private final Map<String, Object> headers = new HashMap<>();
 
-    private MessageCallback callback;
-    private ServiceMapping serviceMapping;
-
     public LemonContext(Map<String, Object> headers, Object content) {
-        this(headers, content, null);
-    }
-
-    public LemonContext(Map<String, Object> headers, Object content, MessageCallback callback) {
         this.headers.putAll(headers);
         this.content = content;
-        this.callback = callback;
+    }
+
+    @Override
+    public void callback(LemonStatusCode statusCode, String message, Object body) {
+
     }
 
     public String getHeaderValue(String headerKey) {
@@ -81,15 +77,15 @@ public class LemonContext {
     }
 
     public void onCallback(LemonStatusCode statusCode) {
-        onCallback(statusCode, statusCode.getMessage(), null);
+        callback(statusCode, statusCode.getMessage(), null);
     }
 
     public void onCallback(LemonStatusCode statusCode, String message) {
-        onCallback(statusCode, message, null);
+        callback(statusCode, message, null);
     }
 
     public void onCallback(LemonStatusCode statusCode, String message, Object body) {
-        callback.callback(statusCode, message, body);
+        callback(statusCode, message, body);
     }
 
 }

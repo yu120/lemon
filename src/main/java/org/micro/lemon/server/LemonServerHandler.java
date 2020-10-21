@@ -154,10 +154,13 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         headers.put(LemonContext.METHOD_KEY, request.method().name());
         headers.put(LemonContext.KEEP_ALIVE_KEY, HttpUtil.isKeepAlive(request));
         headers.put(LemonContext.CONTENT_LENGTH_KEY, contentLength);
-        return new LemonContext(headers, content, (statusCode, message, body) -> {
-            FullHttpResponse response = buildRespone(statusCode, message, body);
-            ctx.writeAndFlush(response).addListener(future -> MDC.remove(LemonContext.LEMON_ID_KEY));
-        });
+        return new LemonContext(headers, content) {
+            @Override
+            public void callback(LemonStatusCode statusCode, String message, Object body) {
+                FullHttpResponse response = buildRespone(statusCode, message, body);
+                ctx.writeAndFlush(response).addListener(future -> MDC.remove(LemonContext.LEMON_ID_KEY));
+            }
+        };
     }
 
     /**
