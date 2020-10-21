@@ -93,10 +93,6 @@ public class LemonConfig implements Serializable {
      */
     private List<String> includeFilters = new ArrayList<>();
     /**
-     * The configure fixed response header list
-     */
-    private Map<String, Object> resHeaders = new LinkedHashMap<>();
-    /**
      * The direct connection service mapping list
      */
     private List<ServiceMapping> services = new ArrayList<>();
