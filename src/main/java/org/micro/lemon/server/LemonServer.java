@@ -24,7 +24,7 @@ public class LemonServer {
     private Channel channel;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private LemonChannelInitializer lemonChannelInitializer;
+    private LemonChannelInitializer channelInitializer;
 
     /**
      * The initialize
@@ -36,7 +36,7 @@ public class LemonServer {
 
         ThreadFactory ioThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-io").build();
         ThreadFactory workThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-work").build();
-        this.lemonChannelInitializer = new LemonChannelInitializer(lemonConfig);
+        this.channelInitializer = new LemonChannelInitializer(lemonConfig);
 
         try {
             this.bossGroup = new NioEventLoopGroup(lemonConfig.getIoThread(), ioThreadFactory);
@@ -47,7 +47,7 @@ public class LemonServer {
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(lemonChannelInitializer);
+                    .childHandler(channelInitializer);
 
             ChannelFuture channelFuture = serverBootstrap.bind(lemonConfig.getPort()).sync();
             channelFuture.addListener((future) -> log.info("The start server is success"));
@@ -78,8 +78,8 @@ public class LemonServer {
             if (workerGroup != null) {
                 workerGroup.shutdownGracefully();
             }
-            if (lemonChannelInitializer != null) {
-                lemonChannelInitializer.destroy();
+            if (channelInitializer != null) {
+                channelInitializer.destroy();
             }
             LemonFactory.INSTANCE.destroy();
         } catch (Exception e) {
