@@ -9,6 +9,7 @@ import org.micro.lemon.filter.LemonChain;
 import org.micro.lemon.proxy.dubbo.RegistryServiceSubscribe;
 import org.micro.lemon.server.LemonContext;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
@@ -57,7 +58,7 @@ public class LemonAuthorizeFilter extends AbstractFilter {
      * @param context {@link LemonContext}
      */
     private void wrapperServiceDefinition(LemonContext context) {
-        List<String> paths = context.getPaths();
+        List<String> paths = Arrays.asList(context.getPath().split(LemonContext.URL_DELIMITER));
         if (paths.size() != 4) {
             throw new IllegalArgumentException("Illegal Request");
         }

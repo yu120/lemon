@@ -26,7 +26,7 @@ public interface LemonInvoke {
      * @param context {@link LemonContext}
      * @return result object
      */
-    Object invoke(LemonContext context);
+    LemonContext invoke(LemonContext context);
 
     /**
      * The async invoke
@@ -34,7 +34,7 @@ public interface LemonInvoke {
      * @param context {@link LemonContext}
      * @return result object {@link CompletableFuture}
      */
-    CompletableFuture<Object> invokeAsync(LemonContext context);
+    CompletableFuture<LemonContext> invokeAsync(LemonContext context);
 
     /**
      * The build failure status code

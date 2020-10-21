@@ -26,6 +26,7 @@ import org.micro.lemon.extension.Extension;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -46,6 +47,7 @@ public class DubboInvoke implements LemonInvoke {
     private RegistryConfig registryConfig;
     private RegistryService registryService;
     private MetadataCollectorFactory metadataCollectorFactory;
+    private RegistryServiceSubscribe registryServiceSubscribe;
 
 
     @Override
@@ -64,13 +66,16 @@ public class DubboInvoke implements LemonInvoke {
         this.serverUrl = new URL("http", NetUtils.getLocalHost(), lemonConfig.getPort(), lemonConfig.getApplication());
         registryService.register(serverUrl);
 
+        this.registryServiceSubscribe = new RegistryServiceSubscribe();
+        registryServiceSubscribe.initialize(registryService);
+
         // 启动Metadata数据收集器
         this.metadataCollectorFactory = MetadataCollectorFactory.INSTANCE;
         metadataCollectorFactory.initialize(lemonConfig);
     }
 
     @Override
-    public Object invoke(LemonContext context) {
+    public LemonContext invoke(LemonContext context) {
         OriginalConfig originalConfig = lemonConfig.getOriginal();
 
         // setter request header list
@@ -90,26 +95,17 @@ public class DubboInvoke implements LemonInvoke {
                 serviceMapping.getParamTypes(), serviceMapping.getParamValues());
 
         // setter response header list
+        Map<String, Object> headers = new HashMap<>();
         for (Map.Entry<String, String> entry : RpcContext.getContext().getAttachments().entrySet()) {
-            // originalResHeaders contains or starts with 'X-'
-            if (originalConfig.getResHeaders().contains(entry.getKey())
-                    || entry.getKey().startsWith(LemonContext.HEADER_PREFIX)) {
-                context.getResHeaders().put(entry.getKey(), entry.getValue());
-            }
+            headers.put(entry.getKey(), entry.getValue());
         }
 
-        return result;
+        return new LemonContext(headers, result);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public CompletableFuture<Object> invokeAsync(LemonContext context) {
-        Object object = invoke(context);
-        if (object instanceof CompletableFuture) {
-            return (CompletableFuture<Object>) object;
-        }
-
-        return CompletableFuture.completedFuture(object);
+    public CompletableFuture<LemonContext> invokeAsync(LemonContext context) {
+        return CompletableFuture.completedFuture(invoke(context));
     }
 
     @Override
@@ -143,14 +139,11 @@ public class DubboInvoke implements LemonInvoke {
      * @param context {@link LemonContext}
      */
     private void wrapperServiceDefinition(LemonContext context) {
-        List<Object> paramValues = new ArrayList<>();
-        String body = new String(context.getContent(), StandardCharsets.UTF_8);
-        if (JSON.isValid(body)) {
-            paramValues.add(JSON.parse(context.getContent()));
-        } else {
-            paramValues.add(context.getContent());
-        }
+        byte[] bytes = (byte[]) context.getContent();
+        String body = new String(bytes, StandardCharsets.UTF_8);
 
+        List<Object> paramValues = new ArrayList<>();
+        paramValues.add(JSON.isValid(body) ? JSON.parse(bytes) : body);
         context.getServiceMapping().setParamValues(paramValues.toArray(new Object[0]));
     }
 

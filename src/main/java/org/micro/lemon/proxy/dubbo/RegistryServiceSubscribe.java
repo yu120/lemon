@@ -1,9 +1,5 @@
 package org.micro.lemon.proxy.dubbo;
 
-import org.micro.lemon.common.LemonInvoke;
-import org.micro.lemon.extension.ExtensionLoader;
-import org.micro.lemon.filter.LemonFactory;
-import org.micro.lemon.server.LemonServer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -58,13 +54,9 @@ public class RegistryServiceSubscribe implements NotifyListener {
             1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
             new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-registry-subscribe").build());
 
-    public void initialize() {
-//        this.registryService = ;
-
-        threadPoolExecutor.submit(() -> {
-            log.info("Init Lemon Dubbo Sync Cache...");
-            registryService.subscribe(SUBSCRIBE, RegistryServiceSubscribe.this);
-        });
+    public void initialize(RegistryService registryService) {
+        this.registryService = registryService;
+        threadPoolExecutor.submit(() -> registryService.subscribe(SUBSCRIBE, RegistryServiceSubscribe.this));
     }
 
     public void update(URL oldUrl, URL newUrl) {

@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author lry
  */
 @Slf4j
-@Extension(value = "invoke", order = 200, category = LemonFactory.ROUTER)
+@Extension(value = "invoke", order = 100, category = LemonFactory.ROUTER)
 public class LemonInvokeFilter extends AbstractFilter {
 
     private final ConcurrentMap<String, LemonInvoke> lemonInvokes = new ConcurrentHashMap<>();
@@ -59,7 +59,7 @@ public class LemonInvokeFilter extends AbstractFilter {
             return;
         }
 
-        CompletableFuture<Object> future = lemonInvoke.invokeAsync(context);
+        CompletableFuture<LemonContext> future = lemonInvoke.invokeAsync(context);
         if (future == null) {
             log.error("The completable future is null by context:{}", context);
             return;
@@ -71,8 +71,6 @@ public class LemonInvokeFilter extends AbstractFilter {
                 LemonStatusCode statusCode = lemonInvoke.failure(context, throwable);
                 context.onCallback(statusCode);
                 return;
-            } else {
-                context.setResult(result);
             }
 
             try {

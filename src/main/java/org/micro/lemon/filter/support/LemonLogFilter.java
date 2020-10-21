@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.micro.lemon.extension.Extension;
 
 /**
- * Lemon Log Filter
+ * LemonLogFilter
  *
  * @author lry
  */
@@ -17,13 +17,13 @@ public class LemonLogFilter extends AbstractFilter {
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
-        log.debug("The pre log lemon context: {}", context);
+        log.info("The pre filter: {}", context.getHeaders());
         super.preFilter(chain, context);
     }
 
     @Override
     public void postFilter(LemonChain chain, LemonContext context) throws Throwable {
-        log.debug("The post log lemon context: {}", context);
+        log.info("The post filter: {}", context.getHeaders());
         super.postFilter(chain, context);
     }
 

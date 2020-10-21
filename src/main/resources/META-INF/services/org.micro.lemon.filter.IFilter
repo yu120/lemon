@@ -1,5 +1,4 @@
 org.micro.lemon.filter.support.LemonExceptionFilter
 org.micro.lemon.filter.support.LemonLogFilter
 org.micro.lemon.filter.support.LemonJwtFilter
-org.micro.lemon.filter.support.LemonCacheFilter
 org.micro.lemon.filter.support.LemonInvokeFilter

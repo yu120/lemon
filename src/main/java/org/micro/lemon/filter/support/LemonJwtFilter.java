@@ -16,7 +16,7 @@ import org.micro.lemon.extension.Extension;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Lemon Jwt Filter
+ * LemonJwtFilter
  *
  * @author lry
  */
@@ -24,9 +24,9 @@ import java.io.UnsupportedEncodingException;
 @Extension(value = "jwt", order = 20)
 public class LemonJwtFilter extends AbstractFilter {
 
+    private JwtConfig jwtConfig;
     private Algorithm algorithm;
     private JWTVerifier verifier;
-    private JwtConfig jwtConfig;
 
     @Override
     public void initialize(LemonConfig lemonConfig) {
@@ -34,8 +34,6 @@ public class LemonJwtFilter extends AbstractFilter {
         if (!jwtConfig.isEnable()) {
             return;
         }
-
-        super.initialize(lemonConfig);
 
         try {
             switch (jwtConfig.getAlgorithm()) {
@@ -52,48 +50,31 @@ public class LemonJwtFilter extends AbstractFilter {
             }
             this.verifier = JWT.require(algorithm).build();
         } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage(), e);
+            log.error("LemonJwtFilter initialize exception", e);
         }
     }
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
-        if (!jwtConfig.isEnable()) {
-            super.preFilter(chain, context);
-            return;
+        if (jwtConfig.isEnable()) {
+            Object token = context.getHeaderValue(jwtConfig.getKey());
+            if (token == null) {
+                context.onCallback(LemonStatusCode.BAD_REQUEST, "'" + jwtConfig.getKey() + "' is null or empty");
+                return;
+            }
+
+            try {
+                verifier.verify(String.valueOf(token));
+            } catch (TokenExpiredException e) {
+                context.onCallback(LemonStatusCode.PAYMENT_REQUIRED, "Token expired");
+                return;
+            } catch (JWTVerificationException e) {
+                context.onCallback(LemonStatusCode.UNAUTHORIZED, "Verify that the token is illegal");
+                return;
+            }
         }
 
-        Object token = context.getHeaders().get(jwtConfig.getKey());
-        if (token == null) {
-            context.onCallback(LemonStatusCode.BAD_REQUEST, "'" + jwtConfig.getKey() + "' is Null or Empty");
-            return;
-        }
-
-        try {
-            verifier.verify(String.valueOf(token));
-            super.preFilter(chain, context);
-        } catch (AlgorithmMismatchException e) {
-            context.onCallback(LemonStatusCode.BAD_REQUEST, "Algorithm Mismatch");
-        } catch (InvalidClaimException e) {
-            context.onCallback(LemonStatusCode.BAD_REQUEST, "Invalid Claim");
-        } catch (JWTDecodeException e) {
-            context.onCallback(LemonStatusCode.BAD_REQUEST, "JWT Decode");
-        } catch (SignatureVerificationException e) {
-            context.onCallback(LemonStatusCode.BAD_REQUEST, "Signature Verification");
-        } catch (TokenExpiredException e) {
-            context.onCallback(LemonStatusCode.PAYMENT_REQUIRED, "Token Expired");
-        } catch (Exception e) {
-            context.onCallback(LemonStatusCode.BAD_REQUEST, "JWT Verify Unknown Exception");
-        }
-    }
-
-    @Override
-    public void postFilter(LemonChain chain, LemonContext context) throws Throwable {
-        if (!jwtConfig.isEnable()) {
-            return;
-        }
-
-        super.postFilter(chain, context);
+        super.preFilter(chain, context);
     }
 
 }

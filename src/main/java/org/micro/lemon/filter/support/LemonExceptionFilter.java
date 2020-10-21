@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.micro.lemon.extension.Extension;
 
 /**
- * Lemon Exception Filter
+ * LemonExceptionFilter
  *
  * @author lry
  */
@@ -21,7 +21,7 @@ public class LemonExceptionFilter extends AbstractFilter {
         try {
             super.preFilter(chain, context);
         } catch (Throwable t) {
-            log.error(t.getMessage(), t);
+            log.error("Lemon exception filter", t);
             context.onCallback(LemonStatusCode.INTERNAL_SERVER_ERROR);
         }
     }

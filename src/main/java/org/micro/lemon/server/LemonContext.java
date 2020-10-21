@@ -40,52 +40,52 @@ public class LemonContext {
     public final static String INVALIDATE_CACHE = "X-Invalidate-Cache";
     public final static String LEMON_TOKEN = "X-Lemon-Token";
 
+    private Object content;
     private final Map<String, Object> headers = new HashMap<>();
-    private byte[] content;
+
     private MessageCallback callback;
-
-
-    private Object result;
-    private final Map<String, Object> resHeaders = new HashMap<>();
-
     private ServiceMapping serviceMapping;
 
-    public LemonContext(Map<String, Object> headers, byte[] content, MessageCallback callback) {
+    public LemonContext(Map<String, Object> headers, Object content) {
+        this(headers, content, null);
+    }
+
+    public LemonContext(Map<String, Object> headers, Object content, MessageCallback callback) {
         this.headers.putAll(headers);
         this.content = content;
         this.callback = callback;
     }
 
+    public String getHeaderValue(String headerKey) {
+        return headers.containsKey(headerKey) ? String.valueOf(headers.get(headerKey)) : null;
+    }
+
     public String getUri() {
-        return headers.containsKey(URI_KEY) ? String.valueOf(headers.get(URI_KEY)) : null;
+        return this.getHeaderValue(URI_KEY);
     }
 
     public String getApplicationPath() {
-        return headers.containsKey(APP_PATH_KEY) ? String.valueOf(headers.get(APP_PATH_KEY)) : null;
+        return this.getHeaderValue(APP_PATH_KEY);
     }
 
     public String getContextPath() {
-        return headers.containsKey(CONTEXT_PATH_KEY) ? String.valueOf(headers.get(CONTEXT_PATH_KEY)) : null;
+        return this.getHeaderValue(CONTEXT_PATH_KEY);
     }
 
     public String getHttpMethod() {
-        return headers.containsKey(METHOD_KEY) ? String.valueOf(headers.get(METHOD_KEY)) : null;
+        return this.getHeaderValue(METHOD_KEY);
     }
 
     public String getPath() {
-        return headers.containsKey(PATH_KEY) ? String.valueOf(headers.get(PATH_KEY)) : null;
-    }
-
-    public List<String> getPaths() {
-        return Arrays.asList(getPath().split(URL_DELIMITER));
+        return this.getHeaderValue(PATH_KEY);
     }
 
     public void onCallback(LemonStatusCode statusCode) {
-        callback.callback(statusCode, null, null);
+        onCallback(statusCode, statusCode.getMessage(), null);
     }
 
     public void onCallback(LemonStatusCode statusCode, String message) {
-        callback.callback(statusCode, message, null);
+        onCallback(statusCode, message, null);
     }
 
     public void onCallback(LemonStatusCode statusCode, String message, Object body) {
