@@ -2,13 +2,11 @@ package org.micro.lemon.common;
 
 import org.micro.lemon.server.LemonContext;
 import org.micro.lemon.extension.SPI;
-import org.micro.lemon.server.LemonRequest;
-import org.micro.lemon.server.LemonResponse;
 
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Lemon Invoke
+ * LemonInvoke
  *
  * @author lry
  */
@@ -25,20 +23,19 @@ public interface LemonInvoke {
     /**
      * The sync invoke
      *
-     * @param request {@link LemonRequest}
-     * @return result object
+     * @param lemonContext {@link LemonContext}
      */
-    LemonResponse invoke(LemonRequest request);
+    LemonContext invoke(LemonContext lemonContext);
 
     /**
      * The async invoke
      *
-     * @param request {@link LemonRequest}
+     * @param lemonContext {@link LemonContext}
      * @return result object {@link CompletableFuture}
      */
-   default CompletableFuture<LemonResponse> invokeAsync(LemonRequest request){
-       return CompletableFuture.completedFuture(invoke(request));
-   }
+    default CompletableFuture<LemonContext> invokeAsync(LemonContext lemonContext) {
+        return CompletableFuture.completedFuture(invoke(lemonContext));
+    }
 
     /**
      * The build failure status code

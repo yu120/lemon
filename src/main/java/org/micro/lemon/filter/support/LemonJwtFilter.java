@@ -3,7 +3,7 @@ package org.micro.lemon.filter.support;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.LemonStatusCode;
 import org.micro.lemon.common.config.JwtConfig;
-import org.micro.lemon.filter.AbstractFilter;
+import org.micro.lemon.filter.IFilter;
 import org.micro.lemon.filter.LemonChain;
 import org.micro.lemon.server.LemonContext;
 import com.auth0.jwt.JWT;
@@ -22,7 +22,7 @@ import java.io.UnsupportedEncodingException;
  */
 @Slf4j
 @Extension(value = "jwt", order = 20)
-public class LemonJwtFilter extends AbstractFilter {
+public class LemonJwtFilter implements IFilter {
 
     private JwtConfig jwtConfig;
     private Algorithm algorithm;
@@ -74,7 +74,7 @@ public class LemonJwtFilter extends AbstractFilter {
             }
         }
 
-        super.preFilter(chain, context);
+        chain.doFilter(context);
     }
 
 }

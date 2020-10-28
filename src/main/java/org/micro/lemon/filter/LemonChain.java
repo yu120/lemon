@@ -59,7 +59,7 @@ public class LemonChain {
      * @param context {@link LemonContext}
      * @throws Throwable throw exception
      */
-    protected void doFilter(LemonContext context) throws Throwable {
+    public void doFilter(LemonContext context) throws Throwable {
         if (flag.get()) {
             int tempIndex = index.getAndIncrement();
             if (tempIndex >= filterMaxIndex) {

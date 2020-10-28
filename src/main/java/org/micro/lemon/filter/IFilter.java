@@ -17,7 +17,9 @@ public interface IFilter {
      *
      * @param lemonConfig {@link LemonConfig}
      */
-    void initialize(LemonConfig lemonConfig);
+    default void initialize(LemonConfig lemonConfig) {
+
+    }
 
     /**
      * The pre filter
@@ -26,7 +28,9 @@ public interface IFilter {
      * @param context {@link LemonContext}
      * @throws Throwable throw exception
      */
-    void preFilter(LemonChain chain, LemonContext context) throws Throwable;
+    default void preFilter(LemonChain chain, LemonContext context) throws Throwable {
+
+    }
 
     /**
      * The post filter
@@ -35,11 +39,15 @@ public interface IFilter {
      * @param context {@link LemonContext}
      * @throws Throwable throw exception
      */
-    void postFilter(LemonChain chain, LemonContext context) throws Throwable;
+    default void postFilter(LemonChain chain, LemonContext context) throws Throwable {
+
+    }
 
     /**
      * The destroy
      */
-    void destroy();
+    default void destroy() {
+
+    }
 
 }

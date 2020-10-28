@@ -4,7 +4,7 @@ import org.micro.lemon.common.LemonInvoke;
 import org.micro.lemon.common.LemonStatusCode;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.ServiceMapping;
-import org.micro.lemon.filter.AbstractFilter;
+import org.micro.lemon.filter.IFilter;
 import org.micro.lemon.filter.LemonChain;
 import org.micro.lemon.filter.LemonFactory;
 import org.micro.lemon.server.LemonContext;
@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 @Slf4j
 @Extension(value = "invoke", order = 100, category = LemonFactory.ROUTER)
-public class LemonInvokeFilter extends AbstractFilter {
+public class LemonInvokeFilter implements IFilter {
 
     private final ConcurrentMap<String, LemonInvoke> lemonInvokes = new ConcurrentHashMap<>();
 
@@ -58,14 +58,13 @@ public class LemonInvokeFilter extends AbstractFilter {
             return;
         }
 
-        context.setFuture(lemonInvoke.invokeAsync(context.getRequest()));
+        context.setFuture(lemonInvoke.invokeAsync(context));
         if (context.getFuture() == null) {
             log.error("The completable future is null by context:{}", context);
             return;
         }
 
         context.getFuture().whenComplete((result, throwable) -> {
-            context.setResponse(result);
             if (throwable != null) {
                 log.error("Invoke exception", throwable);
                 context.callback(lemonInvoke.failure(context, throwable));
@@ -73,7 +72,7 @@ public class LemonInvokeFilter extends AbstractFilter {
             }
 
             try {
-                super.preFilter(chain, context);
+                chain.doFilter(context);
                 context.callback(LemonStatusCode.SUCCESS);
             } catch (Throwable t) {
                 throw new RuntimeException(t);

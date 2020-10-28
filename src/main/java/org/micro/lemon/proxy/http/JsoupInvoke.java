@@ -13,7 +13,6 @@ import org.micro.lemon.common.utils.AntPathMatcher;
 import org.micro.lemon.extension.Extension;
 import org.micro.lemon.server.LemonContext;
 import org.micro.lemon.server.LemonRequest;
-import org.micro.lemon.server.LemonResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -46,17 +45,14 @@ public class JsoupInvoke implements LemonInvoke {
     }
 
     @Override
-    public LemonResponse invoke(LemonRequest request) {
+    public LemonContext invoke(LemonContext lemonContext) {
+        LemonRequest request = lemonContext.getRequest();
         ServiceMapping mapping = null;
         for (ConcurrentMap.Entry<String, ServiceMapping> entry : mappings.entrySet()) {
             if (antPathMatcher.match(entry.getKey(), request.getContextPath())) {
                 mapping = entry.getValue();
             }
         }
-//        if (mapping == null) {
-//            context.callback(LemonStatusCode.NOT_FOUND);
-//            return null;
-//        }
 
         String originalUrl = mapping.getUrl();
         if (mapping.isFullUrl()) {
@@ -90,7 +86,9 @@ public class JsoupInvoke implements LemonInvoke {
         try {
             Connection.Response response = connection.execute();
             Map<String, Object> headers = new HashMap<>(response.headers());
-            return new LemonResponse(headers, response.bodyAsBytes());
+            lemonContext.getResponse().addHeader(headers);
+            lemonContext.getResponse().setContent(response.bodyAsBytes());
+            return lemonContext;
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

@@ -35,6 +35,6 @@ public class LemonContext implements LemonCallback {
 
     private final LemonRequest request = new LemonRequest();
     private final LemonResponse response = new LemonResponse();
-    private CompletableFuture<LemonResponse> future;
+    private CompletableFuture<LemonContext> future;
 
 }

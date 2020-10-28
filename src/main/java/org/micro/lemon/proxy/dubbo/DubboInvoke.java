@@ -24,14 +24,13 @@ import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.service.GenericService;
 import org.micro.lemon.extension.Extension;
 import org.micro.lemon.server.LemonRequest;
-import org.micro.lemon.server.LemonResponse;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Dubbo Lemon Invoke
+ * DubboInvoke
  *
  * @author lry
  */
@@ -77,7 +76,8 @@ public class DubboInvoke implements LemonInvoke {
     }
 
     @Override
-    public LemonResponse invoke(LemonRequest request) {
+    public LemonContext invoke(LemonContext lemonContext) {
+        LemonRequest request = lemonContext.getRequest();
         OriginalConfig originalConfig = lemonConfig.getOriginal();
 
         // setter request header list
@@ -108,7 +108,9 @@ public class DubboInvoke implements LemonInvoke {
             headers.put(entry.getKey(), entry.getValue());
         }
 
-        return new LemonResponse(headers, result);
+        lemonContext.getResponse().addHeader(headers);
+        lemonContext.getResponse().setContent(result);
+        return lemonContext;
     }
 
     @Override
@@ -189,6 +191,12 @@ public class DubboInvoke implements LemonInvoke {
         return serviceMapping;
     }
 
+    /**
+     * The get service name
+     *
+     * @param serviceMapping {@link ServiceMapping}
+     * @return service name
+     */
     private String getServiceName(ServiceMapping serviceMapping) {
         ConcurrentMap<String, String> serviceNames =
                 registryServiceSubscribe.getServiceNames().get(serviceMapping.getApplication());

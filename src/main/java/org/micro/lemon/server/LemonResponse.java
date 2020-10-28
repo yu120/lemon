@@ -26,6 +26,10 @@ public class LemonResponse implements Serializable {
         this.content = content;
     }
 
+    public void addHeader(Map<String, Object> headers) {
+        this.headers.putAll(headers);
+    }
+
     public String getHeaderValue(String headerKey) {
         return headers.containsKey(headerKey) ? String.valueOf(headers.get(headerKey)) : null;
     }
