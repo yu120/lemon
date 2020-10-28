@@ -41,9 +41,9 @@ public class LemonConfig implements Serializable {
      */
     private int port = 8080;
     /**
-     * The server model: true
+     * The hold model: true
      */
-    private boolean server = true;
+    private boolean hold = true;
     /**
      * The IO thread number
      */
@@ -55,7 +55,7 @@ public class LemonConfig implements Serializable {
     /**
      * The default value: 64MB
      */
-    private int maxContentLength = 1024 * 1024 * 64;
+    private int maxContentLength = 64 * 1024 * 1024;
     /**
      * The max server conn (all clients conn)
      **/

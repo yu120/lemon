@@ -2,10 +2,9 @@
 token: lemon
 application: lemon
 port: 8080
-server: true
+hold: true
 io-thread: 0
 work-thread: 0
-# 64 * 1024 * 1024 = 64 MB
 max-content-length: 67108864
 max-channel: 100000
 

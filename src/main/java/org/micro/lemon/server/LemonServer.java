@@ -54,7 +54,7 @@ public class LemonServer {
             this.channel = channelFuture.channel();
 
             Runtime.getRuntime().addShutdownHook(new Thread(LemonServer.this::destroy));
-            if (lemonConfig.isServer()) {
+            if (lemonConfig.isHold()) {
                 channel.closeFuture().sync();
             }
         } catch (Exception e) {
@@ -66,9 +66,8 @@ public class LemonServer {
      * The destroy
      */
     public void destroy() {
-        log.info("The starting close server...");
-
         try {
+            log.info("The starting close server...");
             if (channel != null) {
                 channel.close();
             }
