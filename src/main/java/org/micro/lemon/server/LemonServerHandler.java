@@ -1,5 +1,6 @@
 package org.micro.lemon.server;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -10,6 +11,7 @@ import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.LemonStatusCode;
+import org.micro.lemon.common.config.BizTaskConfig;
 import org.micro.lemon.common.utils.StandardThreadExecutor;
 import org.micro.lemon.filter.LemonChain;
 import org.slf4j.MDC;
@@ -33,10 +35,20 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     private ConcurrentMap<String, Channel> channels;
     private StandardThreadExecutor standardThreadExecutor;
 
-    public LemonServerHandler(LemonConfig lemonConfig, StandardThreadExecutor standardThreadExecutor) {
+    public LemonServerHandler(LemonConfig lemonConfig) {
         this.lemonConfig = lemonConfig;
-        this.standardThreadExecutor = standardThreadExecutor;
         this.channels = new ConcurrentHashMap<>(lemonConfig.getMaxConnection());
+
+        // create biz thread pool
+        BizTaskConfig bizTaskConfig = lemonConfig.getBiz();
+        if (bizTaskConfig.getCoreThread() > 0) {
+            ThreadFactory bizThreadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("lemon-biz").build();
+            this.standardThreadExecutor = new StandardThreadExecutor(
+                    bizTaskConfig.getCoreThread(), bizTaskConfig.getMaxThread(),
+                    bizTaskConfig.getKeepAliveTime(), TimeUnit.MILLISECONDS, bizTaskConfig.getQueueCapacity(),
+                    bizThreadFactory, bizTaskConfig.getRejectedStrategy().getHandler());
+            standardThreadExecutor.prestartAllCoreThreads();
+        }
     }
 
     @Override
@@ -56,7 +68,7 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
-            LemonContext lemonContext = new LemonContext(new LemonRequest()) {
+            final LemonContext lemonContext = new LemonContext() {
                 @Override
                 public void callback(LemonStatusCode statusCode, String message) {
                     FullHttpResponse response = buildResponse(statusCode, message, getResponse());
@@ -117,6 +129,12 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         ctx.fireChannelUnregistered();
     }
 
+    public void destroy() {
+        if (standardThreadExecutor != null) {
+            standardThreadExecutor.shutdown();
+        }
+    }
+
     /**
      * The wrapper chain context
      *
@@ -163,7 +181,8 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         headers.put(LemonContext.METHOD_KEY, request.method().name());
         headers.put(LemonContext.KEEP_ALIVE_KEY, HttpUtil.isKeepAlive(request));
         headers.put(LemonContext.CONTENT_LENGTH_KEY, contentLength);
-        lemonContext.setRequest(new LemonRequest(headers, content));
+        lemonContext.getRequest().addHeader(headers);
+        lemonContext.getRequest().setContent(content);
     }
 
     /**

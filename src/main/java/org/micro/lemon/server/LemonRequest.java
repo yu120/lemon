@@ -23,9 +23,8 @@ public class LemonRequest implements Serializable {
     private Object content;
     private final Map<String, Object> headers = new HashMap<>();
 
-    public LemonRequest(Map<String, Object> headers, Object content) {
+    public void addHeader(Map<String, Object> headers) {
         this.headers.putAll(headers);
-        this.content = content;
     }
 
     public String getHeaderValue(String headerKey) {

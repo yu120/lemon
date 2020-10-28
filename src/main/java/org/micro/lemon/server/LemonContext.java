@@ -33,13 +33,8 @@ public class LemonContext implements LemonCallback {
     public final static String INVALIDATE_CACHE = "X-Invalidate-Cache";
     public final static String LEMON_TOKEN = "X-Lemon-Token";
 
-    private LemonRequest request;
-    private LemonResponse response;
+    private final LemonRequest request = new LemonRequest();
+    private final LemonResponse response = new LemonResponse();
     private CompletableFuture<LemonResponse> future;
-
-    public LemonContext(LemonRequest request) {
-        this.request = request;
-        this.response = new LemonResponse();
-    }
 
 }
