@@ -169,7 +169,9 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         String requestId = httpHeaders.get(LemonContext.LEMON_ID_KEY, UUID.randomUUID().toString().replace("-", ""));
         MDC.put(LemonContext.LEMON_ID_KEY, requestId);
         for (Map.Entry<String, String> entry : httpHeaders.entries()) {
-            originHeaders.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
+            if (!lemonConfig.getIgnoreHeaders().contains(entry.getKey())) {
+                originHeaders.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
+            }
         }
 
         // read uri
@@ -193,9 +195,14 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         }
 
         // build context
-        final Map<String, Object> headers = new HashMap<>(originHeaders);
+        final Map<String, Object> headers = new HashMap<>();
+        for (Map.Entry<String, List<String>> entry : originHeaders.entrySet()) {
+            headers.put(entry.getKey(), entry.getValue().size() == 1 ? entry.getValue().get(0) : entry.getValue());
+        }
         headers.put(LemonContext.LEMON_ID_KEY, requestId);
         headers.put(LemonContext.URI_KEY, request.uri());
+        headers.put(LemonContext.CLIENT_HOST_KEY, httpHeaders.contains("X-Forwarded-For") ?
+                httpHeaders.get("X-Forwarded-For") : httpHeaders.get("Host"));
         headers.put(LemonContext.APP_PATH_KEY, path.substring(0, path.indexOf(LemonContext.URL_DELIMITER, 1)));
         headers.put(LemonContext.CONTEXT_PATH_KEY, path.substring(path.indexOf(LemonContext.URL_DELIMITER, 1)));
         headers.put(LemonContext.PATH_KEY, path);

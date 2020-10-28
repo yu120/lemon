@@ -63,6 +63,11 @@ public class LemonConfig implements Serializable {
 
 
     /**
+     * The call original ignore request header list key
+     */
+    private Set<String> ignoreHeaders = new LinkedHashSet<>();
+
+    /**
      * The biz task config
      */
     private BizTaskConfig biz;

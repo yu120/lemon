@@ -5,8 +5,11 @@ port: 8080
 hold: true
 io-thread: 0
 work-thread: 0
-max-content-length: 67108864
 max-channel: 100000
+max-content-length: 67108864
+
+ignore-headers: [Host, Cookie, Accept, User-Agent, Connection, Cache-Control, Upgrade-Insecure-Requests, content-length,
+                 Sec-Fetch-Dest, Sec-Fetch-Site, Sec-Fetch-User, Sec-Fetch-Mode, Accept-Encoding, Accept-Language]
 
 # biz I/O
 biz:
