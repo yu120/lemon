@@ -31,6 +31,10 @@ public class LemonRequest implements Serializable {
         return headers.containsKey(headerKey) ? String.valueOf(headers.get(headerKey)) : null;
     }
 
+    public String getRequestId() {
+        return this.getHeaderValue(LemonContext.LEMON_ID_KEY);
+    }
+
     public String getUri() {
         return this.getHeaderValue(LemonContext.URI_KEY);
     }

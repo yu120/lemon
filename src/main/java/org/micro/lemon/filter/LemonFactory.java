@@ -26,8 +26,8 @@ public enum LemonFactory {
 
     public final static String ROUTER = "ROUTER";
 
-    private List<IFilter> filters = new ArrayList<>();
-    private Map<Class<?>, IFilter> filterMap = new ConcurrentHashMap<>();
+    private final List<IFilter> filters = new ArrayList<>();
+    private final Map<Class<?>, IFilter> filterMap = new ConcurrentHashMap<>();
 
     /**
      * The initialize filter chain

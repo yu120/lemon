@@ -1,7 +1,9 @@
 package org.micro.lemon.filter;
 
+import org.micro.lemon.common.LemonStatusCode;
 import org.micro.lemon.server.LemonContext;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,22 +21,36 @@ public class LemonChain {
     private AtomicInteger index = new AtomicInteger(0);
     private AtomicBoolean flag = new AtomicBoolean(true);
 
+    private LemonContext lemonContext;
     private int filterMaxIndex = 0;
     private List<IFilter> filters = new ArrayList<>();
 
     /**
      * The do filter
      *
-     * @param context {@link LemonContext}
-     * @throws Throwable throw exception
+     * @param lemonContext {@link LemonContext}
      */
-    public LemonChain(LemonContext context) throws Throwable {
+    public LemonChain(LemonContext lemonContext) {
         List<IFilter> filters = LemonFactory.INSTANCE.getFilters();
         if (!filters.isEmpty()) {
             this.filterMaxIndex = filters.size() - 1;
             this.filters.addAll(filters);
         }
-        doFilter(context);
+        this.lemonContext = lemonContext;
+    }
+
+    /**
+     * The start filter chain
+     */
+    public void start0() {
+        MDC.put(LemonContext.LEMON_ID_KEY, lemonContext.getRequest().getRequestId());
+
+        try {
+            doFilter(lemonContext);
+        } catch (Throwable t) {
+            log.error(LemonStatusCode.INTERNAL_SERVER_ERROR.getMessage(), t);
+            lemonContext.callback(LemonStatusCode.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -43,7 +59,7 @@ public class LemonChain {
      * @param context {@link LemonContext}
      * @throws Throwable throw exception
      */
-    public void doFilter(LemonContext context) throws Throwable {
+    protected void doFilter(LemonContext context) throws Throwable {
         if (flag.get()) {
             int tempIndex = index.getAndIncrement();
             if (tempIndex >= filterMaxIndex) {

@@ -22,8 +22,8 @@ public class LemonResponse implements Serializable {
     private final Map<String, Object> headers = new HashMap<>();
 
     public LemonResponse(Map<String, Object> headers, Object content) {
-        this.content = content;
         this.headers.putAll(headers);
+        this.content = content;
     }
 
     public String getHeaderValue(String headerKey) {
