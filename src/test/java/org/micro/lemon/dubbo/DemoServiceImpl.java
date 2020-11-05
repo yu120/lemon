@@ -1,6 +1,6 @@
 package org.micro.lemon.dubbo;
 
-public class GreetingsServiceImpl implements GreetingsService {
+public class DemoServiceImpl implements DemoService {
 
     @Override
     public String sayHi(String name) {

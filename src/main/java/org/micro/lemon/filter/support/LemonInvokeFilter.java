@@ -52,7 +52,7 @@ public class LemonInvokeFilter implements IFilter {
 
     @Override
     public void preFilter(LemonChain chain, LemonContext context) throws Throwable {
-        LemonInvoke lemonInvoke = lemonInvokes.get("jsoup");
+        LemonInvoke lemonInvoke = lemonInvokes.get("dubbo");
         if (lemonInvoke == null) {
             context.callback(LemonStatusCode.NOT_FOUND);
             return;

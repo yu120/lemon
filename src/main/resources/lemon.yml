@@ -1,7 +1,7 @@
 # base
 token: lemon
 application: lemon
-port: 8080
+port: 9000
 hold: true
 io-thread: 0
 work-thread: 0
@@ -51,6 +51,6 @@ services:
   - protocol: jsoup
     service: /baidu/**
     url: https://www.baidu.com
-  - protocol: jsoup
-    service: /oschina/**
-    url: https://www.oschina.net
+  - protocol: dubbo
+    service: /hello/**
+    serviceName: org.micro.lemon.dubbo.GreetingsService

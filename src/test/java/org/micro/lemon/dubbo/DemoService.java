@@ -1,5 +1,5 @@
 package org.micro.lemon.dubbo;
 
-public interface GreetingsService {
+public interface DemoService {
     String sayHi(String name);
 }

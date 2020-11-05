@@ -167,15 +167,15 @@ public class DubboInvoke implements LemonInvoke {
      * @param request {@link LemonRequest}
      */
     private ServiceMapping parseServiceMapping(LemonRequest request) {
-        List<String> paths = Arrays.asList(request.getPath().split(LemonContext.URL_DELIMITER));
-        if (paths.size() != 4) {
+        List<String> paths = Arrays.asList(request.getContextPath().split(LemonContext.URL_DELIMITER));
+        if (paths.size() != 5) {
             throw new IllegalArgumentException("Illegal Request");
         }
 
         ServiceMapping serviceMapping = new ServiceMapping();
-        serviceMapping.setApplication(paths.get(1));
-        serviceMapping.setService(paths.get(2));
-        serviceMapping.setMethod(paths.get(3));
+        serviceMapping.setApplication(paths.get(2));
+        serviceMapping.setService(paths.get(3));
+        serviceMapping.setMethod(paths.get(4));
 
         // wrapper service name
         serviceMapping.setServiceName(this.getServiceName(serviceMapping));
