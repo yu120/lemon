@@ -1,5 +1,7 @@
 package org.micro.lemon.proxy.dubbo.metadata;
 
+import org.apache.dubbo.metadata.report.identifier.KeyTypeEnum;
+import org.apache.dubbo.metadata.report.identifier.MetadataIdentifier;
 import org.micro.lemon.common.utils.URL;
 import org.micro.lemon.proxy.dubbo.MetadataCollector;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +9,6 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.dubbo.common.constants.CommonConstants;
-import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 import org.micro.lemon.extension.Extension;
 
 /**
@@ -64,7 +65,7 @@ public class ZookeeperMetadataCollector implements MetadataCollector {
             rootDir = root + CommonConstants.PATH_SEPARATOR;
         }
         
-        return rootDir + metadataIdentifier.getUniqueKey(MetadataIdentifier.KeyTypeEnum.PATH);
+        return rootDir + metadataIdentifier.getUniqueKey(KeyTypeEnum.PATH);
     }
 
 }

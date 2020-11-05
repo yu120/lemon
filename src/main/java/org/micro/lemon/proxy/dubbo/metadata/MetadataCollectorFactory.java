@@ -1,5 +1,6 @@
 package org.micro.lemon.proxy.dubbo.metadata;
 
+import org.apache.dubbo.metadata.report.identifier.MetadataIdentifier;
 import org.micro.lemon.common.LemonConfig;
 import org.micro.lemon.common.ServiceMapping;
 import org.micro.lemon.common.utils.URL;
@@ -12,7 +13,6 @@ import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.metadata.definition.model.FullServiceDefinition;
 import org.apache.dubbo.metadata.definition.model.MethodDefinition;
-import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 import org.micro.lemon.extension.ExtensionLoader;
 import org.micro.lemon.server.LemonRequest;
 

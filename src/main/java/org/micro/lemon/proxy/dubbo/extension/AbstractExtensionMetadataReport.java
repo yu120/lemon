@@ -2,8 +2,8 @@ package org.micro.lemon.proxy.dubbo.extension;
 
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.utils.ClassUtils;
-import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
-import org.apache.dubbo.metadata.support.AbstractMetadataReport;
+import org.apache.dubbo.metadata.report.identifier.MetadataIdentifier;
+import org.apache.dubbo.metadata.report.support.AbstractMetadataReport;
 import org.micro.lemon.proxy.dubbo.metadata.annotation.LemonService;
 
 /**

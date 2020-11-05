@@ -2,9 +2,14 @@ package org.micro.lemon.proxy.dubbo.extension;
 
 import lombok.ToString;
 import org.apache.dubbo.common.URL;
-import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
+import org.apache.dubbo.metadata.report.identifier.KeyTypeEnum;
+import org.apache.dubbo.metadata.report.identifier.MetadataIdentifier;
+import org.apache.dubbo.metadata.report.identifier.ServiceMetadataIdentifier;
+import org.apache.dubbo.metadata.report.identifier.SubscriberMetadataIdentifier;
 import org.apache.dubbo.remoting.zookeeper.ZookeeperClient;
 import org.apache.dubbo.remoting.zookeeper.ZookeeperTransporter;
+
+import java.util.List;
 
 import static org.apache.dubbo.common.constants.CommonConstants.GROUP_KEY;
 import static org.apache.dubbo.common.constants.CommonConstants.PATH_SEPARATOR;
@@ -50,12 +55,41 @@ public class ZookeeperMetadataReport extends AbstractExtensionMetadataReport {
         storeMetadata(consumerMetadataIdentifier, super.wrapperStoreConsumerMetadata(consumerMetadataIdentifier, value));
     }
 
+    @Override
+    protected void doSaveMetadata(ServiceMetadataIdentifier metadataIdentifier, URL url) {
+
+    }
+
+    @Override
+    protected void doRemoveMetadata(ServiceMetadataIdentifier metadataIdentifier) {
+
+    }
+
+    @Override
+    protected List<String> doGetExportedURLs(ServiceMetadataIdentifier metadataIdentifier) {
+        return null;
+    }
+
+    @Override
+    protected void doSaveSubscriberData(SubscriberMetadataIdentifier subscriberMetadataIdentifier, String urlListStr) {
+
+    }
+
+    @Override
+    protected String doGetSubscribedURLs(SubscriberMetadataIdentifier subscriberMetadataIdentifier) {
+        return null;
+    }
+
     private void storeMetadata(MetadataIdentifier metadataIdentifier, String v) {
         zkClient.create(getNodePath(metadataIdentifier), v, false);
     }
 
     private String getNodePath(MetadataIdentifier metadataIdentifier) {
-        return toRootDir() + metadataIdentifier.getUniqueKey(MetadataIdentifier.KeyTypeEnum.PATH);
+        return toRootDir() + metadataIdentifier.getUniqueKey(KeyTypeEnum.PATH);
     }
 
+    @Override
+    public String getServiceDefinition(MetadataIdentifier metadataIdentifier) {
+        return null;
+    }
 }

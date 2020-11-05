@@ -5,8 +5,11 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
-import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
-import org.apache.dubbo.metadata.support.AbstractMetadataReport;
+import org.apache.dubbo.metadata.MetadataConstants;
+import org.apache.dubbo.metadata.report.identifier.KeyTypeEnum;
+import org.apache.dubbo.metadata.report.identifier.MetadataIdentifier;
+import org.apache.dubbo.metadata.report.identifier.ServiceMetadataIdentifier;
+import org.apache.dubbo.metadata.report.identifier.SubscriberMetadataIdentifier;
 import org.apache.dubbo.rpc.RpcException;
 import redis.clients.jedis.*;
 
@@ -15,7 +18,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.apache.dubbo.common.constants.CommonConstants.*;
-import static org.apache.dubbo.metadata.identifier.MetadataIdentifier.META_DATA_STORE_TAG;
 
 /**
  * Redis Metadata Report
@@ -56,6 +58,31 @@ public class RedisMetadataReport extends AbstractExtensionMetadataReport {
         this.storeMetadata(consumerMetadataIdentifier, value);
     }
 
+    @Override
+    protected void doSaveMetadata(ServiceMetadataIdentifier metadataIdentifier, URL url) {
+
+    }
+
+    @Override
+    protected void doRemoveMetadata(ServiceMetadataIdentifier metadataIdentifier) {
+
+    }
+
+    @Override
+    protected List<String> doGetExportedURLs(ServiceMetadataIdentifier metadataIdentifier) {
+        return null;
+    }
+
+    @Override
+    protected void doSaveSubscriberData(SubscriberMetadataIdentifier subscriberMetadataIdentifier, String urlListStr) {
+
+    }
+
+    @Override
+    protected String doGetSubscribedURLs(SubscriberMetadataIdentifier subscriberMetadataIdentifier) {
+        return null;
+    }
+
     private void storeMetadata(MetadataIdentifier metadataIdentifier, String v) {
         if (pool != null) {
             storeMetadataStandalone(metadataIdentifier, v);
@@ -66,7 +93,7 @@ public class RedisMetadataReport extends AbstractExtensionMetadataReport {
 
     private void storeMetadataInCluster(MetadataIdentifier metadataIdentifier, String v) {
         try (JedisCluster jedisCluster = new JedisCluster(jedisClusterNodes, timeout, timeout, 2, password, new GenericObjectPoolConfig())) {
-            jedisCluster.set(metadataIdentifier.getIdentifierKey() + META_DATA_STORE_TAG, v);
+            jedisCluster.set(metadataIdentifier.getIdentifierKey() + MetadataConstants.META_DATA_STORE_TAG, v);
         } catch (Throwable e) {
             logger.error("Failed to put " + metadataIdentifier + " to redis cluster " + v + ", cause: " + e.getMessage(), e);
             throw new RpcException("Failed to put " + metadataIdentifier + " to redis cluster " + v + ", cause: " + e.getMessage(), e);
@@ -75,11 +102,15 @@ public class RedisMetadataReport extends AbstractExtensionMetadataReport {
 
     private void storeMetadataStandalone(MetadataIdentifier metadataIdentifier, String v) {
         try (Jedis jedis = pool.getResource()) {
-            jedis.set(metadataIdentifier.getUniqueKey(MetadataIdentifier.KeyTypeEnum.UNIQUE_KEY), v);
+            jedis.set(metadataIdentifier.getUniqueKey(KeyTypeEnum.UNIQUE_KEY), v);
         } catch (Throwable e) {
             logger.error("Failed to put " + metadataIdentifier + " to redis " + v + ", cause: " + e.getMessage(), e);
             throw new RpcException("Failed to put " + metadataIdentifier + " to redis " + v + ", cause: " + e.getMessage(), e);
         }
     }
 
+    @Override
+    public String getServiceDefinition(MetadataIdentifier metadataIdentifier) {
+        return null;
+    }
 }
