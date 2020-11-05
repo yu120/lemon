@@ -56,7 +56,8 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         Channel channel = ctx.channel();
         if (channels.size() > lemonConfig.getMaxConnection()) {
             // Direct close connection beyond maximum connection limit
-            log.warn("The connected channel size out of limit: limit={} current={}", lemonConfig.getMaxConnection(), channels.size());
+            log.warn("The connected channel size out of limit: limit={} current={}",
+                    lemonConfig.getMaxConnection(), channels.size());
             channel.close();
         } else {
             String channelKey = getChannelKey(channel.localAddress(), channel.remoteAddress());
@@ -79,7 +80,8 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
             // check application uri
             final FullHttpRequest request = (FullHttpRequest) msg;
-            if (!request.uri().startsWith(LemonContext.URL_DELIMITER + lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
+            if (!request.uri().startsWith(LemonContext.URL_DELIMITER +
+                    lemonConfig.getApplication() + LemonContext.URL_DELIMITER)) {
                 lemonContext.callback(LemonStatusCode.NOT_FOUND);
                 return;
             }
@@ -166,7 +168,8 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
 
         // read headers
         HttpHeaders httpHeaders = request.headers();
-        String requestId = httpHeaders.get(LemonContext.LEMON_ID_KEY, UUID.randomUUID().toString().replace("-", ""));
+        String requestId = httpHeaders.get(LemonContext.LEMON_ID_KEY,
+                UUID.randomUUID().toString().replace("-", ""));
         MDC.put(LemonContext.LEMON_ID_KEY, requestId);
         for (Map.Entry<String, String> entry : httpHeaders.entries()) {
             if (!lemonConfig.getIgnoreHeaders().contains(entry.getKey())) {
@@ -248,8 +251,10 @@ public class LemonServerHandler extends ChannelInboundHandlerAdapter {
         // build response fixed header
         httpResponse.headers().set(com.google.common.net.HttpHeaders.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         httpResponse.headers().set(com.google.common.net.HttpHeaders.ACCEPT_ENCODING, HttpHeaderValues.GZIP_DEFLATE);
-        httpResponse.headers().set(LemonContext.LEMON_CODE_MESSAGE, (message != null && message.trim().length() > 0) ? message : statusCode.getMessage());
-        httpResponse.headers().set(com.google.common.net.HttpHeaders.CONTENT_LENGTH, (httpResponse.content() == null ? 0 : httpResponse.content().readableBytes()));
+        httpResponse.headers().set(LemonContext.LEMON_CODE_MESSAGE,
+                (message != null && message.trim().length() > 0) ? message : statusCode.getMessage());
+        httpResponse.headers().set(com.google.common.net.HttpHeaders.CONTENT_LENGTH,
+                (httpResponse.content() == null ? 0 : httpResponse.content().readableBytes()));
         return httpResponse;
     }
 
